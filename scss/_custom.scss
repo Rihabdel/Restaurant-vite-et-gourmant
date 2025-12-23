@@ -1,0 +1,11 @@
+// Custom.scss
+// Option A: Include all of Bootstrap
+
+// Include any default variable overrides here (though functions won’t be available)
+$primary: #A56262; // Example: change primary color
+$secondary: #A93C3C; // Example: change secondary color
+$dark: #6E4545; // Example: change dark color
+$bg_dark: #670F00; // Example: change dark background color
+@import "../node_modules/bootstrap/scss/bootstrap";
+
+// Then add additional custom code here
