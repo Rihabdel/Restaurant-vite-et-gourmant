@@ -1,1 +1,33 @@
 @import 'custom';
+@import url('/node_modules/bootstrap-icons/font/bootstrap-icons.css');
+
+
+html{
+    position: relative;
+    min-height: 100vh;
+}
+main{
+    padding-bottom: 200px; /* Height of the footer */
+}
+footer.footer {
+    padding:15px;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}
+p{
+    font-family:"hind madurai", sans-serif;
+    font-size: 18px;
+}
+.navbar-brand{
+    font-family: "family: 'Lobster', cursive";
+    font-size: 28px;
+    color :#A56262 !important;
+    text-shadow: 2px 2px 4px #97936c; 
+    text-emphasis-color:inherit;
+}
+.nav {
+
+    color: $primary !important;
+
+}

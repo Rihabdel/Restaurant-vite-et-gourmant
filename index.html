@@ -8,12 +8,63 @@
 </head>
 <body>
 <header>
-    Bienvenue sur le site Vite et Gourmand
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">Vite & Gourmand</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/">Accueil</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Nos menus</a>
+        </li>
+                <li class="nav-item">
+            <a class="nav-link" href="#">Mes commandes</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Connexion</a>
+        </li>
+                <li class="nav-item">
+            <a class="nav-link" href="#">Deconnexion</a>
+        </li>
+                <li class="nav-item">
+            <a class="nav-link" href="#">Contact</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
 </header>   
 <main id="main-page">
 <!-- Le contenu principal de mon site -->
 </main>
-<footer>le footer de mon site</footer>
+<footer class="bg-dark border-top border-body py-3 mt-3">
+  <div class="container-fluid">
+    <div class="row justify-content-around text-center text-footer">
+
+      <div class="col-lg-3 align-self-end">
+        <p>Mentions légales</p>
+      </div>
+
+      <div class="col-md-auto">
+        <p>Nos horaires</p>
+        <ul class="list-unstyled">
+          <li>Lundi - Vendredi : 8h - 22h</li>
+          <li>Samedi : 9h - 23h</li>
+          <li>Dimanche : 10h - 20h</li>
+        </ul>
+      </div>
+
+      <div class="col-lg-3 align-self-end">
+        <p>Conditions générales</p>
+      </div>
+    </div>
+  </div>
+</footer>
 <script type="module" src="Router/Router.js"></script>
 <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>

@@ -4,6 +4,7 @@
  * Copyright 2011-2025 The Bootstrap Authors
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
+@import url("/node_modules/bootstrap-icons/font/bootstrap-icons.css");
 :root,
 [data-bs-theme=light] {
   --bs-blue: #0d6efd;
@@ -11978,4 +11979,39 @@ textarea.form-control-lg {
   .d-print-none {
     display: none !important;
   }
+}
+html {
+  position: relative;
+  min-height: 100vh;
+}
+
+main {
+  padding-bottom: 200px; /* Height of the footer */
+}
+
+footer.footer {
+  padding: 15px;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
+
+p {
+  font-family: "hind madurai", sans-serif;
+  font-size: 18px;
+}
+
+.navbar-brand {
+  font-family: "family: 'Lobster', cursive";
+  font-size: 28px;
+  color: #A56262 !important;
+  text-shadow: 2px 2px 4px #97936c;
+  -webkit-text-emphasis-color: inherit;
+          text-emphasis-color: inherit;
+}
+
+.nav {
+  font-family: "hind madurai", sans-serif;
+  font-size: 18px;
+  color: #A56262 !important;
 }/*# sourceMappingURL=main.css.map */
