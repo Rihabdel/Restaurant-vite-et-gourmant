@@ -1,0 +1,201 @@
+<section class="container text-center">
+    <div class="section-header mb-4">
+        <h2 class="section-title">Nos cartes de menus pour vos événements</h2>
+        <p class="section-subtitle">Découvrez nos offres personnalisées pour rendre vos événements inoubliables grâce à notre service traiteur de qualité.</p>
+    </div>
+    <div class="section-content">
+    <div class="text-center mb-4">
+      <!-- Button trigger modal -->
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editioncarteModal">
+          Ajoutez une nouvelle carte de menu
+      </button>
+    </div>
+<div class="row row-cols-2 row-cols-lg-3">
+  <div class="col p-3">
+    <div class="menu-card h-100">
+        <div class="card-image">
+    <img src="/scss/images/adobestock_122590829-2-scaled.jpeg" class="card-img-top" alt="...">
+        <p class="titre-image">Titre</p>
+        <div class="action-image-buttons">
+            <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#editioncarteModal"><i class="bi bi-pencil"></i>Modifier</button>
+            <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#deletecarteModal"><i class="bi bi-trash"></i>Supprimer</button>
+        </div>
+</div>
+    <div class="card-body">
+        <h5 class="card-title">titre de menu</h5>
+        <p class="card-description">desciption de menu </p>
+        <ul>
+        <li>Minimum pour [20-50] personnes</li>
+        <li>Prix: 45 Euros/ personnes</li>
+        </ul>
+    </div>
+    <div class="card-footer">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailscarteModal">voir le détail de menu</button>
+    </div>
+    </div>
+    </div>
+    <div class="col p-3">
+    <div class="menu-card h-100">
+        <div class="card-image">
+    <img src="/scss/images/Souper-Festif_bandeau.jpg" class="card-img-top" alt="...">
+    <p class="titre-image">Titre</p>
+        <div class="action-image-buttons">
+            <button class="btn btn-outline-light"><i class="bi bi-pencil"></i>Modifier</button>
+            <button class="btn btn-outline-light"><i class="bi bi-trash"></i>Supprimer</button>
+        </div>
+</div>
+    <div class="card-body">
+        <h5 class="card-title">titre de menu</h5>
+        <p class="card-description">desciption de menu </p>
+        <ul>
+        <li>Minimum pour [20-50] personnes</li>
+        <li>Prix: 45 Euros/ personnes</li>
+        </ul>
+    </div>
+    <div class="card-footer">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailscarteModal">voir le détail de menu</button>
+    </div>
+    </div>
+    </div>
+    <div class="col p-3">
+    <div class="menu-card h-100">
+        <div class="card-image">
+    <img src="/scss/images/deux-femmes-cuisinant-au-cafe-2cef7x0.jpg" class="card-img-top" alt="...">
+        <p class="titre-image">Titre</p>
+        <div class="action-image-buttons">
+            <button class="btn btn-outline-light"><i class="bi bi-pencil"></i>Modifier</button>
+            <button class="btn btn-outline-light"><i class="bi bi-trash"></i>Supprimer</button>
+        </div>
+</div>
+    <div class="card-body">
+        <h5 class="card-title">titre de menu</h5>
+        <p class="card-description">desciption de menu </p>
+        <ul>
+        <li>Minimum pour [20-50] personnes</li>
+        <li>Prix: 45 Euros/ personnes</li>
+        </ul>
+    </div>
+    <div class="card-footer">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailscarteModal">voir le détail de menu</button>
+    </div>
+    </div>
+    </div>
+</div>
+    </div>
+</section>
+
+<!-- Modal d'ajout ou modification de menu-->
+<div class="modal fade" id="editioncarteModal" tabindex="-1" aria-labelledby="editioncarteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="editioncarteModalLabel">Ajouter ou Modifier la carte de menu</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+            <div class="mb-3">
+                <label for="menuTitle" class="form-label">Titre du menu</label>
+                <input type="text" class="form-control" id="menuTitle" placeholder="Entrez le titre du menu">
+            </div>
+            <div class="mb-3">
+                <label for="menuDescription" class="form-label">Description du menu</label>
+                <textarea class="form-control" id="menuDescription" rows="3" placeholder="Entrez la description du menu"></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="nbPersonnes" class="form-label">Minimum pour :</label>
+                <input type="number" class="form-control" id="nbPersonnes" placeholder="Entrez le nombre minimum de personnes">
+            </div>
+            <div class="mb-3">
+                <label for="menuPrice" class="form-label">Prix par personne</label>
+                <input type="number" class="form-control" id="menuPrice" placeholder="Entrez le prix par personne">
+            </div>
+            <div class="mb-3">
+                <label for="menuImage" class="form-label">Image du menu</label>
+                <input class="form-control" type="file" id="menuImage">
+            </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+        <button type="button" class="btn btn-primary">Enregistrer les modifications</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal de suppression de menu-->
+<div class="modal fade" id="deletecarteModal" tabindex="-1" aria-labelledby="deletecarteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="deletecarteModalLabel">Modifier la carte de menu</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+            <p>Êtes-vous sûr de vouloir supprimer cette carte de menu ? Cette action est irréversible.</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+        <button type="button" class="btn btn-primary">Enregistrer les modifications</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- modal details de la carte de menu -->
+<div class="modal fade " id="detailscarteModal" tabindex="-1" aria-labelledby="detailscarteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg details">
+    <div class="modal-content">
+      <div class="modal-body">
+          <div class="container menu-card-detail">
+                      <h2 class="text-center ">Titre de menu</h2>
+                        <div class="menu-category">
+                            <h3><i class="bi bi-egg-fried"></i> Entrées</h3>
+                            <div class="menu-item">
+                                <div class="row row-cols-2 menu-item-header">
+                                    <div class="col-lg-10 menu-item-title">Foie Gras Maison</div>
+                                    <div class="col-lg-2 menu-item-price">18€</div>
+                                </div>
+                                <p class="menu-item-description">Préparé selon la recette familiale, servi avec sa confiture d'oignons et toast brioché</p>
+                                <small ><i class="bi bi-exclamation-triangle-fill"></i> Contient de $allergene</small>
+                            </div> 
+                          </div>    
+                        <div class="menu-category">
+                            <h3><i class="bi bi-cup-hot"></i> Plats Principaux</h3>
+                            <div class="menu-item">
+                                <div class="row row-cols-2 menu-item-header">
+                                    <div class="col-lg-10 menu-item-title">Magret de Canard aux Cèpes</div>
+                                    <div class="col-lg-2 menu-item-price">28€</div>
+                                </div>
+                                <p class="menu-item-description">Magret grillé, sauce au vin de Saint-Émilion, cèpes de Gironde et pommes de terre sautées</p>
+                                <small ><i class="bi bi-exclamation-triangle-fill"></i> Contient de $allergene</small>
+                            </div>
+                        </div>   
+                        <div class="menu-category">
+                            <h3><i class="bi bi-cake2"></i> Desserts</h3>
+                            <div class="menu-item">
+                                <div class="row row-cols-2 menu-item-header">
+                                    <div class="col-lg-10 menu-item-title">Canelés Bordelais</div>
+                                    <div class="col-lg-2 menu-item-price">9€</div>
+                                </div>
+                                <p class="menu-item-description">Spécialité bordelaise, dorés et caramélisés à l'extérieur, moelleux à l'intérieur</p>
+                                <small ><i class="bi bi-exclamation-triangle-fill"></i> Contient de $allergene</small>
+                            </div>
+                          </div>
+          </div>
+          <div class="container mb-4 allergenes-section">
+      <h4 class="text-center">Allergènes</h4>
+      <div class="allergenes-content">
+      <li><i class="bi bi-exclamation-triangle-fill"></i><small> Nos plats peuvent contenir des allergènes tels que gluten, fruits à coque, produits laitiers, œufs, soja, etc.</small></li>
+      <li><i class="bi bi-info-circle-fill"></i><small>Merci de consulter notre liste complète des allergènes pour éviter tout risque.</small></li>
+          </div>
+          </div>
+      <div class="modal-footer d-flex justify-content-center">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ajouter au panier</button>
+        <button type="button" class="btn btn-primary" data-bs-target="#paiementModalToggle2" data-bs-toggle="modal">Commander</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -9,18 +9,14 @@
 <body>
 <header>
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
-  <div class="container-fluid">
     <a class="navbar-brand" href="/">Vite & Gourmand</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+      <ul class="navbar-nav ms-auto mb-lg-0">
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="/">Accueil</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Nos menus</a>
+          <a class="nav-link" href="/menu">Nos menus</a>
         </li>
                 <li class="nav-item">
             <a class="nav-link" href="#">Mes commandes</a>
@@ -35,37 +31,78 @@
             <a class="nav-link" href="#">Contact</a>
         </li>
       </ul>
-    </div>
   </div>
 </nav>
 </header>   
 <main id="main-page">
 <!-- Le contenu principal de mon site -->
 </main>
-<footer class="bg-dark border-top border-body py-3 mt-3">
-  <div class="container-fluid">
-    <div class="row justify-content-around text-center text-footer">
-
-      <div class="col-lg-3 align-self-end">
-        <p>Mentions légales</p>
-      </div>
-
-      <div class="col-md-auto">
-        <p>Nos horaires</p>
-        <ul class="list-unstyled">
-          <li>Lundi - Vendredi : 8h - 22h</li>
-          <li>Samedi : 9h - 23h</li>
-          <li>Dimanche : 10h - 20h</li>
-        </ul>
-      </div>
-
-      <div class="col-lg-3 align-self-end">
-        <p>Conditions générales</p>
-      </div>
+<footer class="text-white mt-5">
+    <div class="container-fluid footer ">
+        <div class="row row-cols-2 row-cols-lg-3">
+            <!-- Colonne 1: Contact -->
+            <div class="col-lg-6 col-md-6 text-center"> 
+                    <h3 class="footer-title mb-4">Contactez-nous</h3>
+                            
+                            <div class="contact-details mb-3"><i class="bi bi-geo-alt me-3 mt-1"></i>
+                                <strong>Adresse :</strong>
+                                <span class="d-block">123 Rue du Traiteur<br>33000 Bordeaux</span>
+                            </div>
+                            
+                            <div class="contact-details mb-3"><i class="bi bi-telephone me-3 mt-1"></i>
+                                <strong>Téléphone :</strong>
+                                <span class="d-block">05 56 12 34 56</span>
+                            </div>
+                                
+                            <div class="contact-details mb-3"><i class="bi bi-envelope me-3 mt-1"></i>
+                                <strong>Email :</strong>
+                                <span class="d-block">contact@vite-gourmand.fr</span>
+                            </div>
+            </div>
+            <!-- Colonne 2: Horaires -->
+            <div class="col-lg-6 col-md-6 text-center"> 
+                                <h3 class="footer-title mb-4"><i class="bi bi-clock fs-5 mt-1 me-3"></i>Horaires</h3>
+                                <div class="contact-details mb-3">
+                                    <strong class="d-block">Lundi - Vendredi</strong>
+                                    <span>9h00 - 19h00</span>
+                                </div>
+                                <div class="contact-details mb-3">
+                                    <strong class="d-block">Samedi</strong>
+                                    <span>10h00 - 18h00</span>
+                                </div>
+                                <div class="contact-details">
+                                    <strong class="d-block">Dimanche</strong>
+                                    <span>Fermé</span>
+                                </div>
+            </div>
+        </div>
+        <!-- Ligne de séparation -->
+        <hr class="my-2 opacity-25">
+        <!-- Copyright et Liens légaux -->
+        <div class="row align-items-center">
+            <div class="col-lg-3 col-md-12 mb-3 mb-lg-0 text-center text-lg-start">
+                <div class="legal-links">
+                    <a href="#" class="text-decoration-none">Conditions générales de vente</a>
+                </div>
+            </div>
+            
+            <div class="col-lg-6 col-md-12 mb-3 mb-lg-0 text-center">
+                <div class="copyright">
+                    <p class="mb-1">&copy; 2023 Vite & Gourmand. Tous droits réservés.</p>
+                    <p class="mb-0 small opacity-75">Site réalisé avec passion à Bordeaux</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-12 text-center text-lg-end">
+                <div class="legal-links">
+                    <a href="#" class="text-decoration-none">Mentions légales</a>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 </footer>
 <script type="module" src="Router/Router.js"></script>
+<script src="scss/js/script.js"></script>
 <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
