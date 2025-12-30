@@ -12166,4 +12166,53 @@ body {
   color: rgb(192, 168, 168);
   font-size: 0.95rem;
   margin-bottom: 0;
+}
+
+.form-container {
+  width: 400px;
+  height: auto;
+  margin: 0 auto;
+  background: transparent;
+  border: 2px solid #fff;
+  border-radius: 10px;
+  -webkit-backdrop-filter: blur(10px);
+          backdrop-filter: blur(10px);
+  box-shadow: 0 0 40px rgba(8, 7, 16, 0.6);
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.form-label {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #A56262;
+}
+
+.form-control {
+  width: 100%;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 15px;
+}
+
+.inscription-link, a {
+  font-size: 14px;
+  color: #0c0808;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background-color: #A56262;
+  border-color: #A56262;
+}
+
+h2.text-center, .text-center.h2 {
+  color: #A93C3C;
+  margin-top: 20px;
 }/*# sourceMappingURL=main.css.map */
