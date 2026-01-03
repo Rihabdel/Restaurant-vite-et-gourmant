@@ -198,37 +198,34 @@ body{
             font-size: 0.95rem;
             margin-bottom: 0;
         }
+        //*-- ----------------------------------/**FORM CONNEXION/INSCRIPTION**/----------------------------------*//
     .form-container {
-        width: 400px;
+        max-width: 70%;
+        width: 100%;
+        padding: auto;
         height: auto;
-        margin: 0 auto;
-        background: transparent;
+        margin: 15px auto;
         border: 2px solid #fff;
-        border-radius: 10px;
-        backdrop-filter: blur(10px);
-        box-shadow: 0 0 40px rgba(8, 7, 16, 0.6);
+        border-radius: 10px;;
+        box-shadow: 0 0 40px $secondary;
+        
     }
     
-    form {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
 
-    
-    }
     .form-label {
         font-size: 18px;
         margin-bottom: 10px;
         color: $primary;
     }
     .form-control {
-        width: 100%;
         font-size: 16px;
-        border: 1px solid #ccc;
+        padding: 10px;
         border-radius: 5px;
+        border: 1px solid #ccc; 
         margin-bottom: 15px;
+
     }
+
 .inscription-link , a {
     font-size: 14px;
     color: #0c0808;
@@ -240,7 +237,32 @@ body{
         border-color: $primary;
 
     }
-    h2.text-center {
-        color: $accent;
+    h2{
+        color: $bg_dark;
         margin-top: 20px;
     }
+    .info-section {
+        margin-top: 30px;
+        max-width: 100%  ;
+        border: 2px solid $bg_dark;
+        border-radius: 10px;
+        padding: 15px;
+    }
+
+table{
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+thead {
+    background-color: $secondary;
+    color: white;
+}
+    th, td {
+        border: 1px solid #ccc;
+        padding: 10px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        text-align: left;
+    }   
