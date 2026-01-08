@@ -1,0 +1,468 @@
+<div class="hero-section">
+        <!-- Image d'arrière-plan -->
+        <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" 
+             alt="Chefs en action dans la cuisine de Vite & Gourmand" class="hero-image">
+        
+        <!-- Contenu texte -->
+        <div class="hero-text overlay">
+            <h4 class="hello">Bienvenue chez Vite & Gourmand</h4>
+            <span class="anniversary-badge">Julie & José, votre duo de traiteurs bordelais depuis 25 ans.</span>
+            <p class="lead">Nous cuisinons pour vous les saveurs authentiques de Bordeaux, de la grande réception au dîner intime</p>
+            <span class="badge">Vite fait, toujours gourmand</span>
+            <div class="highlight-text"> 
+                <span>Chaque création est pensée pour ravir vos papilles et faire de chaque occasion un moment unique, fidèle à la richesse gastronomique de notre région.</span>
+            </div>
+            <p class="founder-mention">— Fondé par Julie et José, passionnés de gastronomie bordelaise</p>
+            
+            <div class="mt-4">
+                <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseWidthHistory" aria-expanded="false" aria-controls="collapseWidthHistory">
+                    En savoir plus <i class="bi bi-chevron-down more-content-icon"></i>
+                </button>
+            </div>
+            
+            <!-- Contenu caché par défaut -->
+            <div class="collapse collapse-content" id="collapseWidthHistory">
+                <h5>Notre histoire et notre philosophie</h5>
+                <p>Il y a 25 ans, Julie et José ont fondé Vite & Gourmand avec une passion commune pour la cuisine bordelaise et un désir de partager les saveurs authentiques de leur région.</p>
+                <p>Notre approche combine les techniques traditionnelles avec une touche de modernité, en utilisant toujours des produits locaux et de saison provenant des meilleurs producteurs de la région bordelaise.</p>
+                
+                <div class="features">
+                    <div class="feature-item">
+                        <i class="bi bi-award"></i>
+                        <h4>25 ans d'expérience</h4>
+                        <p>Un quart de siècle à perfectionner notre art culinaire</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="bi bi-geo-alt"></i>
+                        <h4>Produits locaux</h4>
+                        <p>Ingrédients sélectionnés chez les producteurs bordelais</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="bi bi-people"></i>
+                        <h4>Événements sur mesure</h4>
+                        <p>De l'intimité d'un dîner aux grandes réceptions</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+        <!-- Section Prestations Événementielles -->
+<section class="prestations-section py-5">
+    <div class="container">
+            <div class="section-header text-center mb-4">
+            <h2 class="section-title">Nos prestations pour vos événements</h2>
+            <p class="section-subtitle">Que ce soit pour un mariage, un séminaire d'entreprise ou une réception familiale, nous créons des expériences culinaires mémorables sur mesure.</p>
+            <!-- Button trigger modal -->
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#editionEventModal">
+            Ajouter un évènement
+            </button>
+            </div>
+            <div class="row row-cols-2 row-cols-lg-3 g-4">
+                <!-- Prestation 1 --> 
+                <div class="col-lg-4 col-md-6 p-3">
+                    <div class="prestation-card">
+                        <div class="card-image">
+                            <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Traiteur Mariage">
+                            <div class="action-image-buttons">
+                                <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#editioncarteModal"><i class="bi bi-pencil"></i>Modifier</button>
+                                <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#deletecarteModal"><i class="bi bi-trash"></i>Supprimer</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title"><span class="card-icon"><i class="bi bi-hearts"></i></span>Mariages</h3>
+                            <p class="card-description">Créez le menu parfait pour votre grand jour, de l'apéritif au dessert, avec une attention particulière à chaque détail.</p>
+                            <ul class="prestation-features">
+                                <li>Menu dégustation personnalisé</li>
+                                <li>Dégustation préalable offerte</li>
+                                <li>Pâtisserie sur mesure</li>
+                            </ul>
+                        </div>
+                        <div class="card-footer">
+                            <button type="button" class="cta-button" data-bs-toggle="modal" data-bs-target="#devisModal">Obtenir un devis</button>
+                        </div>
+                        <div class="action-card-buttons text-center mb-3">
+                        <button type="button" class="btn btn-success text-center" data-bs-toggle="modal" data-bs-target="#editionEventModal">
+                        Modifier</button>
+                    <button type="button" class="btn btn-danger text-center" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                    Supprimer</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Prestation 2 -->
+                <div class="col-lg-4 col-md-6 p-3">
+                    <div class="prestation-card">
+                        <div class="card-image">
+                            <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Événement d'entreprise">
+                            <p class="card-title">Titre</p>
+                            <div class="action-image-buttons">
+                                <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#editioncarteModal"><i class="bi bi-pencil"></i>Modifier</button>
+                                <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#deletecarteModal"><i class="bi bi-trash"></i>Supprimer</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title">
+                                <span class="card-icon">
+                                    <i class="bi bi-building"></i>
+                                </span>
+                                Événements d'entreprise
+                            </h3>
+                            <p class="card-description">Séminaires, lancements de produits ou réceptions professionnelles : une offre adaptée à vos besoins professionnels.</p>
+                            <ul class="prestation-features">
+                                <li>Formules déjeuner rapides ou assises</li>
+                                <li>Buffets chauds et froids</li>
+                                <li>Cocktails dinatoires</li>
+                                <li>Livraison sur site</li>
+                            </ul>
+                        </div>
+                        <div class="card-footer">
+                            <button type="button" class="cta-button" data-bs-toggle="modal" data-bs-target="#devisModal">Obtenir un devis</button>
+                        </div>
+                        <div class="action-card-buttons text-center mb-3">
+                        <button type="button" class="btn btn-success text-center" data-bs-toggle="modal" data-bs-target="#editionEventModal">
+                        Modifier</button>
+                    <button type="button" class="btn btn-danger text-center" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                    Supprimer</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Prestation 3 -->
+                <div class="col-lg-4 col-md-6 p-3">
+                    <div class="prestation-card">
+                        <div class="card-image">
+                            <img src="https://images.unsplash.com/photo-1530103862676-de8c9debad1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Réception familiale">
+                            <p class="card-title">Titre</p>
+                            <div class="action-image-buttons">
+                                <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#editioncarteModal"><i class="bi bi-pencil"></i>Modifier</button>
+                                <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#deletecarteModal"><i class="bi bi-trash"></i>Supprimer</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title">
+                                <span class="card-icon">
+                                    <i class="bi bi-people-fill"></i>
+                                </span>
+                                Réceptions familiales
+                            </h3>
+                            <p class="card-description">Anniversaires, baptêmes ou fêtes de famille : profitez pleinement de vos moments précieux sans vous soucier de la cuisine.</p>
+                            <ul class="prestation-features">
+                                <li>Buffets sur mesure</li>
+                                <li>Menus de Noël et du Nouvel An</li>
+                                <li>Plats traditionnels ou créatifs</li>
+                                <li>Location de matériel inclus</li>
+                            </ul>
+                        </div>
+                        <div class="card-footer">
+                            <button type="button" class="cta-button" data-bs-toggle="modal" data-bs-target="#devisModal">Obtenir un devis</button>
+                        </div>
+                        <div class="action-card-buttons text-center mb-3">
+                        <button type="button" class="btn btn-success text-center" data-bs-toggle="modal" data-bs-target="#editionEventModal">
+                        Modifier</button>
+                    <button type="button" class="btn btn-danger text-center" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                    Supprimer</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+    </div>
+</section>
+            
+            <!-- Services complémentaires -->
+            <div class="service-highlight">
+                <div class="container">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h3 class="">Services complémentaires</h3>
+                        <p>En plus de notre expertise culinaire, nous proposons des services complets pour faciliter l'organisation de votre événement :</p>
+                        <div class="row mt-3">
+                            <div class="col-sm-6">
+                                <ul class="prestation-features">
+                                    <li>Location de vaisselle et matériel</li>
+                                    <li>Décoration de table</li>
+                                </ul>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="services mt-4 mt-md-0">
+                            <button class="cta-button" data-bs-toggle="collapse" data-bs-target="#collapseNosServices">Voir nos services</button>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+       
+
+            <!-- Section Nos Services -->
+<div class="collapse-service" id="collapseNosServices">
+<section id="nos-services" class="py-5 bg-light">
+    <div class="container services-section">
+        <button type="button" class="btn-close float-end mb-3" data-bs-toggle="collapse" data-bs-target="#collapseNosServices" aria-label="Close"></button>
+        <div class="row text-center mb-5">
+            <div class="row justify-content-center">
+                <h2 class="section-title">Nos Services</h2>
+                <p class="section-subtitle">Découvrez l'éventail complet de nos services conçus pour rendre votre expérience Vite & Gourmand inoubliable.</p>
+            </div>
+        </div>
+         <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#ajouterServiceModal">
+            Ajouter un service
+        </button>
+        <div class="row">
+        <!-- Service 1 -->
+            <div class="col-lg-4 col-md-6 p-3">
+                <div class="card service-card h-100 border-0 shadow-sm">
+                    <div class="action-image-buttons">
+                                <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#ajouterServiceModal"><i class="bi bi-pencil"></i>Modifier</button>
+                                <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="bi bi-trash"></i>Supprimer</button>
+                            </div>
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon mb-3">
+                            <i class="bi bi-box-seam fs-1 text-primary"></i>
+                        </div>
+                        <h3 class="h4 mb-3">Location de Matériel</h3>
+                        <p class="text-muted">
+                            Vaisselle, nappes, chaises, tentes.
+                            Tout le nécessaire pour votre événement.
+                            
+                        </p>
+                    </div>
+                </div>
+            </div>
+        <!-- Service 2 -->
+            <div class="col-lg-4 col-md-6 p-3">
+                <div class="card service-card h-100 border-0 shadow-sm">
+                    <div class="action-image-buttons">
+                                <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#ajouterServiceModal"><i class="bi bi-pencil"></i>Modifier</button>
+                                <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="bi bi-trash"></i>Supprimer</button>
+                            </div>
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon mb-3">
+                            <i class="bi bi-box-seam fs-1 text-primary"></i>
+                        </div>
+                        <h3 class="h4 mb-3">Livraison</h3>
+                        <p class="text-muted">
+                            Livraison rapide et soignée
+                            directement à votre porte.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- Service 3 -->
+            <div class="col-lg-4 col-md-6 p-3">
+                <div class="card service-card h-100 border-0 shadow-sm">
+                    <div class="action-image-buttons">
+                                <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#ajouterServiceModal"><i class="bi bi-pencil"></i>Modifier</button>
+                                <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="bi bi-trash"></i>Supprimer</button>
+                            </div>
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon mb-3">
+                            <i class="bi bi-palette fs-1 text-primary"></i>
+                        </div>
+                        <h3 class="h4 mb-3">Décoration de Table</h3>
+                        <p class="text-muted">
+                            Centres de table, bougies, fleurs.
+                            Ambiance personnalisée pour chaque événement.
+                        </p>
+                    </div>
+                </div>
+            </div>
+    </div>
+</section>
+</div>
+        <!-- Témoignage -->
+<section class="testimony-section py-5">
+<div class="container">
+        <div class="row">
+            <div class="col-lg-4 col-md-4 align-self-center xs-mb-30">
+                <div class="section-title mb-20">
+                    <p class="">Témoignagnes</p>
+                    <h5 class=" ">Retour de nos clients</h5>
+                </div>
+                <p >Découvrez les avis et expériences de nos cients, qui reflètent la qualité de notre
+                    engagement et notre volonté de toujours offrir le meilleur.</p>
+            </div>
+<div id="carouselTestimonyFade" class="carousel slide carousel-fade col-lg-8 col-md-8 " data-bs-ride="carousel">
+        <div class="carousel-inner ">
+            <div class="carousel-item active">
+                <div class="ti-reviews">
+                <p class="testimony-text">"Vite & Gourmand a transformé notre mariage en une expérience culinaire exceptionnelle. Nos invités n'ont cessé de nous complimenter sur la qualité des plats et le professionnalisme de l'équipe."</p>
+                <p class="testimony-author">— Sophie & Marc, marié en juin 2023</p>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <div class="ti-reviews">
+                <p class="testimony-text">"Vite & Gourmand a transformé notre mariage en une expérience culinaire exceptionnelle. Nos invités n'ont cessé de nous complimenter sur la qualité des plats et le professionnalisme de l'équipe."</p>
+                <p class="testimony-author">— Sophie & Marc</p>
+                </div>
+            </div>
+            <div class="carousel-item">  
+                <div class="ti-reviews">
+                <p class="testimony-text">"Vite & Gourmand a transformé notre mariage en une expérience culinaire exceptionnelle. Nos invités n'ont cessé de nous complimenter sur la qualité des plats et le professionnalisme de l'équipe."</p>
+                <p class="testimony-author">— marié en juin 2023</p>
+                </div>
+            </div>
+        </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselTestimonyFade" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselTestimonyFade" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+    </button>
+</div>
+          
+    </div>
+</div>
+            <!-- Call to Action -->
+            <div class="text-center mt-5">
+                <h3>Prêt à planifier votre événement ?</h3>
+                <button class="cta-button " data-bs-toggle="modal" data-bs-target="#devisModal">Contactez-nous pour un devis personnalisé</button>
+            </div>
+</section>
+
+
+    <!-- Modal d'ajout ou modification d'évènement -->
+<div class="modal fade" id="editionEventModal" tabindex="-1" aria-labelledby="editionEventModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="editionEventModalLabel">Ajouter ou Modifier l'évènement</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+            <div class="mb-3">
+                <label for="eventImage" class="form-label">Image de l'évènement</label>
+                <input class="form-control" type="file" id="eventImage">
+            </div>
+            <div class="mb-3">
+                <label for="eventTitle" class="form-label">Titre de l'évènement</label>
+                <input type="text" class="form-control" id="eventTitle" placeholder="Entrez le titre du menu">
+            </div>
+            <div class="mb-3">
+                <label for="eventDescription" class="form-label">Description de l'évènement</label>
+                <textarea class="form-control" id="eventDescription" rows="3" placeholder="Entrez la description de l'évènement"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label for="eventDetails" class="form-label">Détails de l'évènement</label>
+                <input type="text" class="form-control" id="eventDetails" placeholder="Entrez les détails de l'évènement">
+            </div>
+            <div class="mb-3">
+                <label for="eventDetails" class="form-label">Détails de l'évènement</label>
+                <input type="text" class="form-control" id="eventDetails" placeholder="Entrez les détails de l'évènement">
+            </div>
+            <div class="mb-3">
+                <label for="eventDetails" class="form-label">Détails de l'évènement</label>
+                <input type="text" class="form-control" id="eventDetails" placeholder="Entrez les détails de l'évènement">
+            </div>
+            <div class="mb-3">
+                <label for="eventDetails" class="form-label">Détails de l'évènement</label>
+                <input type="text" class="form-control" id="eventDetails" placeholder="Entrez les détails de l'évènement">
+            </div>
+            <div class="mb-3">
+                <label for="eventPrice" class="form-label">Prix par personne</label>
+                <input type="number" class="form-control" id="eventPrice" placeholder="Entrez le prix par personne">
+            </div>
+            
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+        <button type="button" class="btn btn-primary">Enregistrer les modifications</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- Modal d'un devis  -->
+
+ <div class="modal fade" id="devisModal" tabindex="-1" aria-labelledby="devisModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="devisModalLabel">Demande de devis </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="devisForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">Nom complet *</label>
+                                <input type="text" class="form-control" id="name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Adresse email *</label>
+                                <input type="email" class="form-control" id="email" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Téléphone *</label>
+                                <input type="tel" class="form-control" id="phone" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="eventDate" class="form-label">Date de l'événement *</label>
+                                <input type="date" class="form-control" id="eventDate" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="guests" class="form-label">Nombre de personnes *</label>
+                                <input type="number" class="form-control" id="guests" min="1" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="menu" class="form-label">Menu souhaité *</label>
+                                <select class="form-select" id="menu" required>
+                                    <option value="" selected disabled>Choisissez un menu</option>
+                                    <option value="romance">Menu Romance (Mariage)</option>
+                                    <option value="prestige">Menu Prestige Mariage</option>
+                                    <option value="reveillon">Menu Réveillon Traditionnel</option>
+                                    <option value="nouvelan">Menu Nouvel An Élégant</option>
+                                    <option value="anniversaire_enfant">Menu Anniversaire Enfant</option>
+                                    <option value="anniversaire_adulte">Menu Anniversaire Adulte</option>
+                                    <option value="ete">Menu Été Méditerranéen</option>
+                                    <option value="automne">Menu Automne Forestier</option>
+                                    <option value="hiver">Menu Hiver Montagnard</option>
+                                    <option value="mediterranean">Menu Méditerranéen</option>
+                                    <option value="asian">Menu Asiatique Fusion</option>
+                                    <option value="surmesure">Autre / Sur mesure</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="eventType" class="form-label">Type d'événement *</label>
+                            <select class="form-select" id="eventType" required>
+                                <option value="" selected disabled>Choisissez un type</option>
+                                <option value="mariage">Mariage</option>
+                                <option value="anniversaire">Anniversaire</option>
+                                <option value="noel">Noël / Réveillon</option>
+                                <option value="nouvelan">Nouvel An</option>
+                                <option value="entreprise">Événement d'entreprise</option>
+                                <option value="familial">Réunion familiale</option>
+                                <option value="autre">Autre</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Informations complémentaires</label>
+                            <textarea class="form-control" id="message" rows="4" placeholder="Allergies, restrictions alimentaires, thème spécifique, décorations souhaitées, lieu de l'événement..."></textarea>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="newsletter">
+                            <label class="form-check-label" for="newsletter">Je souhaite recevoir les offres spéciales et nouveautés de Vite & Gourmand</label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary text-center">Obtenir un devis</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
