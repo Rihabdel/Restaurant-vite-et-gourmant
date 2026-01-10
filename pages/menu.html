@@ -1,29 +1,104 @@
-<section class="container text-center">
-    <div class="section-header mb-4">
+<section class="menu-section text-center">
+  <div class="menu-section-header mb-4">
         <h2 class="section-title">Nos cartes de menus pour vos événements</h2>
         <p class="section-subtitle">Découvrez nos offres personnalisées pour rendre vos événements inoubliables grâce à notre service traiteur de qualité.</p>
-    </div>
-    <div class="section-content">
+  </div>
+            <!-- Filtres -->
+            <div class="filters-section">
+              <div class="section-subtitle mb-3">
+              <label class="btn btn-filtres" data-bs-toggle="collapse" href="#filtresCollapse" role="button" aria-expanded="false" aria-controls="filtresCollapse">
+                <i class="bi bi-funnel"></i> Filtrer les cartes de menus par</label>
+                </div>
+                <div class="collapse" id="filtresCollapse">
+              <div class="container filter">
+                    <div class="">
+                        <label for="typeFilter" class="form-label">Type de menu</label>
+                        <select class="form-select" id="typeFilter">
+                            <option value="all">Tous</option>
+                            <option value="vegetarian">Végétarien</option>
+                            <option value="vegan">Vegan</option>
+                            <option value="gluten-free">Sans gluten</option>
+                            <option value="meat-lover">Carnivore</option>
+                        </select>
+                    </div>
+                    <div class="">
+                        <label for="fourchetteFilter" class="form-label">Fourchette de prix</label>
+                        <select class="form-select" id="fourchetteFilter">
+                            <option value="all">Tous</option>
+                            <option value="low">Faible (&lt; 100€)</option>
+                            <option value="medium">Moyen (100€ - 500€)</option>
+                            <option value="high">Élevé (&gt; 500€)</option>
+                        </select>
+                    </div>
+                    <div class="d-flex flex-column align-items-center">
+                        <label for="prixFilter" class="form-label">Prix</label>
+                        <input type="range" class="form-range" min="0" max="1000" step="50" id="prixFilter">
+                        <span>0-1000$</span>
+                    </div>
+                    
+                    <div class="">
+                        <label for="personnesFilter" class="form-label">Nombre des personnes</label>
+                        <select class="form-select" id="personnesFilter">
+                            <option value="all">Tous</option>
+                            <option value="1-19">Moins de 20 personnes</option>
+                            <option value="20-50">Entre 20 et 50 personnes</option>
+                            <option value="51-100">Entre 51 et 100 personnes</option>
+                            <option value="101-200">Entre 101 et 199 personnes</option>
+                            <option value="200+">200 personnes et plus</option>
+                        </select>
+                    </div>
+                    <div class="">
+                        <label for="occasion" class="form-label">Occasion</label>
+                        <select class="form-select" id="occasion">
+                            <option value="all">Tous</option>
+                            <option value="Anniversaire">Anniversaire</option>
+                            <option value="Mariage">Mariage</option>
+                            <option value="Bapteme">Bapteme</option>
+                            <option value="Entreprise">Entreprise</option>
+                            <option value="Familiale">Familiale</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+                    </div>
+                    <div class="">
+                        <label for="regimeFilter" class="form-label">Régime</label>
+                        <select class="form-select" id="regimeFilter">
+                            <option value="all">Tous</option>
+                            <option value="vegetarian">Végétarien</option>
+                            <option value="vegan">Vegan</option>
+                            <option value="gluten-free">Sans gluten</option>
+                        </select>
+                    </div>
+                    
+                    <div class="d-flex align-items-end">
+                        <button class="btn btn-outline-primary w-100" id="resetFilters">
+                            <i class="bi bi-arrow-counterclockwise"></i> Réinitialiser
+                        </button>
+                    </div>
+                </div>
+              
+            </div>
+            </div>
+    
+    <div class="menu-section-content">
     <div class="text-center mb-4">
       <!-- Button trigger modal -->
       <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editioncarteModal">
           Ajoutez une nouvelle carte de menu
       </button>
     </div>
-<div class="row row-cols-2 row-cols-lg-3">
-  <div class="col col-lg-4 col-md-6">
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 ">
+<div class="col">
     <div class="menu-card h-100">
         <div class="card-image">
-    <img src="/scss/images/adobestock_122590829-2-scaled.jpeg" class="card-img-top" alt="...">
-        <p class="card-title">Titre</p>
+    <img src="/scss/images/38f4dbfaeaa1ef70459774f52e75713a.jpg" class="card-img-top" alt="...">
         <div class="action-image-buttons">
             <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#editioncarteModal"><i class="bi bi-pencil"></i>Modifier</button>
             <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#deletecarteModal"><i class="bi bi-trash"></i>Supprimer</button>
         </div>
     </div>
     <div class="card-body">
-        <h5 class="card-title">titre de menu</h5>
-        <p class="card-description">desciption de menu </p>
+        <h5 class="card-title">Titre de menu</h5>
+        <p class="card-description">Description de menu </p>
         <ul>
         <li>Minimum pour [20-50] personnes</li>
         <li>Prix: 45 Euros/ personnes</li>
@@ -33,11 +108,82 @@
         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailscarteModal">voir le détail de menu</button>
     </div>
     </div>
-  </div>
-    <div class="col col-lg-4 col-md-6">
+</div>
+<div class="col">
+  
+    
     <div class="menu-card h-100">
       <div class="card-image">
-      <img src="/scss/images/Souper-Festif_bandeau.jpg" class="card-img-top" alt="...">
+      <img src="/scss/images/Comment-preparer-un-delicieux-poisson-a-la-bordelaise-.png" class="card-img-top" alt="...">
+      
+        <div class="action-image-buttons">
+            <button class="btn btn-outline-light"><i class="bi bi-pencil"></i>Modifier</button>
+            <button class="btn btn-outline-light"><i class="bi bi-trash"></i>Supprimer</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <h5 class="card-title">Titre de menu</h5>
+        <p class="card-description">Description de menu </p>
+        <ul>
+        <li>Minimum pour [20-50] personnes</li>
+        <li>Prix: 45 Euros/ personnes</li>
+        </ul>
+      </div>
+      <div class="card-footer">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailscarteModal">voir le détail de menu</button>
+      </div>
+    </div>
+</div>
+<div class="col">
+    <div class="menu-card h-100">
+      <div class="card-image">
+          <img src="/scss/images/R.jpg" class="card-img-top" alt="...">
+        <div class="action-image-buttons">
+            <button class="btn btn-outline-light"><i class="bi bi-pencil"></i>Modifier</button>
+            <button class="btn btn-outline-light"><i class="bi bi-trash"></i>Supprimer</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <h5 class="card-title">Titre de menu</h5>
+        <p class="card-description">Description de menu </p>
+        <ul>
+        <li>Minimum pour [20-50] personnes</li>
+        <li>Prix: 45 Euros/ personnes</li>
+        </ul>
+      </div>
+      <div class="card-footer">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailscarteModal">voir le détail de menu</button>
+      </div>
+    </div>
+</div>
+<div class="col">
+  
+    <div class="menu-card h-100">
+        <div class="card-image">
+    <img src="/scss/images/38f4dbfaeaa1ef70459774f52e75713a.jpg" class="card-img-top" alt="...">
+        <div class="action-image-buttons">
+            <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#editioncarteModal"><i class="bi bi-pencil"></i>Modifier</button>
+            <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#deletecarteModal"><i class="bi bi-trash"></i>Supprimer</button>
+        </div>
+    </div>
+    <div class="card-body">
+        <h5 class="card-title">Titre de menu</h5>
+        <p class="card-description">Description de menu </p>
+        <ul>
+        <li>Minimum pour [20-50] personnes</li>
+        <li>Prix: 45 Euros/ personnes</li>
+        </ul>
+    </div>
+    <div class="card-footer">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailscarteModal">voir le détail de menu</button>
+    </div>
+    </div>
+
+</div>
+<div class="col">
+    <div class="menu-card h-100">
+      <div class="card-image">
+      <img src="/scss/images/Comment-preparer-un-delicieux-poisson-a-la-bordelaise-.png" class="card-img-top" alt="...">
       <p class="titre-image">Titre</p>
         <div class="action-image-buttons">
             <button class="btn btn-outline-light"><i class="bi bi-pencil"></i>Modifier</button>
@@ -45,8 +191,8 @@
         </div>
       </div>
       <div class="card-body">
-        <h5 class="card-title">titre de menu</h5>
-        <p class="card-description">desciption de menu </p>
+        <h5 class="card-title">Titre de menu</h5>
+        <p class="card-description">Description de menu </p>
         <ul>
         <li>Minimum pour [20-50] personnes</li>
         <li>Prix: 45 Euros/ personnes</li>
@@ -56,20 +202,20 @@
         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailscarteModal">voir le détail de menu</button>
       </div>
     </div>
-    </div>
-    <div class="col col-lg-4 col-md-6">
+</div>
+<div class="col">
     <div class="menu-card h-100">
       <div class="card-image">
-          <img src="/scss/images/deux-femmes-cuisinant-au-cafe-2cef7x0.jpg" class="card-img-top" alt="...">
-          <p class="titre-image">Titre</p>
+          <img src="/scss/images/R.jpg" class="card-img-top" alt="...">
+  
         <div class="action-image-buttons">
             <button class="btn btn-outline-light"><i class="bi bi-pencil"></i>Modifier</button>
             <button class="btn btn-outline-light"><i class="bi bi-trash"></i>Supprimer</button>
         </div>
       </div>
-      <div class="card-body">
-        <h5 class="card-title">titre de menu</h5>
-        <p class="card-description">desciption de menu </p>
+      <div class="card-body text-center">
+        <h5 class="card-title ">Titre de menu</h5>
+        <p class="card-description">Description de menu </p>
         <ul>
         <li>Minimum pour [20-50] personnes</li>
         <li>Prix: 45 Euros/ personnes</li>
@@ -79,7 +225,8 @@
         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailscarteModal">voir le détail de menu</button>
       </div>
     </div>
-    </div>
+</div>
+
 </div>
     </div>
 </section>

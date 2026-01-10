@@ -12001,13 +12001,32 @@ body {
   font-size: 20px;
 }
 
+p {
+  font-family: "Playfair Display", serif;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+}
+
+h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
+  font-family: "Playfair Display", serif;
+  color: #A56262;
+}
+
+li {
+  color: #350903;
+  font-size: 1.1rem;
+}
+
+span {
+  font-size: 1.1rem;
+}
+
 .footer {
   color: white;
   background-color: #5c4643;
 }
 
 .footer-title {
-  font-family: "Playfair Display", serif;
   color: #A56262;
   font-size: 1.5rem;
   font-weight: bold;
@@ -12046,6 +12065,10 @@ body {
   color: #A93C3C !important;
 }
 
+.menu-section-header {
+  margin-bottom: 40px;
+}
+
 .section-title:after {
   content: "";
   position: absolute;
@@ -12062,11 +12085,12 @@ body {
   color: #666;
   font-size: 1.2rem;
   max-width: 700px;
-  margin: 0 auto 50px;
+  margin: 40px;
+  padding: 20px;
 }
 
 .card-image {
-  height: 200px;
+  height: 250px;
   overflow: hidden;
   position: relative;
 }
@@ -12113,6 +12137,7 @@ body {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   transition: all 0.4s ease;
   border: 1px solid rgba(212, 167, 106, 0.2);
+  margin: 15px;
 }
 
 .menu-card:hover {
@@ -12130,7 +12155,6 @@ body {
 }
 
 .card-title {
-  font-family: "Playfair Display", serif;
   color: #A56262;
   font-size: 1.5rem;
   font-weight: 600;
@@ -12142,13 +12166,97 @@ body {
 .card-description {
   color: #666;
   margin-bottom: 20px;
-  min-height: 80px;
+  min-height: 50px;
 }
 
 .card-footer {
   background-color: #f9f9f9;
   border-top: none;
   padding: 20px 25px;
+}
+
+/* filtre menu */
+.btn-filtres {
+  color: white;
+  border: solid 2px #A56262;
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-size: 1rem;
+  width: 100%;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  white-space: nowrap; /* Prevents text wrapping */
+}
+
+.filters-section {
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* Fixed: removed "solid" */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.filters-section .container {
+  max-width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  align-items: center; /* Added for better alignment */
+}
+
+.filters-section .btn {
+  background-color: #A56262;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  white-space: nowrap; /* Prevents text wrapping */
+}
+
+.filters-section .btn:hover {
+  background-color: rgb(134.7530364372, 77.2469635628, 77.2469635628);
+}
+
+.filters-section .form-control {
+  border-radius: 30px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  width: 200px;
+  background-color: white !important;
+  min-height: 42px;
+}
+
+.filters-section .form-label {
+  font-size: 1rem;
+  margin-right: 10px;
+  color: #350903;
+  display: flex;
+  align-items: center;
+}
+
+.filters-section .form-select {
+  border-radius: 30px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  width: 200px;
+  min-height: 42px;
+  cursor: pointer;
+}
+
+.filters-section .collapse {
+  width: 100%;
+  margin-top: 20px;
+  border: 2px solid rgba(212, 167, 106, 0.2);
+  border-radius: 10px;
+  padding: 20px;
+  background-color: white;
 }
 
 .details .modal-content {
@@ -12196,7 +12304,6 @@ body {
 
 .menu-item-description {
   color: rgb(192, 168, 168);
-  font-size: 0.95rem;
   margin-bottom: 0;
 }
 
@@ -12269,11 +12376,9 @@ table {
 thead {
   background-color: #744c58;
   color: white;
-  font-family: "Playfair Display", serif;
 }
 
 th, td {
-  font-family: "Playfair Display", serif;
   padding: 12px;
   border: 1px solid #ccc;
   padding: 10px;
@@ -12298,6 +12403,10 @@ td button {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.hero-section p {
+  color: white;
 }
 
 .hero-image {
@@ -12327,7 +12436,7 @@ td button {
 .hello {
   font-size: 1.8rem;
   font-weight: 600;
-  color: #350903;
+  color: wheat;
   margin-bottom: 0.5rem;
   letter-spacing: 2px;
 }
@@ -12349,6 +12458,7 @@ td button {
   margin-bottom: 1.5rem;
   font-weight: 400;
   line-height: 1.8;
+  color: white;
 }
 
 .badge {
@@ -12495,7 +12605,6 @@ td button {
 }
 
 .section-title {
-  font-family: "Playfair Display", serif;
   color: #A56262;
   font-size: 3rem;
   font-weight: 700;
@@ -12613,7 +12722,6 @@ td button {
 }
 
 .modal-title {
-  font-family: "Playfair Display", serif;
   font-size: 1.8rem;
   font-weight: 700;
   color: #A56262;
@@ -12707,6 +12815,11 @@ td button {
   .collapsing.collapse-horizontal {
     transition: none;
   }
+}
+
+button:hover {
+  background-color: rgb(134.7530364372, 77.2469635628, 77.2469635628);
+  border-color: rgb(134.7530364372, 77.2469635628, 77.2469635628);
 }
 
 /*-- ----------------------------------/**TESTIMONY SECTION**/

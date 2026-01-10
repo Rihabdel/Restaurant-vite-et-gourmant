@@ -16,17 +16,43 @@ footer {
 }
 }
 body{
+
     margin: 0;
     font-family: 'Playfair Display', serif;
     font-size: 20px;
 }
+p
+{
+    font-family: 'Playfair Display', serif;
+    
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+    color: $primary;
+    
+
+}
+
+li{
+    
+    color: $dark;
+    font-size: 1.1rem;
+}
+span{
+
+    font-size: 1.1rem;
+}
+
+
     .footer {
     color: white;
     
     background-color: $secondary; 
 }
 .footer-title{
-    font-family: 'Playfair Display', serif;
+    
     color: $primary;
     font-size: 1.5rem;
     font-weight: bold;
@@ -62,7 +88,29 @@ body{
     font-size: 25px;
     color: $accent !important;
 }
-//*-- nos menus **//
+//*-------------------------- Nos menus------------------------------ **//
+   
+.menu-section {
+    padding: 80px 0;
+    background-color: $body-bg;
+    border-radius: 40px;
+    margin: 40px 0;
+    BORDER: 2PX SOLID RGBA(212, 167, 106, 0.2);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+            
+        }
+        .section-title {
+            
+            color: $primary;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+            position: relative;
+        }
+.menu-section-header {
+        margin-bottom: 40px;
+    }
 
         .section-title:after {
             content: '';
@@ -80,13 +128,17 @@ body{
             color: #666;
             font-size: 1.2rem;
             max-width: 700px;
-            margin: 0 auto 50px;
+            margin: 30px ;
+            padding: 20px;
         }
-        
+        .menu-section-content {
+            margin-top: 20px;
+        }
     .card-image {
-            height: 200px;
+            height: 250px;
             overflow: hidden;
     position:relative;
+    
 
     &:hover{
         .titre-image,
@@ -115,9 +167,9 @@ body{
         transition: all 0.3s;
     }
 
+
     //* MODIFIER ET SUPPRIMER IMAGE DE LA CARTE **//
     .action-image-buttons{
-    
         position : absolute;
         top: 0;
         left: 0;
@@ -128,6 +180,7 @@ body{
         opacity: 0;
         transition: all 0.3s;
     }
+
 }
 
         .menu-card {
@@ -138,16 +191,14 @@ body{
             box-shadow: 0 10px 30px rgba(0,0,0,0.08);
             transition: all 0.4s ease;
             border: 1px solid rgba(212, 167, 106, 0.2);
+            margin: 15px;
         }
         
         .menu-card:hover {
             transform: translateY(-15px);
             box-shadow: 0 20px 40px rgba(66, 56, 56, 0.15);
             border-color: $secondary;
-        }
-        
-
-        
+        }  
         .menu-card:hover .card-image img {
             transform: scale(1.05);
         }
@@ -156,8 +207,7 @@ body{
             padding: 25px;
         }
         
-        .card-title {
-            font-family: 'Playfair Display', serif;
+        .card-title {       
             color: $primary;
             font-size: 1.5rem;
             font-weight: 600;
@@ -169,7 +219,7 @@ body{
         .card-description {
             color: #666;
             margin-bottom: 20px;
-            min-height: 80px;
+            min-height: 50px;
         }
         
         .card-footer {
@@ -178,6 +228,93 @@ body{
             border-top: none;
             padding: 20px 25px;
         }
+
+/* filtre menu */
+.btn-filtres {
+    background-color: $white;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 1rem;
+    cursor: pointer;
+    white-space: nowrap; /* Prevents text wrapping */
+
+}
+.filters-section {
+    padding: 0;
+    background-color: $body-bg;
+    border-radius: 40px;
+    margin: 20px 0;
+    BORDER: 2PX SOLID RGBA(212, 167, 106, 0.2);
+    
+}
+
+.filters-section .container {
+    max-width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    align-items: center; /* Added for better alignment */
+}
+
+.filters-section .btn {
+    background-color: $primary;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    white-space: nowrap; /* Prevents text wrapping */
+}
+
+.filters-section .btn:hover {
+    background-color: darken($primary, 10%);
+}
+
+.filters-section .form-control {
+    border-radius: 30px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    width: 200px;
+    background-color: white !important;
+    min-height: 42px; 
+}
+
+.filters-section .form-label {
+    font-size: 1rem;
+    margin-right: 10px;
+    color: $dark;
+    display: flex;
+    align-items: center;
+}
+
+.filters-section .form-select {
+    border-radius: 30px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    width: 200px;
+
+    min-height: 42px;
+    cursor: pointer;
+}
+
+.filters-section .collapse {
+    width: 100%;
+    margin-top: 20px;
+    border: 2px solid rgba(212, 167, 106, 0.2);
+    border-radius: 10px; 
+    padding: 20px;
+    background-color: white;
+}
+
+
+
         //*-- ----------------------------------/**DETAIL MENU CARD**/----------------------------------*//
 
         .details .modal-content {
@@ -224,7 +361,6 @@ body{
         
         .menu-item-description {
             color:rgb(192, 168, 168);
-            font-size: 0.95rem;
             margin-bottom: 0;
         }
         //*-- ----------------------------------/**FORM CONNEXION/INSCRIPTION**/----------------------------------*//
@@ -296,10 +432,10 @@ table{
 thead {
     background-color: $bg_dark;
     color: white;
-    font-family: 'Playfair Display', serif;
+
 }
     th, td {
-        font-family: 'Playfair Display', serif;
+        
         padding: 12px;
         border: 1px solid #ccc;
         padding: 10px;
@@ -325,6 +461,9 @@ thead {
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+        .hero-section p {
+            color: white;
         }
         
         .hero-image {
@@ -354,7 +493,7 @@ thead {
         .hello {
             font-size: 1.8rem;
             font-weight: 600;
-            color: $dark;
+            color: wheat;
             margin-bottom: 0.5rem;
             letter-spacing: 2px;
         }
@@ -376,6 +515,7 @@ thead {
             margin-bottom: 1.5rem;
             font-weight: 400;
             line-height: 1.8;
+            color: white;
         }
         
         .badge {
@@ -527,7 +667,7 @@ thead {
             margin-bottom: 50px;
         }
         .section-title {
-            font-family: 'Playfair Display', serif;
+            
             color: $primary;
             font-size: 3rem;
             font-weight: 700;
@@ -643,7 +783,7 @@ thead {
             position: relative;
         }
         .modal-title {
-            font-family: 'Playfair Display', serif;
+            
             font-size: 1.8rem;
             font-weight: 700;
             color: $primary;
@@ -715,7 +855,6 @@ button {
     display: none;
   }
 }
-
 .collapsing {
   height: 0;
   overflow: hidden;
@@ -727,6 +866,12 @@ button {
     @include transition($transition-collapse-width);
   }
 }
+button:hover {
+    background-color: darken($primary, 10%);
+    border-color: darken($primary, 10%);
+}
+        
+
   /*-- ----------------------------------/**TESTIMONY SECTION**/----------------------------------*//
         .testimony-section {
             padding: 80px 0;
@@ -764,4 +909,4 @@ button {
         .carousel-control-next-icon {
             background-color: rgba(0, 0, 0, 0.5);
             border-radius: 50%;
-        } 
+        }
