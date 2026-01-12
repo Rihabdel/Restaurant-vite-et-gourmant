@@ -88,28 +88,28 @@ body{
     font-size: 25px;
     color: $accent !important;
 }
-//*-------------------------- Nos menus------------------------------ **//
-   
+//*-------------------------- Nos menus------------------------------ **/
+
 .menu-section {
-    padding: 80px 0;
-    background-color: $body-bg;
+    padding: 30px;
     border-radius: 40px;
-    margin: 40px 0;
+    margin: 40px;
     BORDER: 2PX SOLID RGBA(212, 167, 106, 0.2);
     box-shadow: 0 10px 40px rgba(0,0,0,0.05);
             
         }
-        .section-title {
-            
-            color: $primary;
-            font-size: 3rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-            text-align: center;
-            position: relative;
-        }
-.menu-section-header {
+    .menu-section-header {
         margin-bottom: 40px;
+    }
+
+.section-title {
+            
+    color: $primary;
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    text-align: center;
+    position: relative;
     }
 
         .section-title:after {
@@ -128,9 +128,11 @@ body{
             color: #666;
             font-size: 1.2rem;
             max-width: 700px;
-            margin: 30px ;
-            padding: 20px;
         }
+
+        .menu-cards {
+    margin: 20px;
+}
         .menu-section-content {
             margin-top: 20px;
         }
@@ -155,17 +157,6 @@ body{
         transition: all 0.3s;
     }
 }
-    .titre-image{
-
-        color: white;
-        font-size: 24px;
-        position: absolute;
-        top:50%;
-        left:50%;
-        transform: translate(-50%, -50%);
-        opacity: 0;
-        transition: all 0.3s;
-    }
 
 
     //* MODIFIER ET SUPPRIMER IMAGE DE LA CARTE **//
@@ -230,23 +221,11 @@ body{
         }
 
 /* filtre menu */
-.btn-filtres {
-    background-color: $white;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 30px;
-    font-size: 1rem;
-    cursor: pointer;
-    white-space: nowrap; /* Prevents text wrapping */
 
-}
 .filters-section {
     padding: 0;
-    background-color: $body-bg;
     border-radius: 40px;
-    margin: 20px 0;
-    BORDER: 2PX SOLID RGBA(212, 167, 106, 0.2);
+    margin: 0 0 40px 0;
     
 }
 
@@ -260,9 +239,9 @@ body{
 }
 
 .filters-section .btn {
-    background-color: $primary;
-    color: white;
-    border: none;
+    background-color: white;
+    border: 1px solid #ccc;
+    width: 100%;
     padding: 10px 20px;
     border-radius: 30px;
     font-size: 1rem;
@@ -271,9 +250,6 @@ body{
     white-space: nowrap; /* Prevents text wrapping */
 }
 
-.filters-section .btn:hover {
-    background-color: darken($primary, 10%);
-}
 
 .filters-section .form-control {
     border-radius: 30px;
@@ -307,7 +283,7 @@ body{
 .filters-section .collapse {
     width: 100%;
     margin-top: 20px;
-    border: 2px solid rgba(212, 167, 106, 0.2);
+    border: 2px solid #ccc;
     border-radius: 10px; 
     padding: 20px;
     background-color: white;
@@ -362,6 +338,21 @@ body{
         .menu-item-description {
             color:rgb(192, 168, 168);
             margin-bottom: 0;
+        }
+        //-- ----------------------------------/**commande modal**/----------------------------------*//
+        .commande-modal .modal-content {
+            background-color: rgba($dark,0.8);
+            color: $primary;
+            border-radius: 25px;
+            border-color: $secondary    ;
+            text-decoration-style: wavy;
+        }
+        .paiement-modal .modal-content {
+            background-color: rgba($dark,0.8);
+            color: $primary;
+            border-radius: 25px;
+            border-color: $secondary    ;
+            text-decoration-style: wavy;
         }
         //*-- ----------------------------------/**FORM CONNEXION/INSCRIPTION**/----------------------------------*//
     .form-container {
@@ -769,7 +760,7 @@ thead {
         // *-- ----------------------------------/**MODAL DEVIS**/----------------------------------*//
         .modal-dialog {
             
-            max-width: 600px;
+            max-width: 800px;
             width: 80%;
             margin: 30px auto;
         }

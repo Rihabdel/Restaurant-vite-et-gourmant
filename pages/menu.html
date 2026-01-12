@@ -2,7 +2,6 @@
   <div class="menu-section-header mb-4">
         <h2 class="section-title">Nos cartes de menus pour vos événements</h2>
         <p class="section-subtitle">Découvrez nos offres personnalisées pour rendre vos événements inoubliables grâce à notre service traiteur de qualité.</p>
-  </div>
             <!-- Filtres -->
             <div class="filters-section">
               <div class="section-subtitle mb-3">
@@ -78,7 +77,7 @@
               
             </div>
             </div>
-    
+  </div>
     <div class="menu-section-content">
     <div class="text-center mb-4">
       <!-- Button trigger modal -->
@@ -86,7 +85,7 @@
           Ajoutez une nouvelle carte de menu
       </button>
     </div>
-<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 ">
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 menu-cards">
 <div class="col">
     <div class="menu-card h-100">
         <div class="card-image">
@@ -222,7 +221,7 @@
         </ul>
       </div>
       <div class="card-footer">
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailscarteModal">voir le détail de menu</button>
+        <button class="btn btn-primary" data-bs-target="#detailscarteModal" data-bs-toggle="modal">voir le détail de menu</button>
       </div>
     </div>
 </div>
@@ -292,7 +291,7 @@
 </div>
 
 <!-- modal details de la carte de menu -->
-<div class="modal fade " id="detailscarteModal" tabindex="-1" aria-labelledby="detailscarteModalLabel" aria-hidden="true">
+<div class="modal fade" id="detailscarteModal" aria-hidden="true" aria-labelledby="detailscarteModalToggleLabel" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered modal-lg details">
     <div class="modal-content">
       <div class="modal-body">
@@ -341,7 +340,160 @@
           </div>
       <div class="modal-footer d-flex justify-content-center">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ajouter au panier</button>
-        <button type="button" class="btn btn-primary" data-bs-target="#paiementModalToggle2" data-bs-toggle="modal">Commander</button>
+         <button class="btn btn-primary" data-bs-target="#recapCommandeModal" data-bs-toggle="modal">Commander</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!---modal recap de la commande de menu-->
+<div class="modal fade" id="recapCommandeModal" aria-hidden="true" aria-labelledby="recapCommandeModalLabel" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered recap-commande-modal*">
+    <div class="modal-content">
+      <div class="modal-body">
+        <form>
+          <div class="container-fluid">
+          <div class="row">Vos récapitulatifs de la commande :</div>
+          <div class="row">
+            <div class="col mb-3">
+                <label for="customerName" class="form-label">Nom du client</label>
+                <input type="text" class="form-control" id="customerName" placeholder="Entrez votre nom">
+            </div>
+            <div class="col mb-3">
+                <label for="customerPrenom" class="form-label">Prénom du client</label>
+                <input type="text" class="form-control" id="customerPrenom" placeholder="Entrez votre prénom">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col mb-3">
+                <label for="customerEmail" class="form-label">Email du client</label>
+                <input type="email" class="form-control" id="customerEmail" placeholder="Entrez votre email">
+            </div>
+            <div class="col mb-3">
+                <label for="customerPhone" class="form-label">Numéro de téléphone</label>
+                <input type="tel" class="form-control" id="customerPhone" placeholder="Entrez votre numéro de téléphone">
+            </div>
+          </div>
+          <div class="row facture">
+            <div class="col mb-3">
+                <label for="customerAddress" class="form-label">Adresse de facturation</label>
+                <input type="text" class="form-control" id="customerAddress" placeholder="Entrez votre adresse">
+            </div>
+            <div class="col mb-3">
+                <label for="factDate" class="form-label">Date de facturation</label>
+                <input type="text" class="form-control" id="factDate" placeholder="Entrez votre adresse">
+            </div>
+            </div>
+            <div class="delivery row">
+            <div class="mb-3">
+                <label for="deliveryAddress" class="form-label">Adresse de livraison</label>
+                <input type="text" class="form-control" id="deliveryAddress" placeholder="Entrez votre adresse">
+                <small class="form-text">5 euros de livraison majoré de 59 centimes par kilomètre parcourus</small>
+            </div>
+            <div class="col mb-3">
+                <label for="deliveryDate" class="form-label">Date de livraison</label>
+                <input type="date" class="form-control" id="deliveryDate">
+            </div>
+            <div class="col mb-3">
+                <label for="deliveryTime" class="form-label">Heure de livraison</label>
+                <input type="time" class="form-control" id="deliveryTime">
+            </div>
+            </div>
+            <div class="row">
+            <div class="col mb-3">
+                <label for="menuTitle" class="form-label">Titre du menu :</label>
+                <select class="form-select" id="menuTitle">
+                    <option value="menu1">menu choisi par défaut</option>
+                    <option value="menu2">Menu 2</option>
+                    <option value="menu3">Menu 3</option>
+                </select>
+                <label for="menuQuantity" class="form-label"placeholder="minimum">Nombre de personnes :</label>
+                <input type="number" class="form-control" id="menuQuantity" placeholder="Entrez le nombre de personnes">
+                <small class="form-text">Minimum de [20-50] personnes</small></br>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#detailscarteModal">Retour</button>
+        <button type="button" class="btn btn-primary"  data-bs-target="#detailsCommandeModal" data-bs-toggle="modal">Confirmer vos informations</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<!--détails de la commande-->
+<div class="modal fade" id="detailsCommandeModal" aria-hidden="true" aria-labelledby="detailsCommandeModalLabel" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered details-commande-modal*">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="container commande">
+            <h2 class="text-center mb-4">Récapitulatif de votre commande</h2>
+            <div class="commande-details">
+              <ul>
+                <li><strong>Nom du client :</strong> [Nom]</li>
+                <li><strong>Prénom du client :</strong> [Prénom]</li>
+                <li><strong>Email du client :</strong> [Email]</li>
+                <li><strong>Numéro de téléphone :</strong> [Téléphone]</li>
+                <li><strong>Adresse de facturation :</strong> [Adresse]</li>
+                <li><strong>Date de facturation :</strong> [Date]</li>
+                <li><strong>Adresse de livraison :</strong> [Adresse]</li>
+                <li><strong>Date de livraison :</strong> [Date]</li>
+                <li><strong>Heure de livraison :</strong> [Heure]</li>
+              </ul>
+            </div>
+            <div class="ordered-menu">
+              <h3>Menu commandé :</h3>
+              <form>
+                
+              </form>
+              <ul>
+                <li><strong>Titre du menu :</strong> [Titre]</li>
+                <li><strong>Nombre de personnes :</strong> [Nombre]</li>
+                <li>Description du menu : [Description]</li>
+                <li>Prix par personne : [Prix] €</li>
+                <li>Frais de livraison : [Frais] €</li>
+                <li>Réduction appliquée : [Réduction] €</li>
+              </ul>
+                <small>Une réduction de 10% pour tout commande ayant 5 personnes de plus que le nombre minimum</small>
+            </div>
+            <div class="total-amount">
+                <h3>Total à payer : [Montant] €</h3>
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#recapCommandeModal">Retour</button>
+        <button type="button" class="btn btn-primary" data-bs-target="#paiementModal" data-bs-dismiss="modal">Payer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!---modal paiement de menu-->
+<div class="modal fade" id="paiementModal" aria-hidden="true" aria-labelledby="paiementModalToggleLabel" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered paiement-modal*">
+    <div class="modal-content">
+      <div class="modal-body">
+        <form>
+            <div class="mb-3">
+                <label for="cardNumber" class="form-label">Numéro de carte</label>
+                <input type="text" class="form-control" id="cardNumber" placeholder="Entrez le numéro de votre carte">
+            </div>
+            <div class="mb-3">
+                <label for="cardExpiry" class="form-label">Date d'expiration</label>
+                <input type="text" class="form-control" id="cardExpiry" placeholder="MM/AA">
+            </div>
+            <div class="mb-3">
+                <label for="cardCVC" class="form-label">CVC</label>
+                <input type="text" class="form-control" id="cardCVC" placeholder="Entrez le code CVC">
+            </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#commandeModal">Retour</button>
+        <button type="button" class="btn btn-primary">Payer maintenant</button>
       </div>
     </div>
   </div>
