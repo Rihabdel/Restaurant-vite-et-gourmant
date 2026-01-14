@@ -10,6 +10,7 @@ export const allRoutes = [
     new Route("/profil", "Profil", "/pages/profil.html"),
     new Route("/monCompte", "Mon Compte", "/pages/profil.html"),
     new Route("/order", "Mes commandes", "/pages/order.html"),
+    new Route("/contact", "Contact", "/pages/contact.html"),    
 ];
 
 //Le titre s'affiche comme ceci : Route.titre - websitename
