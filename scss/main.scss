@@ -413,6 +413,14 @@ body{
     box-shadow: 0 10px 40px rgba(0,0,0,0.05);
             
         }
+        .order-recap {
+            max-width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            justify-content: center;
+            align-items: center; /* Added for better alignment */
+        }
 table{
     width: 100%;
     border-collapse: collapse;
@@ -425,14 +433,6 @@ thead {
     color: white;
 
 }
-    th, td {
-        
-        padding: 12px;
-        border: 1px solid #ccc;
-        padding: 10px;
-        text-align: left;
-    
-    }   
     td button {
         
         color: white;
@@ -441,7 +441,29 @@ thead {
         border-radius: 5px;
         cursor: pointer;
     }
-    /* ----------page d'accueil-----------------------*/
+    .orders-section  th,td{
+        font-size: 0.9rem;
+        padding: 12px;
+        border: 1px solid #ccc;
+        padding: 10px;
+        text-align: left;
+    }
+    
+    .orders-section  p, .orders-section  span{
+        font-size: 1rem;
+        color: $dark;
+    }
+    .orders-section  h3{
+        font-size: 1.2rem;
+    }
+
+    .order-recap{
+        padding: 20px;
+        background-color: $body-bg;
+        border-radius: 10px;
+        border: 2px solid rgba(212, 167, 106, 0.2);
+    }
+        /* ----------page d'accueil-----------------------*/
     
         .hero-section {
             position: relative;
