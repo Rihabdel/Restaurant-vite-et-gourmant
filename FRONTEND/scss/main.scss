@@ -292,26 +292,35 @@ body{
 
 
         //*-- ----------------------------------/**DETAIL MENU CARD**/----------------------------------*//
-
+        .menu-title{
+            color: $accent;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+            position: relative;
+        }
         .details .modal-content {
-            background-color: rgba($dark,0.8);
+            background-color: rgba($dark,0.9);
             color: $primary;
             border-radius: 25px;
             border-color: $secondary    ;
             text-decoration-style: wavy;
         }
-        .allergenes-section {
-            background-color:rgb(192, 168, 168);
-            color: $accent;
-            border-radius: 15px;
-            margin-top: 20px;
-            display: flex ;  
-            flex-direction: column ; 
-            justify-content: center     ;
-        }
+
+       
         .menu-category h3 i {
             margin-right: 10px;
             color:#666
+        }
+        .menu-item {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .menu-category small {
+            font-size: 0.9rem;
+            color: #ccc;
         }
 
         .menu-item-header {
@@ -319,26 +328,49 @@ body{
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
+            font-size: 1.2rem;
         }
         
         .menu-item-title {
             font-weight: 600;
             color: white;
             font-size: 1.1rem;
+            margin-bottom: 5px;
         }
         
         .menu-item-price {
-            
+
             color: white;
             padding: 5px 15px;
             border-radius: 20px;
             font-weight: 600;
+            margin-bottom: 5px;
         }
         
         .menu-item-description {
-            color:rgb(192, 168, 168);
+            color:$body-bg;
             margin-bottom: 0;
+            font-size: 1rem;
         }
+        .info-section {
+            background-color: $body-bg;
+            color: $accent;
+            border-radius: 15px;
+            margin-top: 10px;
+            display: flex ;  
+            flex-direction: column ; 
+            justify-content: center     ;
+            padding: 20px;
+        }
+        .info-content li {
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        .info-content li i {
+            margin-right: 8px;
+            color:$accent;
+        }
+        
         //-- ----------------------------------/**commande modal**/----------------------------------*//
         .commande-modal .modal-content {
             background-color: rgba($dark,0.8);

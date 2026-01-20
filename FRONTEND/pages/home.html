@@ -20,7 +20,7 @@
                 </button>
             </div>
             
-            <!-- Contenu caché par défaut -->
+            <!-- en savoir plus -->
             <div class="collapse collapse-content" id="collapseWidthHistory">
                 <h5>Notre histoire et notre philosophie</h5>
                 <p>Il y a 25 ans, Julie et José ont fondé Vite & Gourmand avec une passion commune pour la cuisine bordelaise et un désir de partager les saveurs authentiques de leur région.</p>
@@ -187,19 +187,17 @@
                     </div>
                     <div class="col-md-4 text-center">
                         <div class="services mt-4 mt-md-0">
-                            <button class="cta-button" data-bs-toggle="collapse" data-bs-target="#collapseNosServices">Voir nos services</button>
+                            <button class="cta-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNosServices" aria-expanded="false">Voir nos services</button>
                         </div>
                     </div>
                 </div>
                 </div>
             </div>
-       
 
             <!-- Section Nos Services -->
-<div class="collapse-service" id="collapseNosServices">
+<div class="collapse collapse-service" id="collapseNosServices">
 <section id="nos-services" class="py-5 bg-light">
     <div class="container services-section">
-        <button type="button" class="btn-close float-end mb-3" data-bs-toggle="collapse" data-bs-target="#collapseNosServices" aria-label="Close"></button>
         <div class="row text-center mb-5">
             <div class="row justify-content-center">
                 <h2 class="section-title">Nos Services</h2>
@@ -378,6 +376,22 @@
   </div>
 </div>
 
+<!--modal delete event  -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="deleteModalLabel">Confirmer la suppression</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <p>Êtes-vous sûr de vouloir supprimer cet évènement ? Cette action est irréversible.</p>
+            <button type="button" class="btn btn-danger">Supprimer</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        </div>
+        </div>
+    </div>
+</div>
   <!-- Modal d'un devis  -->
 
  <div class="modal fade" id="devisModal" tabindex="-1" aria-labelledby="devisModalLabel" aria-hidden="true">

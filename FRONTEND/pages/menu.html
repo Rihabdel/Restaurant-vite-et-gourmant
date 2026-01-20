@@ -317,7 +317,7 @@
     <div class="modal-content">
       <div class="modal-body">
           <div class="container menu-card-detail">
-                      <h2 class="text-center ">Titre de menu</h2>
+                      <h2 class="Menu-title text-center ">Titre de menu</h2>
                         <div class="menu-category">
                             <h3><i class="bi bi-egg-fried"></i> Entrées</h3>
                             <div class="menu-item">
@@ -351,18 +351,25 @@
                                 <small ><i class="bi bi-exclamation-triangle-fill"></i> Contient de $allergene</small>
                             </div>
                           </div>
+                          <div class="totalPrice">
+            <h4 class="text-center mt-4">Prix total par personne : 45 Euros</h4>
+            </div>
+                          </div>
           </div>
-          <div class="container mb-4 allergenes-section">
-      <h4 class="text-center">Allergènes</h4>
-      <div class="allergenes-content">
-      <li><i class="bi bi-exclamation-triangle-fill"></i><small> Nos plats peuvent contenir des allergènes tels que gluten, fruits à coque, produits laitiers, œufs, soja, etc.</small></li>
-      <li><i class="bi bi-info-circle-fill"></i><small>Merci de consulter notre liste complète des allergènes pour éviter tout risque.</small></li>
+      <div class="container mb-4 info-section">
+          <div class="info-header">
+              <h5>Allergènes et informations supplémentaires :</h5>
+          <div class="info-content">
+        <li><i class="bi bi-info-circle-fill"></i><small> Ce menu est conçu pour un minimum de [20-50] personnes.</small></li>
+        <li><i class="bi bi-exclamation-triangle-fill"></i><small>Ce menu nécessite une commande x jours à l'avance.</small></li>
+      <li><i class="bi bi-exclamation-triangle-fill"></i><small> Merci de consulter notre liste complète des allergènes pour éviter tout risque.</small></li>
+      <li><i class="bi bi-info-circle-fill"></i><small>Contactez notre équipe pour toute demande spéciale ou question concernant le menu.</small></li>
           </div>
           </div>
       </div>
       <div class="modal-footer d-flex justify-content-center">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ajouter au panier</button>
-         <button class="btn btn-primary" data-bs-target="#recapCommandeModal" data-bs-toggle="modal">Commander</button>
+        <button class="btn btn-primary" data-bs-target="#recapCommandeModal" data-bs-toggle="modal">Commander</button>
       </div>
       <div class ="modal-footer d-flex justify-content-center">
         <button type="button" class="btn btn-success" data-bs-target="#editCarteMenu" data-bs-toggle="modal">modifier la carte </button>
