@@ -7,8 +7,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Theme;
-use App\Entity\Diet;
+use App\Enum\Theme;
+use App\Enum\Diet;
 use PhpParser\Builder\Enum_;
 
 #[ORM\Entity(repositoryClass: MenusRepository::class)]
@@ -297,5 +297,34 @@ class Menus
         }
 
         return $this;
+    }
+    public function is_available(): bool
+    {
+        return $this->stock > 0;
+    }
+    public function calculate_total_price(int $number_of_people): float
+    {
+        return $this->price * $number_of_people;
+        if ($number_of_people < $this->min_people) {
+            throw new \InvalidArgumentException('Number of people is less than the minimum required for this menu.');
+        } else if ($number_of_people >= $this->min_people + 5) {
+            return $this->price * 0.9 * $number_of_people;
+        } else {
+            return $this->price * $number_of_people;
+        }
+    }
+    // Get all allergenes from the dishes in the menu
+    public function getAllAllergenes(): array
+    {
+        $allergenes = [];
+        foreach ($this->menusDishes as $menuDish) {
+            $dish = $menuDish->getDish();
+            if ($dish) {
+                foreach ($dish->getDishAllergens() as $allergene) {
+                    $allergenes[$allergene->getId()] = $allergene;
+                }
+            }
+        }
+        return array_values($allergenes);
     }
 }

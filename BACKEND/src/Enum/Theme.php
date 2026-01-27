@@ -1,7 +1,7 @@
 <?PHP
 
 
-namespace App\Entity;
+namespace App\Enum;
 
 
 enum Theme: string

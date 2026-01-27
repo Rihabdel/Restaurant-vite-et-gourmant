@@ -6,6 +6,18 @@
 
 # To list all registered routes, run the following command:
 #   bin/console debug:router
-
+# Import routes from other files
+# _import:
+#     resource: 'another_routes.yaml'
+# Import routes defined as PHP attributes in controller classes
 controllers:
-    resource: routing.controllers
+    resource: "../src/Controller/"
+
+    type: attribute
+
+home:
+    path: /
+    controller: App\Controller\HomeController::index
+menus:
+    path: /api/menus
+    controller: App\Controller\MenusController::new
