@@ -141,7 +141,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $data = (array) $this;
         $data["\0" . self::class . "\0password"] = hash('crc32c', $this->password);
-        
+
         return $data;
     }
 
@@ -281,5 +281,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         return $this;
+    }
+    public function is_admin(): bool
+    {
+        return in_array('ROLE_ADMIN', $this->getRoles(), true);
+    }
+    public function isUser(): bool
+    {
+        return in_array('ROLE_USER', $this->getRoles(), true);
+    }
+    public function is_employee(): bool
+    {
+        return in_array('ROLE_EMPLOYEE', $this->getRoles(), true);
     }
 }
