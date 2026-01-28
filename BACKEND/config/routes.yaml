@@ -21,3 +21,37 @@ home:
 menus:
     path: /api/menus
     controller: App\Controller\MenusController::new
+    methods: [POST]
+menu_show:
+    path: /api/menus/{id}
+    controller: App\Controller\MenusController::show
+    methods: [GET]
+menu_edit:
+    path: /api/menus\{id}
+    controller: App\Controller\MenusController::edit
+    methods: [PUT]
+
+user_show:
+    path: /{id}
+    controller: App\Controller\UserController::show
+    # Add requirements if needed
+    requirements:
+        id: '\d+'
+login:
+    path: /api/login
+    controller: App\Controller\SecurityController::login
+    methods: [POST]
+register:
+    path: /api/register
+    controller: App\Controller\SecurityController::register
+    methods: [POST]
+
+edit:
+    path: /api/user/{id}
+    controller: App\Controller\UserController::edit
+    methods: [PUT]
+
+delete:
+    path: /api/user/{id}
+    controller: App\Controller\UserController::delete
+    methods: [DELETE]

@@ -16,9 +16,12 @@ final class MenusController extends AbstractController
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private MenusRepository $menusRepository
-    ) {}
-    #[Route(methods: 'POST', name: 'new')]
+        private MenusRepository $menusRepository,
+        private ?int $id = null
+    ) {
+        $id = null;
+    }
+    #[Route(methods: ['POST'], name: 'new')]
     public function new(EntityManagerInterface $entityManager): Response
     {
 
@@ -41,15 +44,18 @@ final class MenusController extends AbstractController
             Response::HTTP_CREATED
         );
     }
-    #[Route('/show/{id}', methods: 'GET', name: 'show')]
-    public function show(EntityManagerInterface $entityManager, int $id): Response
+    #[Route('/{id}', methods: ['GET'], name: 'show')]
+    public function show(int $id, MenusRepository $menusRepository): Response
+
     {
-        $menus = $entityManager->getRepository(Menus::class)->findOneById($id);
+        $menus = $menusRepository->find($id);
         if (!$menus) {
-            throw $this->createNotFoundException(
-                'No menus found for id ' . $id
+            return $this->json(
+                ['message' => 'Menus not found'],
+                Response::HTTP_NOT_FOUND
             );
         }
+
         return $this->json($menus);
         [
             'id' => $menus->getId(),
@@ -80,7 +86,7 @@ final class MenusController extends AbstractController
             ['id' => $menus->getId()]
         );
     }
-    #[Route(methods: ['DELETE'], name: 'delete')]
+    #[Route('/{id}', methods: ['DELETE'], name: 'delete')]
     public function delete(EntityManagerInterface $entityManager, int $id): Response
     {
 
