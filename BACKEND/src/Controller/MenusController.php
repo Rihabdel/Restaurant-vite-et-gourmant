@@ -18,18 +18,19 @@ final class MenusController extends AbstractController
         private EntityManagerInterface $entityManager,
         private MenusRepository $menusRepository
     ) {}
-    #[Route('/new', methods: 'POST', name: 'new')]
+    #[Route(methods: 'POST', name: 'new')]
     public function new(EntityManagerInterface $entityManager): Response
     {
+
         $menus = new Menus();
-        $menus->setTitle('Menu du jour');
-        $menus->setDescription('Description du menu du jour');
+        $menus->setTitle('Menu d\'aujourd\'hui');
+        $menus->setDescription('Description du menu ');
         $menus->setPrice(19.99);
         $menus->setMinPeople(40);
         $menus->setStock(100);
         $menus->setCreatedAt(new \DateTimeImmutable());
-        $menus->setConditions('commande avant 48h');
-        $menus->setPicture('menu.jpg');
+        $menus->setConditions('commande avant 72h');
+        $menus->setPicture('menus.jpg');
         $entityManager->persist($menus);
         $entityManager->flush();
         return $this->json(
