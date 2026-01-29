@@ -64,10 +64,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: ContactMsg::class, mappedBy: 'user')]
     private Collection $contactMsgs;
 
+    #[ORM\Column(length: 255)]
+    private ?string $apiToken = null;
+
     public function __construct()
     {
         $this->orders = new ArrayCollection();
         $this->contactMsgs = new ArrayCollection();
+        $this->apiToken = bin2hex(random_bytes(30));
     }
 
     public function getId(): ?int
@@ -293,5 +297,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function is_employee(): bool
     {
         return in_array('ROLE_EMPLOYEE', $this->getRoles(), true);
+    }
+
+    public function getApiToken(): ?string
+    {
+        return $this->apiToken;
+    }
+
+    public function setApiToken(string $apiToken): static
+    {
+        $this->apiToken = $apiToken;
+
+        return $this;
     }
 }
