@@ -66,14 +66,12 @@ class Menus
     /**
      * @var Collection<int, Orders>
      */
-    #[ORM\OneToMany(targetEntity: Orders::class, mappedBy: 'menus')]
-    private Collection $Order_menu;
+
 
     public function __construct()
     {
         $this->menusDishes = new ArrayCollection();
         $this->orders = new ArrayCollection();
-        $this->Order_menu = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -270,34 +268,9 @@ class Menus
     }
 
     /**
-     * @return Collection<int, Orders>
      */
-    public function getOrderMenu(): Collection
-    {
-        return $this->Order_menu;
-    }
 
-    public function addOrderMenu(Orders $orderMenu): static
-    {
-        if (!$this->Order_menu->contains($orderMenu)) {
-            $this->Order_menu->add($orderMenu);
-            $orderMenu->setMenus($this);
-        }
 
-        return $this;
-    }
-
-    public function removeOrderMenu(Orders $orderMenu): static
-    {
-        if ($this->Order_menu->removeElement($orderMenu)) {
-            // set the owning side to null (unless already changed)
-            if ($orderMenu->getMenus() === $this) {
-                $orderMenu->setMenus(null);
-            }
-        }
-
-        return $this;
-    }
     public function is_available(): bool
     {
         return $this->stock > 0;

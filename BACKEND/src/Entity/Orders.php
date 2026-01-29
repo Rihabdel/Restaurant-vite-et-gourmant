@@ -70,8 +70,6 @@ class Orders
     #[ORM\ManyToOne(inversedBy: 'orders')]
     private ?User $user = null;
 
-    #[ORM\ManyToOne(inversedBy: 'Order_menu')]
-    private ?Menus $menus = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?Reviews $review = null;
@@ -303,17 +301,6 @@ class Orders
         return $this;
     }
 
-    public function getMenus(): ?Menus
-    {
-        return $this->menus;
-    }
-
-    public function setMenus(?Menus $menus): static
-    {
-        $this->menus = $menus;
-
-        return $this;
-    }
 
     public function getReview(): ?Reviews
     {
