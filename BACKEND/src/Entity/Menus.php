@@ -10,47 +10,94 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Enum\Theme;
 use App\Enum\Diet;
 use PhpParser\Builder\Enum_;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Get;
+use Symfony\Component\Serializer\Attribute\Groups;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Delete;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: MenusRepository::class)]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+
+            normalizationContext: ['groups' => ['menu:list']]
+        ),
+        new Get(
+
+            normalizationContext: ['groups' => ['menu:detail']]
+        ),
+
+        new Post(
+            security: 'is_granted("ROLE_ADMIN") or is_granted("ROLE_EMPLOYEE")',
+            denormalizationContext: ['groups' => ['menu:write']]
+        ),
+        new Put(
+            security: 'is_granted("ROLE_ADMIN") or is_granted("ROLE_EMPLOYEE")',
+            denormalizationContext: ['groups' => ['menu:write']]
+        ),
+        new Delete(
+            security: 'is_granted("ROLE_ADMIN") or is_granted("ROLE_EMPLOYEE")'
+        ),
+    ]
+)]
+
 class Menus
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['menu:read', 'menu:list', 'order:read'])]
     private ?int $id = null;
 
+    #[Groups(['menu:read', 'menu:write', 'menu:list', 'menu:detail', 'order:read'])]
     #[ORM\Column(length: 255)]
     private ?string $title = null;
 
+    #[Groups(['menu:read', 'menu:list', 'menu:write', 'menu:detail', 'order:read'])]
     #[ORM\Column(type: Types::TEXT)]
     private ?string $description = null;
 
+    #[Groups(['menu:read', 'menu:list', 'menu:detail', 'order:read'])]
     #[ORM\Column(type: Types::BLOB, nullable: true)]
     private mixed $picture = null;
 
-    #[ORM\Column]
-    private ?int $min_people = null;
 
+    #[Assert\Positive]
+    #[Groups(['menu:read', 'menu:list', 'menu:write', 'menu:detail', 'order:read'])]
+    #[ORM\Column(type: Types::INTEGER)]
+    private ?int $minPeople = null;
+
+    #[Groups(['menu:read', 'menu:list', 'menu:write', 'menu:detail', 'order:read'])]
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private ?string $price = null;
 
+    #[Groups(['menu:read', 'menu:list', 'menu:write', 'menu:detail'])]
     #[ORM\Column(type: Types::TEXT)]
     private ?string $conditions = null;
 
+    #[Groups(['menu:read', 'menu:list', 'menu:write', 'menu:detail', 'order:read'])]
     #[ORM\Column]
     private ?int $stock = null;
 
+    #[Groups(['menu:read'])]
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column]
+    #[Groups(['menu:read'])]
+    #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\Column(enumType: Theme::class, nullable: true)]
-    private ?Theme $theme_menu = null;
-    #[ORM\Column(enumType: Diet::class, nullable: true)]
-    private ?Diet $diet_menu = null;
+    #[Groups(['menu:read', 'menu:detail'])]
+    #[ORM\Column(type: "string", enumType: Theme::class, nullable: true)]
+    private ?Theme $themeMenu = null;
 
+    #[Groups(['menu:read', 'menu:detail'])]
+    #[ORM\Column(type: "string", enumType: Diet::class, nullable: true)]
+    private ?Diet $dietMenu = null;
     /**
      * @var Collection<int, MenusDishes>
      */
@@ -63,17 +110,11 @@ class Menus
     #[ORM\OneToMany(targetEntity: Orders::class, mappedBy: 'menu')]
     private Collection $orders;
 
-    /**
-     * @var Collection<int, Orders>
-     */
-    #[ORM\OneToMany(targetEntity: Orders::class, mappedBy: 'menus')]
-    private Collection $Order_menu;
 
     public function __construct()
     {
         $this->menusDishes = new ArrayCollection();
         $this->orders = new ArrayCollection();
-        $this->Order_menu = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -118,32 +159,31 @@ class Menus
     }
     public function getThemeMenu(): ?Theme
     {
-        return $this->theme_menu;
+        return $this->themeMenu;
     }
-    public function setThemeMenu(?Theme $theme_menu): static
+    public function setThemeMenu(?Theme $themeMenu): static
     {
-        $this->theme_menu = $theme_menu;
-
+        $this->themeMenu = $themeMenu;
         return $this;
     }
-    public function getDietMenu(): ?diet
+    public function getDietMenu(): ?Diet
     {
-        return $this->diet_menu;
+        return $this->dietMenu;
     }
-    public function setDietMenu(?diet $diet_menu): static
+    public function setDietMenu(?Diet $dietMenu): static
     {
-        $this->diet_menu = $diet_menu;
+        $this->dietMenu = $dietMenu;
         return $this;
     }
 
     public function getMinPeople(): ?int
     {
-        return $this->min_people;
+        return $this->minPeople;
     }
 
-    public function setMinPeople(int $min_people): static
+    public function setMinPeople(int $minPeople): static
     {
-        $this->min_people = $min_people;
+        $this->minPeople = $minPeople;
 
         return $this;
     }
@@ -239,6 +279,57 @@ class Menus
         return $this;
     }
 
+    public function is_available(): bool
+    {
+        return $this->stock > 0;
+    }
+    public function calculate_total_price(int $numberofPeople): float
+    {
+        return $this->price * $numberofPeople;
+        if ($numberofPeople < $this->minPeople) {
+            throw new \InvalidArgumentException(sprintf('Le nombre de personnes (%d) est insuffisant pour ce menu (minimum: %d)', $numberofPeople, $this->minPeople));
+        } else if ($numberofPeople >= $this->minPeople + 5) {
+            return $this->price * 0.9 * $numberofPeople;
+        } else {
+            return $this->price * $numberofPeople;
+        }
+    }
+    // Get all allergenes from the dishes in the menu
+    public function getAllAllergenes(): array
+    {
+        $allergenes = [];
+        foreach ($this->menusDishes as $menuDish) {
+            $dish = $menuDish->getDish();
+            if ($dish) {
+                foreach ($dish->getDishAllergens() as $allergene) {
+                    $allergenes[$allergene->getId()] = $allergene;
+                }
+            }
+        }
+        return array_values($allergenes);
+    }
+    #[Groups(['menu:list', 'menu:detail'])]
+    public function getDishCount(): int
+    {
+        return $this->menusDishes->count();
+    }
+
+    #[Groups(['menu:detail'])]
+    public function getCategories(): array
+    {
+        $categories = [];
+        foreach ($this->menusDishes as $menuDish) {
+            $dish = $menuDish->getDish();
+            if ($dish) {
+                $category = $dish->getCategory();
+                if (!in_array($category, $categories)) {
+                    $categories[] = $category;
+                }
+            }
+        }
+        return $categories;
+    }
+
     /**
      * @return Collection<int, Orders>
      */
@@ -267,64 +358,5 @@ class Menus
         }
 
         return $this;
-    }
-
-    /**
-     * @return Collection<int, Orders>
-     */
-    public function getOrderMenu(): Collection
-    {
-        return $this->Order_menu;
-    }
-
-    public function addOrderMenu(Orders $orderMenu): static
-    {
-        if (!$this->Order_menu->contains($orderMenu)) {
-            $this->Order_menu->add($orderMenu);
-            $orderMenu->setMenus($this);
-        }
-
-        return $this;
-    }
-
-    public function removeOrderMenu(Orders $orderMenu): static
-    {
-        if ($this->Order_menu->removeElement($orderMenu)) {
-            // set the owning side to null (unless already changed)
-            if ($orderMenu->getMenus() === $this) {
-                $orderMenu->setMenus(null);
-            }
-        }
-
-        return $this;
-    }
-    public function is_available(): bool
-    {
-        return $this->stock > 0;
-    }
-    public function calculate_total_price(int $number_of_people): float
-    {
-        return $this->price * $number_of_people;
-        if ($number_of_people < $this->min_people) {
-            throw new \InvalidArgumentException('Number of people is less than the minimum required for this menu.');
-        } else if ($number_of_people >= $this->min_people + 5) {
-            return $this->price * 0.9 * $number_of_people;
-        } else {
-            return $this->price * $number_of_people;
-        }
-    }
-    // Get all allergenes from the dishes in the menu
-    public function getAllAllergenes(): array
-    {
-        $allergenes = [];
-        foreach ($this->menusDishes as $menuDish) {
-            $dish = $menuDish->getDish();
-            if ($dish) {
-                foreach ($dish->getDishAllergens() as $allergene) {
-                    $allergenes[$allergene->getId()] = $allergene;
-                }
-            }
-        }
-        return array_values($allergenes);
     }
 }

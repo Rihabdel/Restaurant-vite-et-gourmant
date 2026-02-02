@@ -26,6 +26,48 @@ class MenusRepository extends ServiceEntityRepository
     {
         return parent::find($id, $lockMode, $lockVersion);
     }
+    public function findWithFilters(array $filters): array
+    {
+        $qb = $this->createQueryBuilder('m');
+
+        if (isset($filters['theme'])) {
+            $qb->andWhere('m.themeMenu = :theme')
+                ->setParameter('theme', $filters['theme']);
+        }
+
+        if (isset($filters['diet'])) {
+            $qb->andWhere('m.dietMenu = :diet')
+                ->setParameter('diet', $filters['diet']);
+        }
+
+        if (isset($filters['price_min'])) {
+            $qb->andWhere('m.price >= :minPrice')
+                ->setParameter('minPrice', $filters['price_min']);
+        }
+        if (isset($filters['price_max'])) {
+            $qb->andWhere('m.price <= :maxPrice')
+                ->setParameter('maxPrice', $filters['price_max']);
+        }
+
+
+        if (isset($filters['min_persons'])) {
+            $qb->andWhere('m.minPeople >= :min_persons')
+                ->setParameter('min_persons', $filters['min_persons']);
+        }
+        return $qb->getQuery()->getResult();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
     //    /**
     //     * @return Menus[] Returns an array of Menus objects
     //     */
