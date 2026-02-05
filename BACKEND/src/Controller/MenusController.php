@@ -7,6 +7,9 @@ use App\Entity\Menus;
 use App\Enum\Theme;
 use App\Enum\Diet;
 use App\Repository\MenusRepository;
+use App\Entity\MenusDishes;
+use App\Entity\Dishes;
+use App\Repository\MenusDishesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,7 +31,8 @@ final class MenusController extends AbstractController
     public function __construct(
         private EntityManagerInterface $entityManager,
         private SerializerInterface $serializer,
-        private ValidatorInterface $validator
+        private ValidatorInterface $validator,
+        private MenusDishesRepository $menusDishesRepository
     ) {
         $id = null;
     }
@@ -39,13 +43,13 @@ final class MenusController extends AbstractController
         $menu = new Menus();
         //decoder le json
         $data = json_decode($request->getContent(), true);
-        if (!isset($data['theme'])) {
+        if (!isset($data['themeMenu'])) {
             return new JsonResponse(
                 ['erreurs' => 'Le thème est obligatoire'],
                 Response::HTTP_UNPROCESSABLE_ENTITY
             );
         }
-        $themeMenu = Theme::tryFrom($data['theme']);
+        $themeMenu = Theme::tryFrom($data['themeMenu']);
 
         if (!$themeMenu) {
             return new JsonResponse(
@@ -53,13 +57,13 @@ final class MenusController extends AbstractController
                 Response::HTTP_UNPROCESSABLE_ENTITY
             );
         }
-        if (!isset($data['diet'])) {
+        if (!isset($data['dietMenu'])) {
             return new JsonResponse(
                 ['erreurs' => 'Le régime est obligatoire'],
                 Response::HTTP_UNPROCESSABLE_ENTITY
             );
         }
-        $dietMenu = Diet::tryFrom($data['diet']);
+        $dietMenu = Diet::tryFrom($data['dietMenu']);
 
         if (!$dietMenu) {
             return new JsonResponse(
@@ -68,8 +72,8 @@ final class MenusController extends AbstractController
             );
         }
         //supprimer les champs enum du tableau
-        unset($data['theme']);
-        unset($data['diet']);
+        unset($data['themeMenu']);
+        unset($data['dietMenu']);
         //reecreer un json sans enum
         $jsonSansEnum = json_encode($data);
         //deserializer le json en entité
@@ -110,8 +114,6 @@ final class MenusController extends AbstractController
             'Location' => $location
         ], true);
     }
-
-
     #[Route('', name: 'list', methods: ['GET'])]
     public function list(MenusRepository $repository, Request $request): JsonResponse
     {
@@ -130,9 +132,11 @@ final class MenusController extends AbstractController
                 $menu = $repository->findAll();
                 error_log("=== METHODE findAll UTILISEE ===");
                 error_log("Nombre de résultats: " . count($menu));
+                $menusDishes = $this->entityManager->getRepository(MenusDishesRepository::class)->findAll();
 
-                $responseData = $this->serializer->serialize($menu, 'json', [
-                    'groups' => 'menu:list'
+
+                $responseData = $this->serializer->serialize($menusDishes, 'json', [
+                    'groups' => ['menu:list', 'dish:read'],
                 ]);
                 return new JsonResponse($responseData, Response::HTTP_OK, [], true);
             }
@@ -184,29 +188,22 @@ final class MenusController extends AbstractController
             );
         }
     }
-
-
-
-
-
-
     #[Route('/{id}', methods: ['GET'], name: 'show')]
-    public function show(int $id, MenusRepository $menusRepository): Response
-
+    public function show(int $id): JsonResponse
     {
-        $menus = $menusRepository->find($id);
+        $menus = $this->entityManager->getRepository(Menus::class)->find($id);
         if (!$menus) {
             return new JsonResponse(
                 ['message' => 'Aucun menu non trouvé'],
                 Response::HTTP_NOT_FOUND
             );
         }
-        $responseData = $this->serializer->serialize($menus, 'json');
+        $responseData = $this->serializer->serialize($menus, 'json', ['groups' => 'menu:read']);
         return new JsonResponse($responseData, Response::HTTP_OK, [], true);
     }
 
     #[Route('/{id}', methods: ['PUT'], name: 'edit')]
-    public function edit(EntityManagerInterface $entityManager, int $id): Response
+    public function edit(EntityManagerInterface $entityManager, int $id): JsonResponse
     {
         $menus = $entityManager->getRepository(Menus::class)->find($id);
         if (!$menus) {
@@ -215,7 +212,6 @@ final class MenusController extends AbstractController
                 Response::HTTP_NOT_FOUND
             );
         }
-        $menus->setUpdatedAt(new DateTimeImmutable());
         $menus = $this->serializer->deserialize(
             file_get_contents('php://input'),
             Menus::class,
@@ -223,6 +219,7 @@ final class MenusController extends AbstractController
             [AbstractNormalizer::OBJECT_TO_POPULATE => $menus]
         );
 
+        $menus->setUpdatedAt(new DateTimeImmutable());
         $entityManager->persist($menus);
         $entityManager->flush();
         $responseData = $this->serializer->serialize($menus, 'json');
@@ -231,7 +228,9 @@ final class MenusController extends AbstractController
             ['id' => $menus->getId()],
             UrlGeneratorInterface::ABSOLUTE_URL
         );
-        return new JsonResponse($responseData, Response::HTTP_OK, ['Location' => $location], true);
+        return new JsonResponse($responseData, Response::HTTP_OK, [
+            'Location' => $location
+        ], true);
     }
     #[Route('/{id}', methods: ['DELETE'], name: 'delete')]
     public function delete(EntityManagerInterface $entityManager, int $id): Response
@@ -247,8 +246,55 @@ final class MenusController extends AbstractController
         $entityManager->remove($menus);
         $entityManager->flush();
         return new JsonResponse(
-            null,
-            JsonResponse::HTTP_NO_CONTENT
+            ['message' => 'Menus deleted successfully'],
+            Response::HTTP_OK
+        );
+    }
+
+
+    //public functions for menu dishes management
+
+
+
+
+    // ajouter un plat à un menu
+
+    #[Route('/{id}/dish', methods: ['DELETE'], name: 'remove_dish_from_menu')]
+    public function removeDishFromMenu(int $id, Request $request): JsonResponse
+    {
+        $menu = $this->entityManager->getRepository(Menus::class)->find($id);
+        if (!$menu) {
+            return new JsonResponse(
+                ['message' => 'Menu non trouvé'],
+                Response::HTTP_NOT_FOUND
+            );
+        }
+        $data = json_decode($request->getContent(), true);
+        if (!isset($data['dish_id'])) {
+            return new JsonResponse(
+                ['message' => 'ID du plat manquant'],
+                Response::HTTP_BAD_REQUEST
+            );
+        }
+        $dishId = $data['dish_id'];
+        $dish = $this->entityManager->getRepository(Dishes::class)->find($dishId);
+        if (!$dish) {
+            return new JsonResponse(
+                ['message' => 'Plat non trouvé'],
+                Response::HTTP_NOT_FOUND
+            );
+        }
+        $errors = $this->menusDishesRepository->isDishInMenu($menu, $dish);
+        if (empty($errors)) {
+            return new JsonResponse(
+                ['message' => 'Le plat n\'est pas dans le menu'],
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            );
+        }
+        $this->menusDishesRepository->removeDishFromMenu($menu, $dish);
+        return new JsonResponse(
+            ['message' => 'Plat supprimé du menu avec succès'],
+            Response::HTTP_OK
         );
     }
 }

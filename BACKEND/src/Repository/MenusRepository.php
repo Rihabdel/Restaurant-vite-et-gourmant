@@ -55,41 +55,44 @@ class MenusRepository extends ServiceEntityRepository
                 ->setParameter('min_persons', $filters['min_persons']);
         }
         return $qb->getQuery()->getResult();
+
+        // src/Repository/MenusRepository.php
     }
-
-
-
-
-
-
-
-
-
-
-
-
-    //    /**
-    //     * @return Menus[] Returns an array of Menus objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('m')
-    //            ->andWhere('m.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('m.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Menus
-    //    {
-    //        return $this->createQueryBuilder('m')
-    //            ->andWhere('m.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function findWithDishesAndAllergens(int $id): ?Menus
+    {
+        return $this->createQueryBuilder('m')
+            ->leftJoin('m.menusDishes', 'md')
+            ->addSelect('md')
+            ->leftJoin('md.dish', 'd')
+            ->addSelect('d')
+            ->leftJoin('d.allergens', 'a')
+            ->addSelect('a')
+            ->where('m.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+    public function getDetailsMenu(int $id): ?Menus
+    {
+        return $this->createQueryBuilder('m')
+            ->leftJoin('m.menusDishes', 'md')
+            ->addSelect('md')
+            ->leftJoin('md.dish', 'd')
+            ->addSelect('d')
+            ->where('m.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+    public function removeDishFromMenu(Menus $menu, int $dishId): void
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->delete('App\Entity\MenusDishes', 'md')
+            ->where('md.menu = :menu')
+            ->andWhere('md.dish = :dishId')
+            ->setParameter('menu', $menu)
+            ->setParameter('dishId', $dishId)
+            ->getQuery()
+            ->execute();
+    }
 }

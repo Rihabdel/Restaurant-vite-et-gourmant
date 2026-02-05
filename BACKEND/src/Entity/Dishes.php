@@ -80,7 +80,7 @@ class Dishes
     /**
      * @var Collection<int, DishAllergen>
      */
-    #[Groups(['menu_dish:read', 'dish:list', 'dish:detail', 'dish:write', 'menu:detail'])]
+
     #[ORM\OneToMany(targetEntity: DishAllergen::class, mappedBy: 'dish')]
     private Collection $dishAllergens;
 
@@ -243,5 +243,14 @@ class Dishes
     public function getMenuCount(): int
     {
         return $this->menusDishes->count();
+    }
+    #[Groups(['menu_dish:detail'])]
+    public function getListOfAllergensFromDishes(): array
+    {
+        $allergens = [];
+        foreach ($this->dishAllergens as $dishAllergen) {
+            $allergens[] = $dishAllergen->getAllergen();
+        }
+        return $allergens;
     }
 }

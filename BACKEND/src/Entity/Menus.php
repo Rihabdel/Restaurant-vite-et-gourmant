@@ -17,6 +17,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Delete;
+use ContainerTMkOneg\getDataCollector_Request_SessionCollectorService;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: MenusRepository::class)]
@@ -50,10 +51,10 @@ class Menus
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['menu:read', 'menu:list', 'order:read'])]
+    #[Groups(['menu_dish:read', 'menu:read', 'menu:list', 'order:read'])]
     private ?int $id = null;
 
-    #[Groups(['menu:read', 'menu:write', 'menu:list', 'menu:detail', 'order:read'])]
+    #[Groups(['menu_dish:read', 'menu:read', 'menu:write', 'menu:list', 'menu:detail', 'order:read'])]
     #[ORM\Column(length: 255)]
     private ?string $title = null;
 
@@ -101,13 +102,13 @@ class Menus
     /**
      * @var Collection<int, MenusDishes>
      */
-    #[ORM\OneToMany(targetEntity: MenusDishes::class, mappedBy: 'menu')]
+    #[ORM\OneToMany(targetEntity: MenusDishes::class, mappedBy: 'menu', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $menusDishes;
 
     /**
      * @var Collection<int, Orders>
      */
-    #[ORM\OneToMany(targetEntity: Orders::class, mappedBy: 'menu')]
+    #[ORM\OneToMany(targetEntity: Orders::class, mappedBy: 'menu', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $orders;
 
 
@@ -121,7 +122,7 @@ class Menus
     {
         return $this->id;
     }
-
+    #[Groups(['menu_dish:list'])]
     public function getTitle(): ?string
     {
         return $this->title;
@@ -133,7 +134,7 @@ class Menus
 
         return $this;
     }
-
+    #[Groups(['menu_dish:list'])]
     public function getDescription(): ?string
     {
         return $this->description;
@@ -175,7 +176,7 @@ class Menus
         $this->dietMenu = $dietMenu;
         return $this;
     }
-
+    #[Groups(['menu_dish:list'])]
     public function getMinPeople(): ?int
     {
         return $this->minPeople;
@@ -187,7 +188,7 @@ class Menus
 
         return $this;
     }
-
+    #[Groups(['menu_dish:list'])]
     public function getPrice(): ?string
     {
         return $this->price;
@@ -199,7 +200,7 @@ class Menus
 
         return $this;
     }
-
+    #[Groups(['menu_dish:list'])]
     public function getConditions(): ?string
     {
         return $this->conditions;
@@ -266,7 +267,7 @@ class Menus
 
         return $this;
     }
-
+    //remove un plat d'un menu
     public function removeMenusDish(MenusDishes $menusDish): static
     {
         if ($this->menusDishes->removeElement($menusDish)) {
@@ -278,7 +279,6 @@ class Menus
 
         return $this;
     }
-
     public function is_available(): bool
     {
         return $this->stock > 0;
@@ -295,6 +295,7 @@ class Menus
         }
     }
     // Get all allergenes from the dishes in the menu
+
     public function getAllAllergenes(): array
     {
         $allergenes = [];
@@ -358,5 +359,15 @@ class Menus
         }
 
         return $this;
+    }
+    //liste des plats d'un menu
+    #[Groups(['menu_dish:detail', 'menu_dish:list'])]
+    public function getListOfDishesFromMenu(): array
+    {
+        $dishes = [];
+        foreach ($this->menusDishes as $menuDish) {
+            $dishes[] = $menuDish->getDish();
+        }
+        return $dishes;
     }
 }

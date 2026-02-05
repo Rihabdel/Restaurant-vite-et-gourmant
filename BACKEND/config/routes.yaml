@@ -19,35 +19,37 @@ home:
     path: /
     controller: App\Controller\HomeController::index
 menus:
-    path: /api/menus
+    path: /api/menu
     controller: App\Controller\MenusController::new
     methods: [POST]
 menu_show:
-    path: /api/menus/{id}
+    path: /api/menu/{id}
     controller: App\Controller\MenusController::show
     methods: [GET]
 menu_edit:
-    path: /api/menus\{id}
+    path: /api/menu/{id}
     controller: App\Controller\MenusController::edit
     methods: [PUT]
-
+menu_delete:
+    path: /api/menu/{id}
+    controller: App\Controller\MenusController::delete
+    methods: [DELETE]
+user_new:
+    path: /api/user
+    controller: App\Controller\UserController::new
+    methods: [POST]
 user_show:
-    path: /{id}
+    path: /api/user/{id}
     controller: App\Controller\UserController::show
     # Add requirements if needed
     requirements:
         id: '\d+'
-login:
-    path: /api/login
-    controller: App\Controller\SecurityController::login
-    methods: [POST]
-
-edit:
+user_edit:
     path: /api/user/{id}
     controller: App\Controller\UserController::edit
     methods: [PUT]
 
-delete:
+user_delete:
     path: /api/user/{id}
     controller: App\Controller\UserController::delete
     methods: [DELETE]
@@ -55,3 +57,95 @@ register:
     path: /api/registration
     controller: App\Controller\SecurityController::register
     methods: [POST]
+login:
+    path: /api/login
+    controller: App\Controller\SecurityController::login
+    methods: [POST]
+Dishes:
+    path: /api/dishes
+    controller: App\Controller\DishesController::new
+    methods: [POST]
+Dishes_show:
+    path: /api/dishes/{id}
+    controller: App\Controller\DishesController::show
+    methods: [GET]
+Dishes_edit:
+    path: /api/dishes/{id}
+    controller: App\Controller\DishesController::edit
+    methods: [PUT]
+Dishes_delete:
+    path: /api/dishes/{id}
+    controller: App\Controller\DishesController::delete
+    methods: [DELETE]
+Orders:
+    path: /api/orders
+    controller: App\Controller\OrdersController::new
+    methods: [POST]
+Orders_show:
+    path: /api/orders/{id}
+    controller: App\Controller\OrdersController::show
+    methods: [GET]
+Orders_edit:
+    path: /api/orders/{id}
+    controller: App\Controller\OrdersController::edit
+    methods: [PUT]
+Orders_delete:
+    path: /api/orders/{id}
+    controller: App\Controller\OrdersController::delete
+    methods: [DELETE]
+
+MenuDish:
+    path: /api/menus-dishes/{id}
+    controller: App\Controller\MenusController::addDishToMenu
+    methods: [POST]
+
+MenuDish_edit:
+    path: /api/menu/{id}/dish
+    controller: App\Controller\MenusController::edit
+    methods: [PUT]
+MenuDish_delete:
+    path: /api/menu/{id}/dish
+    controller: App\Controller\MenusController::remosveDishFromMenu
+    methods: [DELETE]
+menu_detail:
+    path: /api/menus-dishes/{id}/detail
+    controller: App\Controller\MenusDishesController::detail
+    methods: [GET]
+menu_dish_list:
+    path: /api/menus-dishes/{id}/list
+    controller: App\Controller\MenusDishesController::getMenuDishList
+    methods: [GET]
+
+allergens:
+    path: /api/allergens
+    controller: App\Controller\AllergensController::list
+    methods: [GET]
+allergen_show:
+    path: /api/allergens/{id}
+    controller: App\Controller\AllergensController::show
+    methods: [GET]
+allergen_new:
+    path: /api/allergens
+    controller: App\Controller\AllergensController::new
+    methods: [POST]
+allergen_edit:
+    path: /api/allergens/{id}
+    controller: App\Controller\AllergensController::edit
+    methods: [PUT]
+
+dish_allergen_add:
+    path: /api/dish_allergen/{id}
+    controller: App\Controller\DishAllergenController::addAllergenToDish
+    methods: [POST]
+dish_allergens_list:
+    path: /api/dish_allergen/{id}
+    controller: App\Controller\DishAllergenController::getDishAllergenList
+    methods: [GET]
+dish_allergen_remove:
+    path: /api/dish_allergen/{id}
+    controller: App\Controller\DishAllergenController::removeAllergenFromDish
+    methods: [DELETE]
+detail:
+    path: /api/dish_allergen/{id}/detail
+    controller: App\Controller\DishAllergenController::detail
+    methods: [GET]
