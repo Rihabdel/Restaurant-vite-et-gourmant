@@ -11,47 +11,4 @@
 #     resource: 'another_routes.yaml'
 # Import routes defined as PHP attributes in controller classes
 controllers:
-    resource: "../src/Controller/"
-
-    type: attribute
-
-home:
-    path: /
-    controller: App\Controller\HomeController::index
-menus:
-    path: /api/menus
-    controller: App\Controller\MenusController::new
-    methods: [POST]
-menu_show:
-    path: /api/menus/{id}
-    controller: App\Controller\MenusController::show
-    methods: [GET]
-menu_edit:
-    path: /api/menus\{id}
-    controller: App\Controller\MenusController::edit
-    methods: [PUT]
-
-user_show:
-    path: /{id}
-    controller: App\Controller\UserController::show
-    # Add requirements if needed
-    requirements:
-        id: '\d+'
-login:
-    path: /api/login
-    controller: App\Controller\SecurityController::login
-    methods: [POST]
-
-edit:
-    path: /api/user/{id}
-    controller: App\Controller\UserController::edit
-    methods: [PUT]
-
-delete:
-    path: /api/user/{id}
-    controller: App\Controller\UserController::delete
-    methods: [DELETE]
-register:
-    path: /api/registration
-    controller: App\Controller\SecurityController::register
-    methods: [POST]
+    resource: routing.controllers

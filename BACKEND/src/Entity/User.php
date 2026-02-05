@@ -272,6 +272,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return in_array('ROLE_EMPLOYEE', $this->getRoles(), true);
     }
+<<<<<<< HEAD
 
     public function getApiToken(): ?string
     {
@@ -314,4 +315,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+=======
+>>>>>>> ec62c79685a53c31927ea9e763f8ee74e95067bf
 }

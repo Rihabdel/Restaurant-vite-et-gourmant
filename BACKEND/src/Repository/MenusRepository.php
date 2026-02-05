@@ -16,16 +16,7 @@ class MenusRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Menus::class);
     }
-    public function findAll(): array
-    {
-        return $this->createQueryBuilder('m')
-            ->getQuery()
-            ->getResult();
-    }
-    public function find($id, $lockMode = null, $lockVersion = null): ?Menus
-    {
-        return parent::find($id, $lockMode, $lockVersion);
-    }
+
     //    /**
     //     * @return Menus[] Returns an array of Menus objects
     //     */
