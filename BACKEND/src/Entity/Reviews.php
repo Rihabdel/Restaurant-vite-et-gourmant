@@ -17,9 +17,6 @@ class Reviews
     #[ORM\Column]
     private ?int $rating = null;
 
-    #[ORM\Column(type: Types::TEXT)]
-    private ?string $message = null;
-
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $comment = null;
 
@@ -29,8 +26,6 @@ class Reviews
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    private ?Orders $commande = null;
 
     public function getId(): ?int
     {
@@ -81,18 +76,6 @@ class Reviews
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    public function getCommande(): ?Orders
-    {
-        return $this->commande;
-    }
-
-    public function setCommande(?Orders $commande): static
-    {
-        $this->commande = $commande;
 
         return $this;
     }

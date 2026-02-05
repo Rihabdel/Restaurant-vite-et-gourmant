@@ -12,31 +12,59 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use DateTimeImmutable;
 
 
 #[Route('/api', name: 'app_api_')]
-class SecurityController extends AbstractController
+final class SecurityController extends AbstractController
 {
-    public function __construct(private EntityManagerInterface $manager, private SerializerInterface $serializer) {}
+    #[Route('/registration', name: 'registration', methods: ['POST'])]
+    public function register(
+        Request $request,
+        UserPasswordHasherInterface $passwordHasher,
+        EntityManagerInterface $em,
+        SerializerInterface $serializer
+    ): JsonResponse {
+        //  recuperer les données de la requete    
+        $data = json_decode($request->getContent(), true);
+        //  valider les données
+        if (!isset($data['email']) || !isset($data['password'])) {
+            return new JsonResponse(
+                [
+                    'error' => 'Missing data',
+                    'message' => 'Email and password are required'
+                ],
+                Response::HTTP_BAD_REQUEST
+            );
+        }
+        //  Désérialiser SANS le mot de passe
+        unset($data['password']);
+        $jsonWithoutPassword = json_encode($data);
 
-    #[Route('/registration', name: 'registration', methods: 'POST')]
-    public function register(Request $request, UserPasswordHasherInterface $passwordHasher): JsonResponse
-    {
-        $user = $this->serializer->deserialize($request->getContent(), User::class, 'json');
-        $user->setPassword($passwordHasher->hashPassword($user, $user->getPassword()));
-        $user->setCreatedAt(new DateTimeImmutable());
+        $user = $serializer->deserialize($jsonWithoutPassword, User::class, 'json');
 
-        $this->manager->persist($user);
-        $this->manager->flush();
+        // HASHer le mot de passe et le setter
+        $hashedPassword = $passwordHasher->hashPassword($user, $jsonWithoutPassword);
+        $user->setPassword($hashedPassword);
+        $user->setCreatedAt(new \DateTimeImmutable());
+
+        // Persist et flush
+        $em->persist($user);
+        $em->flush();
+
         return new JsonResponse(
-            ['user'  => $user->getUserIdentifier(), 'apiToken' => $user->getApiToken(), 'roles' => $user->getRoles()],
+            [
+                'message' => 'User created successfully',
+                'user' => $user->getUserIdentifier(),
+                'email' => $user->getEmail()
+            ],
             Response::HTTP_CREATED
         );
     }
     // …
 
-    #[Route('/login', name: 'login', methods: 'POST')]
+    #[Route('/login', name: 'login', methods: ['POST'])]
     public function login(#[CurrentUser] ?User $user): JsonResponse
     {
         if (null === $user) {

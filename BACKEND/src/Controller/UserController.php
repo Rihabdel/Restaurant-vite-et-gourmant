@@ -17,12 +17,16 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use symfony\component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 
 
 #[Route('api/user', name: 'app_api_user_')]
 final class UserController extends AbstractController
 {
+    const ROLE_USER = 'ROLE_USER';
+    const ROLE_EMPLOYE = 'ROLE_EMPLOYE';
+    const ROLE_ADMIN = 'ROLE_ADMIN';
     public function __construct(
         private EntityManagerInterface $entityManager,
         private SerializerInterface $serializer,
@@ -30,52 +34,30 @@ final class UserController extends AbstractController
 
 
     ) {}
-    #[Route('/new', name: 'new', methods: ['POST'])]
-    public function new(Request $request): JsonResponse
-    {
-        try {
-            $user = $this->serializer->deserialize($request->getContent(), User::class, 'json');
-            $user->setCreatedAt(new \DateTimeImmutable());
-            if (empty($user->getEmail()) || empty($user->getFirstname())) {
-                return new JsonResponse(
-                    null,
-                    Response::HTTP_CREATED,
-                    [],
-                    true
-                );
-            }
-            $this->entityManager->persist($user);
-            $this->entityManager->flush();
 
-            $responseData = $this->serializer->serialize($user, 'json');
-            $location = $this->generateUrl(
-                'app_api_user_show',
-                ['id' => $user->getId()],
-                UrlGeneratorInterface::ABSOLUTE_URL
-            );
-
-            return new JsonResponse($responseData, Response::HTTP_CREATED, [
-                'Location' => $location
-            ], true);
-        } catch (\Exception $e) {
-            return new JsonResponse(
-                ['error' => 'Failed to create user', 'message' => $e->getMessage()],
-                Response::HTTP_BAD_REQUEST
-            );
-        }
-    }
-    #[Route('/{id}', name: 'show', methods: ['GET'])]
-    public function show(User $user): Response
+    #[Route('/profile', name: 'api_profile', methods: ['GET'])]
+    public function profile(#[CurrentUser] ?User $user): JsonResponse
     {
-        $user = $this->entityManager->getRepository(User::class)->find($user->getId());
         if (!$user) {
-            return new JsonResponse(
-                ['error' => 'User not found'],
-                Response::HTTP_NOT_FOUND
-            );
+            return new JsonResponse([
+                'success' => false,
+                'error' => 'Unauthorized',
+                'message' => 'User not authenticated'
+            ], Response::HTTP_UNAUTHORIZED);
         }
-        $responseData = $this->serializer->serialize($user, 'json');
-        return new JsonResponse($responseData, Response::HTTP_OK, [], true);
+
+        return new JsonResponse([
+            'success' => true,
+            'user' => [
+                'id' => $user->getId(),
+                'email' => $user->getEmail(),
+                'firstName' => $user->getFirstName(),
+                'lastName' => $user->getLastName(),
+                'roles' => $user->getRoles(),
+                'apiToken' => $user->getApiToken(),
+                'token' => $user->getApiToken()
+            ]
+        ]);
     }
 
     #[Route('/{id}', name: 'edit', methods: ['PUT'])]
