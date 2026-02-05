@@ -7,28 +7,64 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Enum\TypeDishes;
+use App\Enum\CategoryDishes;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\ApiResource;
+use Doctrine\ORM\Mapping\JoinColumn;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Config\SecurityConfig;
 
 #[ORM\Entity(repositoryClass: DishesRepository::class)]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            normalizationContext: ['groups' => ['dish:detail', 'menu:detail', 'dish:list']]
+        ),
+        new Get(
+            normalizationContext: ['groups' => ['dish:detail']]
+        ),
+
+        new Post(
+
+            denormalizationContext: ['groups' => ['dish:write']]
+        ),
+        new Put(
+
+            denormalizationContext: ['groups' => ['dish:write']]
+        ),
+        new Delete(),
+    ]
+)]
+
 class Dishes
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['dish:read', 'dish:detail', 'menu:detail', 'menu_dish:read', 'dish:list'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['menu_dish:read', 'dish:read', 'dish:list', 'dish:detail', 'dish:write', 'menu:detail'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['dish:list', 'dish:detail', 'dish:write', 'menu:detail'])]
     private ?string $description = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    #[Groups(['menu_dish:read', 'dish:list', 'dish:detail', 'dish:write', 'menu:detail'])]
     private ?string $price = null;
 
-    #[ORM\Column(enumType: TypeDishes::class, nullable: false)]
-    private ?TypeDishes $type = null;
+    #[Groups(['menu_dish:read', 'dish:list', 'dish:detail', 'menu:detail'])]
+    #[ORM\Column(enumType: CategoryDishes::class, nullable: false)]
+    private ?CategoryDishes $category = null;
 
+    #[Groups(['dish:detail'])]
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
@@ -38,12 +74,13 @@ class Dishes
     /**
      * @var Collection<int, MenusDishes>
      */
-    #[ORM\OneToMany(targetEntity: MenusDishes::class, mappedBy: 'dish')]
+    #[ORM\OneToMany(targetEntity: MenusDishes::class, mappedBy: 'dish', cascade: ['persist', 'remove'])]
     private Collection $menusDishes;
 
     /**
      * @var Collection<int, DishAllergen>
      */
+    #[Groups(['menu_dish:read', 'dish:list', 'dish:detail', 'dish:write', 'menu:detail'])]
     #[ORM\OneToMany(targetEntity: DishAllergen::class, mappedBy: 'dish')]
     private Collection $dishAllergens;
 
@@ -51,8 +88,8 @@ class Dishes
     {
         $this->menusDishes = new ArrayCollection();
         $this->dishAllergens = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
     }
-
     public function getId(): ?int
     {
         return $this->id;
@@ -117,14 +154,13 @@ class Dishes
 
         return $this;
     }
-    public function getType(): ?TypeDishes
+    public function getCategory(): ?CategoryDishes
     {
-        return $this->type;
+        return $this->category;
     }
-    public function setType(TypeDishes $type): static
+    public function setCategory(CategoryDishes $category): static
     {
-        $this->type = $type;
-
+        $this->category = $category;
         return $this;
     }
 
@@ -186,5 +222,26 @@ class Dishes
         }
 
         return $this;
+    }
+    public function updateDishAllergens(array $allergens): static
+    {
+        // Supprimer les allergènes existants
+        foreach ($this->dishAllergens as $dishAllergen) {
+            $this->removeDishAllergen($dishAllergen);
+        }
+
+        // Ajouter les nouveaux allergènes
+        foreach ($allergens as $allergen) {
+            $dishAllergen = new DishAllergen();
+            $dishAllergen->setAllergen($allergen);
+            $this->addDishAllergen($dishAllergen);
+        }
+
+        return $this;
+    }
+
+    public function getMenuCount(): int
+    {
+        return $this->menusDishes->count();
     }
 }
