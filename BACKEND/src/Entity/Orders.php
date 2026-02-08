@@ -6,39 +6,52 @@ use App\Repository\OrdersRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+use Symfony\Component\Serializer\Attribute\Groups;
+
+
 #[ORM\Entity(repositoryClass: OrdersRepository::class)]
 class Orders
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['orders:read'])]
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups(['orders:read', 'orders:write'])]
     private ?int $numberOfPeople = null;
 
     #[ORM\Column]
+    #[Groups(['orders:read'])]
     private ?float $totalPrice = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 0, nullable: true)]
+    #[Groups(['orders:read', 'orders:write'])]
     private ?string $deliveryCost = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['orders:read', 'orders:write'])]
     private ?string $deliveryAddress = null;
 
     #[ORM\Column]
+    #[Groups(['orders:read', 'orders:write'])]
     private ?\DateTime $deliveryDate = null;
 
     #[ORM\Column(type: Types::TIME_MUTABLE)]
+    #[Groups(['orders:read', 'orders:write'])]
     private ?\DateTime $deliveryTime = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['orders:read', 'orders:write'])]
     private ?string $status = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['orders:read'])]
     private ?string $cancellationReason = null;
 
     #[ORM\Column]
+    #[Groups(['orders:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
@@ -245,6 +258,9 @@ class Orders
     public function setDeliveryPostalCode(int $deliveryPostalCode): static
     {
         $this->deliveryPostalCode = $deliveryPostalCode;
+        if (!preg_match('/^\d{5}$/', (string)$deliveryPostalCode)) {
+            throw new \InvalidArgumentException('Le code postal doit être un nombre à 5 chiffres');
+        }
 
         return $this;
     }
@@ -259,5 +275,16 @@ class Orders
         $this->concaledBy = $concaledBy;
 
         return $this;
+    }
+    public function cancelOrder(string $reason, string $cancelledBy): void
+    {
+        $this->setStatus('annulée');
+        $this->setCancellationReason($reason);
+        $this->setConcaledBy($cancelledBy);
+    }
+    public function isCancellable(): bool
+    {
+        $cancellableStatuses = ['en attente'];
+        return in_array($this->status, $cancellableStatuses);
     }
 }

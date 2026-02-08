@@ -149,3 +149,24 @@ detail:
     path: /api/dish_allergen/{id}/detail
     controller: App\Controller\DishAllergenController::detail
     methods: [GET]
+
+api_orders_show:
+    path: /api/orders/{id}
+    controller: App\Controller\OrdersController::show
+    methods: [GET]
+order_cancel:
+    path: /api/orders/{id}/cancel
+    controller: App\Controller\OrdersController::cancel
+    methods: [DELETE]
+order_complete:
+    path: /api/orders/{id}/complete
+    controller: App\Controller\OrdersController::complete
+    methods: [POST]
+orders_list:
+    path: /api/orders
+    controller: App\Controller\OrdersController::list
+    methods: [GET]
+orders_esit:
+    path: /api/orders/{id}/edit
+    controller: App\Controller\OrdersController::edit
+    methods: [PUT]

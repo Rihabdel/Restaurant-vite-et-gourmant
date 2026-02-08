@@ -283,16 +283,18 @@ class Menus
     {
         return $this->stock > 0;
     }
-    public function calculate_total_price(int $numberofPeople): float
+    public function calculate_total_price(int $numberOfPeople): float
     {
-        return $this->price * $numberofPeople;
-        if ($numberofPeople < $this->minPeople) {
-            throw new \InvalidArgumentException(sprintf('Le nombre de personnes (%d) est insuffisant pour ce menu (minimum: %d)', $numberofPeople, $this->minPeople));
-        } else if ($numberofPeople >= $this->minPeople + 5) {
-            return $this->price * 0.9 * $numberofPeople;
+        $basePrice = $this->getPrice() * $numberOfPeople;
+
+        // Appliquer réduction de 10% si +5 personnes au-delà du minimum
+        if ($numberOfPeople > $this->getMinPeople() + 5) {
+            $basePrice *= 0.9; // Réduction de 10%
         } else {
-            return $this->price * $numberofPeople;
+            $basePrice *= 1.0; // Pas de réduction
         }
+
+        return $basePrice;
     }
     // Get all allergenes from the dishes in the menu
 

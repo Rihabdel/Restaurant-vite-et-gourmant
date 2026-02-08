@@ -134,7 +134,6 @@ final class MenusController extends AbstractController
                 error_log("Nombre de résultats: " . count($menu));
                 $menusDishes = $this->entityManager->getRepository(MenusDishesRepository::class)->findAll();
 
-
                 $responseData = $this->serializer->serialize($menusDishes, 'json', [
                     'groups' => ['menu:list', 'dish:read'],
                 ]);
