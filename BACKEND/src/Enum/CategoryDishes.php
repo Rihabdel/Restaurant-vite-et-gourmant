@@ -24,15 +24,15 @@ enum CategoryDishes: string
         }
         return $choices;
     }
-    public function est_entree(): bool
+    public function entree(): bool
     {
         return $this === self::entree;
     }
-    public function est_plat(): bool
+    public function plat(): bool
     {
         return $this === self::plat;
     }
-    public function est_dessert(): bool
+    public function dessert(): bool
     {
         return $this === self::dessert;
     }

@@ -20,6 +20,7 @@ use symfony\component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use OpenApi\Attributes as OA;
 
 #[Route('api/dishes', name: 'app_api_dishes_')]
 final class DishesController extends AbstractController
@@ -28,11 +29,61 @@ final class DishesController extends AbstractController
         private EntityManagerInterface $entityManager,
         private SerializerInterface $serializer,
         private ValidatorInterface $validator
-    ) {
-        $id = null;
-    }
+    ) {}
 
     #[Route('/new', methods: ['POST'], name: 'new')]
+    #[
+        OA\Post(
+            tags: ['Dish'],
+            summary: 'Créer un nouveau plat',
+            description: 'Cette endpoint permet de créer un nouveau plat dans le menu.',
+            requestBody: new OA\RequestBody(
+                required: true,
+                content: new OA\JsonContent(
+                    example: [
+                        'name' => 'Pizza Margherita',
+                        'description' => 'Une pizza classique avec sauce tomate, mozzarella et basilic.',
+                        'price' => 12.99,
+                        'category' => 'main_course',
+                        'allergens' => [1, 2] // IDs des allergènes associés
+                    ]
+                )
+            ),
+            responses: [
+                new OA\Response(
+                    response: 201,
+                    description: 'Plat créé avec succès',
+                    content: new OA\JsonContent(
+                        example: [
+                            'id' => 1,
+                            'name' => 'Pizza Margherita',
+                            'description' => 'Une pizza classique avec sauce tomate, mozzarella et basilic.',
+                            'price' => 12.99,
+                            'category' => 'main_course',
+                            'createdAt' => '2024-06-01T12:00:00Z',
+                            'allergens' => [
+                                ['id' => 1, 'name' => 'Gluten'],
+                                ['id' => 2, 'name' => 'Lactose']
+                            ]
+                        ]
+                    )
+                ),
+                new OA\Response(
+                    response: 400,
+                    description: 'Requête invalide'
+                ),
+                new OA\Response(
+                    response: 422,
+                    description: 'Validation échouée'
+                ),
+                new OA\Response(
+                    response: 500,
+                    description: 'Erreur serveur'
+                )
+            ]
+        )
+
+    ]
     public function new(Request $request): JsonResponse
     {
         try {
@@ -90,7 +141,6 @@ final class DishesController extends AbstractController
 
             $dish->setCategory($category);
             $dish->setCreatedAt(new DateTimeImmutable());
-            $dish->setUpdatedAt(new DateTimeImmutable());
 
             // Gestion des allergènes associés
             if (!empty($allergenIds)) {
@@ -146,31 +196,138 @@ final class DishesController extends AbstractController
             );
         }
     }
-
-
-
     #[Route('/{id}', methods: ['GET'], name: 'show')]
-    public function show(int $id, DishesRepository $dishesRepository): Response
+    #[OA\Get(
+        tags: ['Dish'],
+        summary: 'Afficher les détails d\'un plat',
+        description: 'Cette endpoint permet de récupérer les détails d\'un plat spécifique en utilisant son ID.',
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                in: 'path',
+                description: 'ID du plat à récupérer',
+                required: true,
+                schema: new OA\Schema(type: 'integer')
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Détails du plat récupérés avec succès',
+                content: new OA\JsonContent(
+                    example: [
+                        'id' => 1,
+                        'name' => 'nom du plat',
+                        'description' => 'description du plat.',
+                        'price' => 12.99,
+                        'category' => 'entree',
+                        'createdAt' => '2024-06-01T12:00:00Z',
+                        'allergens' => [
+                            ['id' => 1, 'name' => 'nom de l\'allergène'],
+                            ['id' => 2, 'name' => 'nom de l\'allergène']
+                        ]
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'Plat non trouvé'
+            ),
+            new OA\Response(
+                response: 500,
+                description: 'Erreur serveur'
+            )
+        ]
+    )]
+
+    public function show(int $id, EntityManagerInterface $em): Response
 
     {
-        $dish = $dishesRepository->find($id);
+        $dish = $em->getRepository(Dishes::class)->find($id);
         if (!$dish) {
             return new JsonResponse(
-                ['message' => 'Dishes not found'],
+                ['message' => 'Dish not found'],
                 Response::HTTP_NOT_FOUND
             );
         }
-        $responseData = $this->serializer->serialize($dish, 'json');
-        return new JsonResponse($responseData, Response::HTTP_OK, [], true);
+        return new JsonResponse(
+            $this->serializer->serialize($dish, 'json', ['groups' => ['dish:detail']]),
+            Response::HTTP_OK,
+            [],
+            true
+        );
     }
 
     #[Route('/{id}', methods: ['PUT'], name: 'edit')]
+    #[OA\Put(
+        tags: ['Dish'],
+        summary: 'Mettre à jour un plat',
+        description: 'Cette endpoint permet de mettre à jour les informations d\'un plat existant en utilisant son ID.',
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                in: 'path',
+                description: 'ID du plat à mettre à jour',
+                required: true,
+                schema: new OA\Schema(type: 'integer')
+            )
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                example: [
+                    'name' => 'plat à mettre à jour',
+                    'description' => 'description à mettre à jour.',
+                    'price' => 14.99,
+                    'category' => 'ENTREE',
+                    'allergens' => [1, 2] // IDs des allergènes associés
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Plat mis à jour avec succès',
+                content: new OA\JsonContent(
+                    example: [
+                        'id' => 1,
+                        'name' => 'nom du plat mis à jour',
+                        'description' => 'description du plat mis à jour.',
+                        'price' => 14.99,
+                        'category' => 'ENTREE',
+                        'createdAt' => '2024-06-01T12:00:00Z',
+                        'allergens' => [
+                            ['id' => 1, 'name' => 'nom de l\'allergène'],
+                            ['id' => 2, 'name' => 'nom de l\'allergène']
+                        ]
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 400,
+                description: 'Requête invalide'
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'Plat non trouvé'
+            ),
+            new OA\Response(
+                response: 422,
+                description: 'Validation échouée'
+            ),
+            new OA\Response(
+                response: 500,
+                description: 'Erreur serveur'
+            )
+        ]
+    )]
     public function update(
         int $id,
         Request $request,
         EntityManagerInterface $em,
         ValidatorInterface $validator
     ): Response {
+
         $dish = $em->getRepository(Dishes::class)->find($id);
 
         if (!$dish) {
@@ -205,6 +362,36 @@ final class DishesController extends AbstractController
     }
 
     #[Route('/{id}', methods: ['DELETE'], name: 'delete')]
+    #[
+        OA\Delete(
+            tags: ['Dish'],
+            summary: 'Supprimer un plat',
+            description: 'Cette endpoint permet de supprimer un plat existant en utilisant son ID.',
+            parameters: [
+                new OA\Parameter(
+                    name: 'id',
+                    in: 'path',
+                    description: 'ID du plat à supprimer',
+                    required: true,
+                    schema: new OA\Schema(type: 'integer')
+                )
+            ],
+            responses: [
+                new OA\Response(
+                    response: 200,
+                    description: 'Plat supprimé avec succès'
+                ),
+                new OA\Response(
+                    response: 404,
+                    description: 'Plat non trouvé'
+                ),
+                new OA\Response(
+                    response: 500,
+                    description: 'Erreur serveur'
+                )
+            ]
+        )
+    ]
     public function delete(EntityManagerInterface $entityManager, int $id, Request $request): Response
     {
 

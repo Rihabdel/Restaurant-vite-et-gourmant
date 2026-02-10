@@ -13,28 +13,12 @@ use ApiPlatform\Metadata\Delete;
 use PhpParser\Node\Stmt\Unset_;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-use function Symfony\Component\String\u;
+
 
 #[ORM\Entity(repositoryClass: MenusDishesRepository::class)]
 #[ApiResource(
-    operations: [
-        new GetCollection(
-            normalizationContext: ['groups' => ['menu_dish:list']]
-        ),
-        new Get(
-            normalizationContext: ['groups' => ['menu_dish:read']]
-        ),
-        new Post(
-            normalizationContext: ['groups' => ['menu_dish:read']],
-            denormalizationContext: ['groups' => ['menu_dish:write']]
-        ),
-        new Put(
-            normalizationContext: ['groups' => ['menu_dish:read']],
-            denormalizationContext: ['groups' => ['menu_dish:write']]
 
-        ),
-        new Delete(),
-    ]
+    operations: []
 )]
 
 class MenusDishes
@@ -56,7 +40,7 @@ class MenusDishes
 
     #[ORM\Column]
 
-    private ?int $display_order = null;
+    private ?int $displayOrder = null;
 
     public function getId(): ?int
     {
@@ -90,12 +74,12 @@ class MenusDishes
 
     public function getDisplayOrder(): ?int
     {
-        return $this->display_order;
+        return $this->displayOrder;
     }
 
-    public function setDisplayOrder(int $display_order): static
+    public function setDisplayOrder(int $displayOrder): static
     {
-        $this->display_order = $display_order;
+        $this->displayOrder = $displayOrder;
 
         return $this;
     }

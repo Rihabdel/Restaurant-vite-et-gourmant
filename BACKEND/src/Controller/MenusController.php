@@ -22,25 +22,48 @@ use symfony\component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use OpenApi\Attributes as OA;
 
 
 
-#[Route('api/menu', name: 'app_api_menus_')]
+#[Route('/api/menu', name: 'app_api_menus_')]
 final class MenusController extends AbstractController
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
         private SerializerInterface $serializer,
         private ValidatorInterface $validator,
-        private MenusDishesRepository $menusDishesRepository
-    ) {
-        $id = null;
-    }
 
-    #[Route('/new', methods: ['POST'], name: 'new')]
+    ) {}
+    #[Route('/new', name: 'new', methods: ['POST'])]
+    #[OA\Post(
+        tags: ['Menu'],
+        summary: 'Créer un nouveau menu',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                type: 'object',
+                properties: [
+                    new OA\Property(property: 'title', type: 'string', example: 'Menu du jour'),
+                    new OA\Property(property: 'descriptionMenu', type: 'string', example: 'Un menu délicieux pour aujourd\'hui'),
+                    new OA\Property(property: 'price', type: 'string', format: 'float', example: 19.99),
+                    new OA\Property(property: 'minPeople', type: 'integer', example: 10),
+                    new OA\Property(property: 'orderBefore', type: 'integer', example: 24),
+                    new OA\Property(property: 'conditions', type: 'string', example: 'Aucune annulation possible après 24h avant la date de livraison'),
+                    new OA\Property(property: 'stock', type: 'integer', example: 10),
+                    new OA\Property(property: 'themeMenu', type: 'string', enum: ['classique', 'noel', 'anniversaire', 'mariage', 'paques'], example: 'classique'),
+                    new OA\Property(property: 'dietMenu', type: 'string', enum: ['classique', 'vegetarien', 'vegan', 'sans_gluten', 'autres'], example: 'vegetarien'),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 201, description: 'Menu créé'),
+            new OA\Response(response: 422, description: 'Erreur de validation')
+        ]
+    )]
+
     public function new(Request $request): JsonResponse
     {
-        $menu = new Menus();
         //decoder le json
         $data = json_decode($request->getContent(), true);
         if (!isset($data['themeMenu'])) {
@@ -114,7 +137,54 @@ final class MenusController extends AbstractController
             'Location' => $location
         ], true);
     }
-    #[Route('', name: 'list', methods: ['GET'])]
+
+    #[Route('/list', name: 'list', methods: ['GET'])]
+    #[OA\Get(
+        tags: ['Menu'],
+        summary: 'Lister les menus avec filtres optionnels',
+        parameters: [
+            new OA\Parameter(
+                name: 'price_max',
+                in: 'query',
+                description: 'Prix maximum du menu',
+                required: false,
+                schema: new OA\Schema(type: 'number', format: 'float')
+            ),
+            new OA\Parameter(
+                name: 'price_min',
+                in: 'query',
+                description: 'Prix minimum du menu',
+                required: false,
+                schema: new OA\Schema(type: 'number', format: 'float')
+            ),
+            new OA\Parameter(
+                name: 'theme',
+                in: 'query',
+                description: 'Thème du menu (classique, noel, anniversaire, mariage, paques)',
+                required: false,
+                schema: new OA\Schema(type: 'string', enum: ['classique', 'noel', 'anniversaire', 'mariage', 'paques'])
+            ),
+            new OA\Parameter(
+                name: 'diet',
+                in: 'query',
+                description: 'Régime du menu (classique, vegetarien, vegan, sans_gluten, autres)',
+                required: false,
+                schema: new OA\Schema(type: 'string', enum: ['classique', 'vegetarien', 'vegan', 'sans_gluten', 'autres'])
+            ),
+            new OA\Parameter(
+                name: 'min_persons',
+                in: 'query',
+                description: 'Nombre minimum de personnes pour le menu',
+                required: false,
+                schema: new OA\Schema(type: 'integer')
+            )
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Liste des menus'),
+            new OA\Response(response: 404, description: 'Aucun menu trouvé avec ces critères'),
+            new OA\Response(response: 422, description: 'Erreur de validation des filtres')
+        ]
+    )]
     public function list(MenusRepository $repository, Request $request): JsonResponse
     {
         try {
@@ -188,6 +258,23 @@ final class MenusController extends AbstractController
         }
     }
     #[Route('/{id}', methods: ['GET'], name: 'show')]
+    #[OA\Get(
+        tags: ['Menu'],
+        summary: 'Afficher les détails d\'un menu',
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                in: 'path',
+                description: 'ID du menu à afficher',
+                required: true,
+                schema: new OA\Schema(type: 'integer')
+            )
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Détails du menu'),
+            new OA\Response(response: 404, description: 'Menu non trouvé')
+        ]
+    )]
     public function show(int $id): JsonResponse
     {
         $menus = $this->entityManager->getRepository(Menus::class)->find($id);
@@ -202,6 +289,41 @@ final class MenusController extends AbstractController
     }
 
     #[Route('/{id}', methods: ['PUT'], name: 'edit')]
+    #[OA\Put(
+        tags: ['Menu'],
+        summary: 'Modifier un menu existant',
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                in: 'path',
+                description: 'ID du menu à modifier',
+                required: true,
+                schema: new OA\Schema(type: 'integer')
+            )
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                type: 'object',
+                properties: [
+                    new OA\Property(property: 'title', type: 'string', example: 'Menu du jour'),
+                    new OA\Property(property: 'descriptionMenu', type: 'string', example: 'Un menu délicieux pour aujourd\'hui'),
+                    new OA\Property(property: 'price', type: 'string', format: 'float', example: 19.99),
+                    new OA\Property(property: 'orderBefore', type: 'integer', example: 24),
+                    new OA\Property(property: 'minPeople', type: 'integer', example: 1),
+                    new OA\Property(property: 'conditions', type: 'string', example: 4),
+                    new OA\Property(property: 'stock', type: 'integer', example: 10),
+                    new OA\Property(property: 'themeMenu', type: 'string', enum: ['classique', 'noel', 'anniversaire', 'mariage', 'paques'], example: 'classique'),
+                    new OA\Property(property: 'dietMenu', type: 'string', enum: ['classique', 'vegetarien', 'vegan', 'sans_gluten', 'autres'], example: 'vegetarien'),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: 'Menu modifié'),
+            new OA\Response(response: 404, description: 'Menu non trouvé'),
+            new OA\Response(response: 422, description: 'Erreur de validation')
+        ]
+    )]
     public function edit(EntityManagerInterface $entityManager, int $id): JsonResponse
     {
         $menus = $entityManager->getRepository(Menus::class)->find($id);
@@ -232,6 +354,23 @@ final class MenusController extends AbstractController
         ], true);
     }
     #[Route('/{id}', methods: ['DELETE'], name: 'delete')]
+    #[OA\Delete(
+        tags: ['Menu'],
+        summary: 'Supprimer un menu',
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                in: 'path',
+                description: 'ID du menu à supprimer',
+                required: true,
+                schema: new OA\Schema(type: 'integer')
+            )
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Menu supprimé'),
+            new OA\Response(response: 404, description: 'Menu non trouvé')
+        ]
+    )]
     public function delete(EntityManagerInterface $entityManager, int $id): Response
     {
 
@@ -246,53 +385,6 @@ final class MenusController extends AbstractController
         $entityManager->flush();
         return new JsonResponse(
             ['message' => 'Menus deleted successfully'],
-            Response::HTTP_OK
-        );
-    }
-
-
-    //public functions for menu dishes management
-
-
-
-
-    // ajouter un plat à un menu
-
-    #[Route('/{id}/dish', methods: ['DELETE'], name: 'remove_dish_from_menu')]
-    public function removeDishFromMenu(int $id, Request $request): JsonResponse
-    {
-        $menu = $this->entityManager->getRepository(Menus::class)->find($id);
-        if (!$menu) {
-            return new JsonResponse(
-                ['message' => 'Menu non trouvé'],
-                Response::HTTP_NOT_FOUND
-            );
-        }
-        $data = json_decode($request->getContent(), true);
-        if (!isset($data['dish_id'])) {
-            return new JsonResponse(
-                ['message' => 'ID du plat manquant'],
-                Response::HTTP_BAD_REQUEST
-            );
-        }
-        $dishId = $data['dish_id'];
-        $dish = $this->entityManager->getRepository(Dishes::class)->find($dishId);
-        if (!$dish) {
-            return new JsonResponse(
-                ['message' => 'Plat non trouvé'],
-                Response::HTTP_NOT_FOUND
-            );
-        }
-        $errors = $this->menusDishesRepository->isDishInMenu($menu, $dish);
-        if (empty($errors)) {
-            return new JsonResponse(
-                ['message' => 'Le plat n\'est pas dans le menu'],
-                Response::HTTP_UNPROCESSABLE_ENTITY
-            );
-        }
-        $this->menusDishesRepository->removeDishFromMenu($menu, $dish);
-        return new JsonResponse(
-            ['message' => 'Plat supprimé du menu avec succès'],
             Response::HTTP_OK
         );
     }

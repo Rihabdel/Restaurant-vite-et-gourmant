@@ -20,24 +20,7 @@ use Symfony\Config\SecurityConfig;
 
 #[ORM\Entity(repositoryClass: DishesRepository::class)]
 #[ApiResource(
-    operations: [
-        new GetCollection(
-            normalizationContext: ['groups' => ['dish:detail', 'menu:detail', 'dish:list']]
-        ),
-        new Get(
-            normalizationContext: ['groups' => ['dish:detail']]
-        ),
-
-        new Post(
-
-            denormalizationContext: ['groups' => ['dish:write']]
-        ),
-        new Put(
-
-            denormalizationContext: ['groups' => ['dish:write']]
-        ),
-        new Delete(),
-    ]
+    operations: []
 )]
 
 class Dishes
@@ -184,11 +167,8 @@ class Dishes
 
     public function removeMenusDish(MenusDishes $menusDish): static
     {
-        if ($this->menusDishes->removeElement($menusDish)) {
-            // set the owning side to null (unless already changed)
-            if ($menusDish->getDish() === $this) {
-                $menusDish->setDish(null);
-            }
+        if ($this->menusDishes->removeElement($menusDish) && $menusDish->getDish() === $this) {
+            $menusDish->setDish(null);
         }
 
         return $this;
@@ -214,11 +194,8 @@ class Dishes
 
     public function removeDishAllergen(DishAllergen $dishAllergen): static
     {
-        if ($this->dishAllergens->removeElement($dishAllergen)) {
-            // set the owning side to null (unless already changed)
-            if ($dishAllergen->getDish() === $this) {
-                $dishAllergen->setDish(null);
-            }
+        if ($this->dishAllergens->removeElement($dishAllergen) && $dishAllergen->getDish() === $this) {
+            $dishAllergen->setDish(null);
         }
 
         return $this;

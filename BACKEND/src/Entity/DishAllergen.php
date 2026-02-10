@@ -14,21 +14,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: DishAllergenRepository::class)]
 #[ApiResource(
-    operations: [
-        new GetCollection(
-            normalizationContext: ['groups' => ['dish_allergen:read']]
-        ),
-        new Get(
-            normalizationContext: ['groups' => ['dish_allergen:read']]
-        ),
-        new Post(
-            denormalizationContext: ['groups' => ['allergen:write', 'dish:detail']]
-        ),
-        new Put(),
-        new Delete(
-            denormalizationContext: ['groups' => ['allergen:write', 'dish:detail']]
-        )
-    ]
+    operations: []
 )]
 class DishAllergen
 {

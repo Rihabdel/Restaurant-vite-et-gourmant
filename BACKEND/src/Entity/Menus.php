@@ -11,39 +11,13 @@ use App\Enum\Theme;
 use App\Enum\Diet;
 use PhpParser\Builder\Enum_;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Get;
 use Symfony\Component\Serializer\Attribute\Groups;
-use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
-use ApiPlatform\Metadata\Delete;
-use ContainerTMkOneg\getDataCollector_Request_SessionCollectorService;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: MenusRepository::class)]
 #[ApiResource(
-    operations: [
-        new GetCollection(
-
-            normalizationContext: ['groups' => ['menu:list']]
-        ),
-        new Get(
-
-            normalizationContext: ['groups' => ['menu:detail']]
-        ),
-
-        new Post(
-            security: 'is_granted("ROLE_ADMIN") or is_granted("ROLE_EMPLOYEE")',
-            denormalizationContext: ['groups' => ['menu:write']]
-        ),
-        new Put(
-            security: 'is_granted("ROLE_ADMIN") or is_granted("ROLE_EMPLOYEE")',
-            denormalizationContext: ['groups' => ['menu:write']]
-        ),
-        new Delete(
-            security: 'is_granted("ROLE_ADMIN") or is_granted("ROLE_EMPLOYEE")'
-        ),
-    ]
+    uriTemplate: '/menu',
+    operations: []
 )]
 
 class Menus
@@ -59,8 +33,8 @@ class Menus
     private ?string $title = null;
 
     #[Groups(['menu:read', 'menu:list', 'menu:write', 'menu:detail', 'order:read'])]
-    #[ORM\Column(type: Types::TEXT)]
-    private ?string $description = null;
+    #[ORM\Column(type: Types::TEXT, nullable: false)]
+    private ?string $descriptionMenu = null;
 
     #[Groups(['menu:read', 'menu:list', 'menu:detail', 'order:read'])]
     #[ORM\Column(type: Types::BLOB, nullable: true)]
@@ -111,6 +85,12 @@ class Menus
     #[ORM\OneToMany(targetEntity: Orders::class, mappedBy: 'menu', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $orders;
 
+    #[ORM\Column(nullable: false)]
+    private ?int $orderBefore = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $isAvailable = null;
+
 
     public function __construct()
     {
@@ -135,14 +115,14 @@ class Menus
         return $this;
     }
     #[Groups(['menu_dish:list'])]
-    public function getDescription(): ?string
+    public function getDescriptionMenu(): ?string
     {
-        return $this->description;
+        return $this->descriptionMenu;
     }
 
-    public function setDescription(string $description): static
+    public function setDescriptionMenu(string $descriptionMenu): static
     {
-        $this->description = $description;
+        $this->descriptionMenu = $descriptionMenu;
 
         return $this;
     }
@@ -371,5 +351,29 @@ class Menus
             $dishes[] = $menuDish->getDish();
         }
         return $dishes;
+    }
+
+    public function getOrderBefore(): ?int
+    {
+        return $this->orderBefore;
+    }
+
+    public function setOrderBefore(int $orderBefore): static
+    {
+        $this->orderBefore = $orderBefore;
+
+        return $this;
+    }
+
+    public function isAvailable(): ?bool
+    {
+        return $this->isAvailable;
+    }
+
+    public function setIsAvailable(?bool $isAvailable): static
+    {
+        $this->isAvailable = $isAvailable;
+
+        return $this;
     }
 }

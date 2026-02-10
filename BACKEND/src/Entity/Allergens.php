@@ -18,24 +18,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: AllergensRepository::class)]
 #[ApiResource(
-    operations: [
-        new GetCollection(
-            normalizationContext: ['groups' => ['allergen:read', 'allergen:detail', 'dish:detail']]
-        ),
-        new Get(
-            normalizationContext: ['groups' => ['allergen:read', 'allergen:detail', 'dish:detail']]
-        ),
-
-        new Post(
-
-            denormalizationContext: ['groups' => ['allergen:write']]
-        ),
-        new Put(
-
-            denormalizationContext: ['groups' => ['allergen:write']]
-        ),
-        new Delete(),
-    ]
+    operations: []
 )]
 
 class Allergens
@@ -66,7 +49,7 @@ class Allergens
      * @var Collection<int, DishAllergen>
      */
     #[Groups(['allergen_dish:read'])]
-    #[ORM\OneToMany(targetEntity: DishAllergen::class, mappedBy: 'allergen')]
+    #[ORM\OneToMany(targetEntity: DishAllergen::class, mappedBy: 'allergen', cascade: ['persist', 'remove'])]
     private Collection $dishAllergens;
 
     public function __construct()
@@ -147,11 +130,18 @@ class Allergens
     }
     public function removeDishAllergen(DishAllergen $dishAllergen): static
     {
-        if ($this->dishAllergens->removeElement($dishAllergen)) {
-            // set the owning side to null (unless already changed)
-            if ($dishAllergen->getAllergen() === $this) {
-                $dishAllergen->setAllergen(null);
-            }
+        if ($this->dishAllergens->removeElement($dishAllergen) && $dishAllergen->getAllergen() === $this) {
+
+            $dishAllergen->setAllergen(null);
+        }
+
+        return $this;
+    }
+    public function remove(DishAllergen $dishAllergen): static
+    {
+        if ($this->dishAllergens->removeElement($dishAllergen) && $dishAllergen->getAllergen() === $this) {
+
+            $dishAllergen->setAllergen(null);
         }
 
         return $this;
