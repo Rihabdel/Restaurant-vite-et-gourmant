@@ -25,7 +25,7 @@ final class AllergensController extends AbstractController
     public function __construct(
         private EntityManagerInterface $entityManager,
         private SerializerInterface $serializer,
-        private AllergensRepository $allergensRepository
+
 
     ) {}
 
@@ -71,38 +71,31 @@ final class AllergensController extends AbstractController
     )]
     public function new(Request $request): JsonResponse
     {
-        try {
-            $data = json_decode($request->getContent(), true);
+        $data = json_decode($request->getContent(), true);
 
-            // Validation des champs obligatoires
-            if (empty($data['name']) || empty($data['description'])) {
-                return new JsonResponse(
-                    ['error' => 'Le champ nom et de description de l\'allergène est obligatoire'],
-                    Response::HTTP_BAD_REQUEST
-                );
-            }
-
-            $allergen = new Allergens();
-            $allergen->setName($data['name']);
-            $allergen->setDescription($data['description']);
-            $allergen->setCreatedAt(new DateTimeImmutable());
-
-            $this->entityManager->persist($allergen);
-            $this->entityManager->flush();
-
-            $responseData = $this->serializer->serialize($allergen, 'json');
-            $location = $this->generateUrl(
-                'app_api_allergens_show',
-                ['id' => $allergen->getId()],
-                UrlGeneratorInterface::ABSOLUTE_URL
-            );
-            return new JsonResponse($responseData, Response::HTTP_CREATED, ['Location' => $location], true);
-        } catch (\Exception $e) {
+        // Validation des champs obligatoires
+        if (empty($data['name']) || empty($data['description'])) {
             return new JsonResponse(
-                ['error' => 'Une erreur est survenue lors de la création de l\'allergène: ' . $e->getMessage()],
-                Response::HTTP_INTERNAL_SERVER_ERROR
+                ['error' => 'Le champ nom et de description de l\'allergène est obligatoire'],
+                Response::HTTP_BAD_REQUEST
             );
         }
+
+        $allergen = new Allergens();
+        $allergen->setName($data['name']);
+        $allergen->setDescription($data['description']);
+        $allergen->setCreatedAt(new DateTimeImmutable());
+
+        $this->entityManager->persist($allergen);
+        $this->entityManager->flush();
+
+        $responseData = $this->serializer->serialize($allergen, 'json');
+        $location = $this->generateUrl(
+            'app_api_allergens_show',
+            ['id' => $allergen->getId()],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        return new JsonResponse($responseData, Response::HTTP_CREATED, ['Location' => $location], true);
     }
 
 
