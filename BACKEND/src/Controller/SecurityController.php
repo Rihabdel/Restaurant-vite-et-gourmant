@@ -21,6 +21,43 @@ use OpenApi\Attributes as OA;
 final class SecurityController extends AbstractController
 {
     #[Route('/registration', name: 'registration', methods: ['POST'])]
+    #[OA\Post(
+        tags: ['Authentication'],
+        description: 'User registration endpoint',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: 'email', type: 'string'),
+                    new OA\Property(property: 'password', type: 'string'),
+                    new OA\Property(property: 'firstName', type: 'string'),
+                    new OA\Property(property: 'lastName', type: 'string'),
+
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 201,
+                description: 'User created successfully',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'user', type: 'string'),
+                        new OA\Property(property: 'email', type: 'string'),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 400,
+                description: 'Bad Request - missing or invalid data',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'error', type: 'string'),
+                    ]
+                )
+            )
+        ]
+    )]
     public function register(
         Request $request,
         UserPasswordHasherInterface $passwordHasher,
@@ -65,6 +102,7 @@ final class SecurityController extends AbstractController
     }
     #[Route('/login', name: 'login', methods: ['POST'])]
     #[OA\Post(
+        tags: ['Authentication'],
         description: 'Login endpoint',
         requestBody: new OA\RequestBody(
             required: true,
