@@ -4,8 +4,23 @@ namespace App\Entity;
 
 use App\Repository\MenusDishesRepository;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Delete;
+use PhpParser\Node\Stmt\Unset_;
+use Symfony\Component\Serializer\Attribute\Groups;
+
+
 
 #[ORM\Entity(repositoryClass: MenusDishesRepository::class)]
+#[ApiResource(
+
+    operations: []
+)]
+
 class MenusDishes
 {
     #[ORM\Id]
@@ -14,19 +29,24 @@ class MenusDishes
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'menusDishes')]
+
+    #[ORM\JoinColumn(onDelete: "CASCADE")]
     private ?Menus $menu = null;
 
-    #[ORM\ManyToOne(inversedBy: 'menusDishes')]
+    #[ORM\ManyToOne(targetEntity: Dishes::class, inversedBy: 'menusDishes')]
+
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Dishes $dish = null;
 
     #[ORM\Column]
-    private ?int $display_order = null;
+
+    private ?int $displayOrder = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
-
+    #[Groups(['menu_dish:list'])]
     public function getMenu(): ?Menus
     {
         return $this->menu;
@@ -51,15 +71,58 @@ class MenusDishes
         return $this;
     }
 
+
     public function getDisplayOrder(): ?int
     {
-        return $this->display_order;
+        return $this->displayOrder;
     }
 
-    public function setDisplayOrder(int $display_order): static
+    public function setDisplayOrder(int $displayOrder): static
     {
-        $this->display_order = $display_order;
+        $this->displayOrder = $displayOrder;
 
         return $this;
+    }
+
+    #[Groups(['menu_dish:detail'])]
+    public function getMenuDetails(): ?array
+    {
+        if (!$this->menu) {
+            return null;
+        }
+
+        return [
+            'id' => $this->menu->getId(),
+            'title' => $this->menu->getTitle(),
+            'description' => $this->menu->getDescription(),
+            'theme' => $this->menu->getThemeMenu(),
+            'diet' => $this->menu->getDietMenu(),
+            'min_people' => $this->menu->getMinPeople(),
+            'price' => $this->menu->getPrice(),
+        ];
+    }
+
+    #[Groups(['menu_dish:detail'])]
+    public function getDishDetails(): ?array
+    {
+        if (!$this->dish) {
+            return null;
+        }
+
+        return [
+            'id' => $this->dish->getId(),
+            'name' => $this->dish->getName(),
+            'description' => $this->dish->getDescription(),
+            'category' => $this->dish->getCategory(),
+            'price' => $this->dish->getPrice()
+        ];
+    }
+    #[Groups(['menu_dish:detail', 'menu_dish:list'])]
+    public function getMenuDishList(): ?string
+    {
+        if (!$this->menu || !$this->dish) {
+            return null;
+        }
+        return 'Menu: ' . $this->menu->getTitle();
     }
 }

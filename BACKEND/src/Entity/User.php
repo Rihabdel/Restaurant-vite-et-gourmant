@@ -9,8 +9,18 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Delete;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ApiResource(
+    operations: []
+)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -29,6 +39,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     const ROLE_EMPLOYE = 'ROLE_EMPLOYE';
     const ROLE_ADMIN = 'ROLE_ADMIN';
     #[ORM\Column]
+
+    #   [OA\Property(type: 'array', items: ['type' => 'string'])]
+
     private array $roles = [];
 
     /**
@@ -232,6 +245,32 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
+     * @return Collection<int, Orders>
+     */
+    public function getOrders(): Collection
+    {
+        return $this->orders;
+    }
+
+    public function addOrder(Orders $order): static
+    {
+        if (!$this->orders->contains($order)) {
+            $this->orders->add($order);
+            $order->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOrder(Orders $order): static
+    {
+        if ($this->orders->removeElement($order) && $order->getUser() === $this) {
+            $order->setUser(null);
+        }
+        return $this;
+    }
+
+    /**
      * @return Collection<int, ContactMsg>
      */
     public function getContactMsgs(): Collection
@@ -251,13 +290,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function removeContactMsg(ContactMsg $contactMsg): static
     {
-        if ($this->contactMsgs->removeElement($contactMsg)) {
-            // set the owning side to null (unless already changed)
-            if ($contactMsg->getUser() === $this) {
-                $contactMsg->setUser(null);
-            }
+        if ($this->contactMsgs->removeElement($contactMsg) && $contactMsg->getUser() === $this) {
+            $contactMsg->setUser(null);
         }
-
         return $this;
     }
     public function is_admin(): bool

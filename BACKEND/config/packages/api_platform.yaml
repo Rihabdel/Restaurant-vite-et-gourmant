@@ -1,0 +1,12 @@
+api_platform:
+    title: "Restaurant Vite et Gourmant API"
+    version: 1.0.0
+    defaults:
+        stateless: true
+        cache_headers:
+            vary: ["Content-Type", "Authorization", "Origin"]
+        cors: false
+
+        formats:
+            jsonld: ["application/ld+json"]
+            json: ["application/json"]

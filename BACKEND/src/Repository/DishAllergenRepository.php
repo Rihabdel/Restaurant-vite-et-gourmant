@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\DishAllergen;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use PhpParser\Node\Name;
 
 /**
  * @extends ServiceEntityRepository<DishAllergen>
@@ -15,29 +16,32 @@ class DishAllergenRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, DishAllergen::class);
     }
+    public function getAllergensForDish(int $dishId): array
+    {
+        return $this->createQueryBuilder('da')
+            ->select('a.id, a.name')
+            ->join('da.allergen', 'a')
+            ->join('da.dish', 'd')
+            ->where('d.id = :dishId')
+            ->setParameter('dishId', $dishId)
+            ->groupBy('a.id')
+            ->orderBy('a.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+    public function findAllergensByDishId(int $dishId): array
+    {
+        return $this->createQueryBuilder('da')
+            ->select('a.id, a.name')
 
-//    /**
-//     * @return DishAllergen[] Returns an array of DishAllergen objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('d')
-//            ->andWhere('d.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('d.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+            ->join('da.allergen', 'a')
+            ->join('da.dish', 'd')
+            ->where('d.id = :dishId')
+            ->setParameter('dishId', $dishId)
 
-//    public function findOneBySomeField($value): ?DishAllergen
-//    {
-//        return $this->createQueryBuilder('d')
-//            ->andWhere('d.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+            ->groupBy('a.id')
+            ->orderBy('a.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

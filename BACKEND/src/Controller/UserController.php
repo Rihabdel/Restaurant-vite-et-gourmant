@@ -20,13 +20,10 @@ use symfony\component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 
-
 #[Route('api/user', name: 'app_api_user_')]
 final class UserController extends AbstractController
 {
-    const ROLE_USER = 'ROLE_USER';
-    const ROLE_EMPLOYE = 'ROLE_EMPLOYE';
-    const ROLE_ADMIN = 'ROLE_ADMIN';
+
     public function __construct(
         private EntityManagerInterface $entityManager,
         private SerializerInterface $serializer,
@@ -34,31 +31,6 @@ final class UserController extends AbstractController
 
 
     ) {}
-
-    #[Route('/profile', name: 'api_profile', methods: ['GET'])]
-    public function profile(#[CurrentUser] ?User $user): JsonResponse
-    {
-        if (!$user) {
-            return new JsonResponse([
-                'success' => false,
-                'error' => 'Unauthorized',
-                'message' => 'User not authenticated'
-            ], Response::HTTP_UNAUTHORIZED);
-        }
-
-        return new JsonResponse([
-            'success' => true,
-            'user' => [
-                'id' => $user->getId(),
-                'email' => $user->getEmail(),
-                'firstName' => $user->getFirstName(),
-                'lastName' => $user->getLastName(),
-                'roles' => $user->getRoles(),
-                'apiToken' => $user->getApiToken(),
-                'token' => $user->getApiToken()
-            ]
-        ]);
-    }
 
     #[Route('/{id}', name: 'edit', methods: ['PUT'])]
     public function edit(Request $request, User $user): Response

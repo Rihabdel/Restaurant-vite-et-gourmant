@@ -5,234 +5,184 @@ namespace App\Entity;
 use App\Repository\OrdersRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Enum\Status;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Delete;
+use Symfony\Component\Serializer\Attribute\Groups;
+
 
 
 #[ORM\Entity(repositoryClass: OrdersRepository::class)]
+#[ApiResource(
+    operations: []
+)]
 class Orders
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['orders:read'])]
     private ?int $id = null;
 
-    #[ORM\Column(length: 20)]
-    private ?string $orderNumber = null;
+    #[ORM\Column]
+    #[Groups(['orders:read', 'orders:write'])]
+    private ?int $numberOfPeople = null;
 
     #[ORM\Column]
-    private ?int $peopleCount = null;
+    #[Groups(['orders:read'])]
+    private ?float $totalPrice = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTime $deleveryDate = null;
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 0, nullable: true)]
+    #[Groups(['orders:read', 'orders:write'])]
+    private ?string $deliveryCost = null;
+
+    #[ORM\Column(length: 255)]
+    #[Groups(['orders:read', 'orders:write'])]
+    private ?string $deliveryAddress = null;
+
+    #[ORM\Column]
+    #[Groups(['orders:read', 'orders:write'])]
+    private ?\DateTime $deliveryDate = null;
 
     #[ORM\Column(type: Types::TIME_MUTABLE)]
-    private ?\DateTime $deleveryTime = null;
-
-    #[ORM\Column(length: 100)]
-    private ?string $deleveryAdress = null;
-
-    #[ORM\Column(length: 100)]
-    private ?string $deleveryCity = null;
-
-    #[ORM\Column(length: 10)]
-    private ?string $deleveryPostalCode = null;
-
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    private ?string $menuPrice = null;
-
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
-    private ?string $deleveryFee = null;
-
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
-    private ?string $discount = null;
-
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    private ?string $totalPrice = null;
+    #[Groups(['orders:read', 'orders:write'])]
+    private ?\DateTime $deliveryTime = null;
 
     #[ORM\Column(length: 50)]
-    private ?string $concaledBy = null;
+    #[Groups(['orders:read', 'orders:write'])]
+    private ?string $status = null;
 
-    #[ORM\Column(length: 100)]
-    private ?string $cancelReason = null;
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['orders:read'])]
+    private ?string $cancellationReason = null;
 
     #[ORM\Column]
+    #[Groups(['orders:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\Column(enumType: Status::class, nullable: false)]
-    private ?Status $status = null;
-
     #[ORM\ManyToOne(inversedBy: 'orders')]
-    private ?Menus $menu = null;
-
-    #[ORM\ManyToOne(inversedBy: 'orders')]
+    #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
-    #[ORM\ManyToOne(inversedBy: 'Order_menu')]
-    private ?Menus $menus = null;
+    #[ORM\ManyToOne(inversedBy: 'orders')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Menus $menu = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?Reviews $review = null;
+
+    #[ORM\Column(length: 50)]
+    private ?string $deliveryCity = null;
+
+    #[ORM\Column]
+    private ?int $deliveryPostalCode = null;
+
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $concaledBy = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getOrderNumber(): ?string
+    public function getNumberOfPeople(): ?int
     {
-        return $this->orderNumber;
+        return $this->numberOfPeople;
     }
 
-    public function setOrderNumber(string $orderNumber): static
+    public function setNumberOfPeople(int $numberOfPeople): static
     {
-        $this->orderNumber = $orderNumber;
+        $this->numberOfPeople = $numberOfPeople;
 
         return $this;
     }
 
-    public function getPeopleCount(): ?int
-    {
-        return $this->peopleCount;
-    }
-
-    public function setPeopleCount(int $peopleCount): static
-    {
-        $this->peopleCount = $peopleCount;
-
-        return $this;
-    }
-
-    public function getDeleveryDate(): ?\DateTime
-    {
-        return $this->deleveryDate;
-    }
-
-    public function setDeleveryDate(\DateTime $deleveryDate): static
-    {
-        $this->deleveryDate = $deleveryDate;
-
-        return $this;
-    }
-
-    public function getDeleveryTime(): ?\DateTime
-    {
-        return $this->deleveryTime;
-    }
-
-    public function setDeleveryTime(\DateTime $deleveryTime): static
-    {
-        $this->deleveryTime = $deleveryTime;
-
-        return $this;
-    }
-
-    public function getDeleveryAdress(): ?string
-    {
-        return $this->deleveryAdress;
-    }
-
-    public function setDeleveryAdress(string $deleveryAdress): static
-    {
-        $this->deleveryAdress = $deleveryAdress;
-
-        return $this;
-    }
-
-    public function getDeleveryCity(): ?string
-    {
-        return $this->deleveryCity;
-    }
-
-    public function setDeleveryCity(string $deleveryCity): static
-    {
-        $this->deleveryCity = $deleveryCity;
-
-        return $this;
-    }
-
-    public function getDeleveryPostalCode(): ?string
-    {
-        return $this->deleveryPostalCode;
-    }
-
-    public function setDeleveryPostalCode(string $deleveryPostalCode): static
-    {
-        $this->deleveryPostalCode = $deleveryPostalCode;
-
-        return $this;
-    }
-
-    public function getMenuPrice(): ?string
-    {
-        return $this->menuPrice;
-    }
-
-    public function setMenuPrice(string $menuPrice): static
-    {
-        $this->menuPrice = $menuPrice;
-
-        return $this;
-    }
-
-    public function getDeleveryFee(): ?string
-    {
-        return $this->deleveryFee;
-    }
-
-    public function setDeleveryFee(?string $deleveryFee): static
-    {
-        $this->deleveryFee = $deleveryFee;
-
-        return $this;
-    }
-
-    public function getDiscount(): ?string
-    {
-        return $this->discount;
-    }
-
-    public function setDiscount(?string $discount): static
-    {
-        $this->discount = $discount;
-
-        return $this;
-    }
-
-    public function getTotalPrice(): ?string
+    public function getTotalPrice(): ?float
     {
         return $this->totalPrice;
     }
 
-    public function setTotalPrice(string $totalPrice): static
+    public function setTotalPrice(float $totalPrice): static
     {
         $this->totalPrice = $totalPrice;
 
         return $this;
     }
 
-    public function getConcaledBy(): ?string
+    public function getDeliveryCost(): ?string
     {
-        return $this->concaledBy;
+        return $this->deliveryCost;
     }
 
-    public function setConcaledBy(string $concaledBy): static
+    public function setDeliveryCost(?string $deliveryCost): static
     {
-        $this->concaledBy = $concaledBy;
+        $this->deliveryCost = $deliveryCost;
 
         return $this;
     }
 
-    public function getCancelReason(): ?string
+    public function getDeliveryAddress(): ?string
     {
-        return $this->cancelReason;
+        return $this->deliveryAddress;
     }
 
-    public function setCancelReason(string $cancelReason): static
+    public function setDeliveryAddress(string $deliveryAddress): static
     {
-        $this->cancelReason = $cancelReason;
+        $this->deliveryAddress = $deliveryAddress;
+
+        return $this;
+    }
+
+    public function getDeliveryDate(): ?\DateTime
+    {
+        return $this->deliveryDate;
+    }
+
+    public function setDeliveryDate(\DateTime $deliveryDate): static
+    {
+        $this->deliveryDate = $deliveryDate;
+
+        return $this;
+    }
+
+    public function getDeliveryTime(): ?\DateTime
+    {
+        return $this->deliveryTime;
+    }
+
+    public function setDeliveryTime(\DateTime $deliveryTime): static
+    {
+        $this->deliveryTime = $deliveryTime;
+
+        return $this;
+    }
+
+    public function getStatus(): ?string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(string $status): static
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    public function getCancellationReason(): ?string
+    {
+        return $this->cancellationReason;
+    }
+
+    public function setCancellationReason(?string $cancellationReason): static
+    {
+        $this->cancellationReason = $cancellationReason;
 
         return $this;
     }
@@ -254,39 +204,9 @@ class Orders
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
+    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-    public function getStatus(): ?Status
-    {
-        return $this->status;
-    }
-    public function setStatus(Status $status): static
-    {
-        $this->status = $status;
-
-        return $this;
-    }
-    public function getStatusLabel(): ?string
-    {
-        return $this->status?->label();
-    }
-    public function getStatusColor(): ?string
-    {
-        return $this->status?->color();
-    }
-
-    public function getMenu(): ?Menus
-    {
-        return $this->menu;
-    }
-
-    public function setMenu(?Menus $menu): static
-    {
-        $this->menu = $menu;
 
         return $this;
     }
@@ -303,14 +223,14 @@ class Orders
         return $this;
     }
 
-    public function getMenus(): ?Menus
+    public function getMenu(): ?Menus
     {
-        return $this->menus;
+        return $this->menu;
     }
 
-    public function setMenus(?Menus $menus): static
+    public function setMenu(?Menus $menu): static
     {
-        $this->menus = $menus;
+        $this->menu = $menu;
 
         return $this;
     }
@@ -325,5 +245,55 @@ class Orders
         $this->review = $review;
 
         return $this;
+    }
+
+    public function getDeliveryCity(): ?string
+    {
+        return $this->deliveryCity;
+    }
+
+    public function setDeliveryCity(string $deliveryCity): static
+    {
+        $this->deliveryCity = $deliveryCity;
+
+        return $this;
+    }
+
+    public function getDeliveryPostalCode(): ?int
+    {
+        return $this->deliveryPostalCode;
+    }
+
+    public function setDeliveryPostalCode(int $deliveryPostalCode): static
+    {
+        $this->deliveryPostalCode = $deliveryPostalCode;
+        if (!preg_match('/^\d{5}$/', (string)$deliveryPostalCode)) {
+            throw new \InvalidArgumentException('Le code postal doit être un nombre à 5 chiffres');
+        }
+
+        return $this;
+    }
+
+    public function getConcaledBy(): ?string
+    {
+        return $this->concaledBy;
+    }
+
+    public function setConcaledBy(?string $concaledBy): static
+    {
+        $this->concaledBy = $concaledBy;
+
+        return $this;
+    }
+    public function cancelOrder(string $reason, string $cancelledBy): void
+    {
+        $this->setStatus('annulée');
+        $this->setCancellationReason($reason);
+        $this->setConcaledBy($cancelledBy);
+    }
+    public function isCancellable(): bool
+    {
+        $cancellableStatuses = ['en attente'];
+        return in_array($this->status, $cancellableStatuses);
     }
 }

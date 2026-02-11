@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20260129190558 extends AbstractMigration
+final class Version20260209205247 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,16 +20,12 @@ final class Version20260129190558 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE orders ADD menus_id INT DEFAULT NULL');
-        $this->addSql('ALTER TABLE orders ADD CONSTRAINT FK_E52FFDEE14041B84 FOREIGN KEY (menus_id) REFERENCES menus (id)');
-        $this->addSql('CREATE INDEX IDX_E52FFDEE14041B84 ON orders (menus_id)');
+        $this->addSql('ALTER TABLE menus CHANGE description_menu description_menu LONGTEXT NOT NULL, CHANGE order_before order_before INT NOT NULL');
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE orders DROP FOREIGN KEY FK_E52FFDEE14041B84');
-        $this->addSql('DROP INDEX IDX_E52FFDEE14041B84 ON orders');
-        $this->addSql('ALTER TABLE orders DROP menus_id');
+        $this->addSql('ALTER TABLE menus CHANGE description_menu description_menu LONGTEXT DEFAULT NULL, CHANGE order_before order_before INT DEFAULT NULL');
     }
 }

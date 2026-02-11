@@ -20,12 +20,14 @@ class Reviews
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $comment = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(options: ['default' => false])]
     private ?bool $isValidated = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[ORM\OneToOne(inversedBy: 'reviews')]
+    private ?Orders $commande = null;
 
     public function getId(): ?int
     {
