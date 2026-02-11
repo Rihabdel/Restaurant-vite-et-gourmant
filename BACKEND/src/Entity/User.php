@@ -9,8 +9,18 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Delete;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ApiResource(
+    operations: []
+)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -26,6 +36,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var list<string> The user roles
      */
     #[ORM\Column]
+
+    #   [OA\Property(type: 'array', items: ['type' => 'string'])]
+
     private array $roles = [];
 
     /**
@@ -247,13 +260,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function removeOrder(Orders $order): static
     {
-        if ($this->orders->removeElement($order)) {
-            // set the owning side to null (unless already changed)
-            if ($order->getUser() === $this) {
-                $order->setUser(null);
-            }
+        if ($this->orders->removeElement($order) && $order->getUser() === $this) {
+            $order->setUser(null);
         }
-
         return $this;
     }
 
@@ -277,13 +286,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function removeContactMsg(ContactMsg $contactMsg): static
     {
-        if ($this->contactMsgs->removeElement($contactMsg)) {
-            // set the owning side to null (unless already changed)
-            if ($contactMsg->getUser() === $this) {
-                $contactMsg->setUser(null);
-            }
+        if ($this->contactMsgs->removeElement($contactMsg) && $contactMsg->getUser() === $this) {
+            $contactMsg->setUser(null);
         }
-
         return $this;
     }
     public function is_admin(): bool

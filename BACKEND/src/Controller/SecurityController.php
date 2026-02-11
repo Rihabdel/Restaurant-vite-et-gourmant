@@ -12,7 +12,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use DateTimeImmutable;
+use OpenApi\Attributes as OA;
 
 
 #[Route('/api', name: 'app_api_')]
@@ -34,19 +36,46 @@ class SecurityController extends AbstractController
             Response::HTTP_CREATED
         );
     }
-    // …
-
-    #[Route('/login', name: 'login', methods: 'POST')]
+    #[Route('/login', name: 'login', methods: ['POST'])]
+    #[OA\Post(
+        description: 'Login endpoint',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: 'username', type: 'string'),
+                    new OA\Property(property: 'password', type: 'string'),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Successful login',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'user', type: 'string'),
+                        new OA\Property(property: 'token', type: 'string'),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 401,
+                description: 'Unauthorized - missing credentials'
+            )
+        ]
+    )]
     public function login(#[CurrentUser] ?User $user): JsonResponse
     {
         if (null === $user) {
-            return new JsonResponse(['message' => 'Missing credentials'], Response::HTTP_UNAUTHORIZED);
+            return $this->json([
+                'message' => 'missing credentials',
+            ], Response::HTTP_UNAUTHORIZED);
         }
-
-        return new JsonResponse([
+        $token = $user->getApiToken();
+        return $this->json([
             'user'  => $user->getUserIdentifier(),
-            'apiToken' => $user->getApiToken(),
-            'roles' => $user->getRoles(),
+            'token' => $token,
         ]);
     }
 }
