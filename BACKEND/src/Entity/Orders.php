@@ -5,11 +5,20 @@ namespace App\Entity;
 use App\Repository\OrdersRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Delete;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 
+
 #[ORM\Entity(repositoryClass: OrdersRepository::class)]
+#[ApiResource(
+    operations: []
+)]
 class Orders
 {
     #[ORM\Id]
