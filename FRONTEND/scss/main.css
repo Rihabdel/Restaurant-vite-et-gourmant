@@ -11996,6 +11996,7 @@ html footer {
 }
 
 body {
+  background-color: white !important;
   margin: 0;
   font-family: "Playfair Display", serif;
   font-size: 20px;
@@ -12358,8 +12359,8 @@ body {
   padding: 20px;
   background-color: white;
   border-radius: 10px;
+  border-color: rgba(212, 167, 106, 0.2);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  background-color: #dbcbca;
 }
 
 .form-label {
@@ -12374,7 +12375,7 @@ body {
   border-radius: 5px;
   border: 1px solid #ccc;
   margin-bottom: 15px;
-  background-color: white;
+  background-color: white !important;
 }
 
 .inscription-link, a {

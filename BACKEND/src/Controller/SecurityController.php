@@ -18,88 +18,25 @@ use OpenApi\Attributes as OA;
 
 
 #[Route('/api', name: 'app_api_')]
-final class SecurityController extends AbstractController
+class SecurityController extends AbstractController
 {
-    #[Route('/registration', name: 'registration', methods: ['POST'])]
-    #[OA\Post(
-        tags: ['Authentication'],
-        description: 'User registration endpoint',
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                properties: [
-                    new OA\Property(property: 'email', type: 'string'),
-                    new OA\Property(property: 'password', type: 'string'),
-                    new OA\Property(property: 'firstName', type: 'string'),
-                    new OA\Property(property: 'lastName', type: 'string'),
+    public function __construct(private EntityManagerInterface $manager, private SerializerInterface $serializer) {}
 
-                ]
-            )
-        ),
-        responses: [
-            new OA\Response(
-                response: 201,
-                description: 'User created successfully',
-                content: new OA\JsonContent(
-                    properties: [
-                        new OA\Property(property: 'user', type: 'string'),
-                        new OA\Property(property: 'email', type: 'string'),
-                    ]
-                )
-            ),
-            new OA\Response(
-                response: 400,
-                description: 'Bad Request - missing or invalid data',
-                content: new OA\JsonContent(
-                    properties: [
-                        new OA\Property(property: 'error', type: 'string'),
-                    ]
-                )
-            )
-        ]
-    )]
-    public function register(
-        Request $request,
-        UserPasswordHasherInterface $passwordHasher,
-        EntityManagerInterface $em,
-        SerializerInterface $serializer
-    ): JsonResponse {
-        //  recuperer les données de la requete    
-        $data = json_decode($request->getContent(), true);
-        //  valider les données
-        if (!isset($data['email']) || !isset($data['password'])) {
-            return new JsonResponse(
-                [
-                    'error' => 'Missing data',
-                    'message' => 'Email and password are required'
-                ],
-                Response::HTTP_BAD_REQUEST
-            );
-        }
-        //  Désérialiser SANS le mot de passe
-        unset($data['password']);
-        $jsonWithoutPassword = json_encode($data);
+    #[Route('/registration', name: 'registration', methods: 'POST')]
+    public function register(Request $request, UserPasswordHasherInterface $passwordHasher): JsonResponse
+    {
+        $user = $this->serializer->deserialize($request->getContent(), User::class, 'json');
+        $user->setPassword($passwordHasher->hashPassword($user, $user->getPassword()));
+        $user->setCreatedAt(new DateTimeImmutable());
 
-        $user = $serializer->deserialize($jsonWithoutPassword, User::class, 'json');
-
-        // HASHer le mot de passe et le setter
-        $hashedPassword = $passwordHasher->hashPassword($user, $jsonWithoutPassword);
-        $user->setPassword($hashedPassword);
-        $user->setCreatedAt(new \DateTimeImmutable());
-
-        // Persist et flush
-        $em->persist($user);
-        $em->flush();
-
+        $this->manager->persist($user);
+        $this->manager->flush();
         return new JsonResponse(
-            [
-                'message' => 'User created successfully',
-                'user' => $user->getUserIdentifier(),
-                'email' => $user->getEmail()
-            ],
+            ['user'  => $user->getUserIdentifier(), 'apiToken' => $user->getApiToken(), 'roles' => $user->getRoles()],
             Response::HTTP_CREATED
         );
     }
+
     #[Route('/login', name: 'login', methods: ['POST'])]
     #[OA\Post(
         tags: ['Authentication'],
@@ -119,28 +56,66 @@ final class SecurityController extends AbstractController
                 description: 'Successful login',
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: 'user', type: 'string'),
-                        new OA\Property(property: 'token', type: 'string'),
+                        new OA\Property(property: 'email', type: 'string', example: 'user@example.com'),
+                        new OA\Property(property: 'token', type: 'string', example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'),
+                        new OA\Property(property: 'Role', type: 'string', example: 'ROLE_USER'),
                     ]
                 )
             ),
-            new OA\Response(
-                response: 401,
-                description: 'Unauthorized - missing credentials'
-            )
+            new OA\Response(response: 404, description: 'Unauthorized - invalid credentials', content: new OA\JsonContent(properties: [new OA\Property(property: 'message', type: 'string', example: 'mandatory credentials are missing'),]))
         ]
     )]
+
     public function login(#[CurrentUser] ?User $user): JsonResponse
     {
         if (null === $user) {
-            return $this->json([
-                'message' => 'missing credentials',
-            ], Response::HTTP_UNAUTHORIZED);
+            return new JsonResponse(['message' => 'non'], Response::HTTP_UNAUTHORIZED);
         }
-        $token = $user->getApiToken();
-        return $this->json([
+
+        return new JsonResponse([
             'user'  => $user->getUserIdentifier(),
-            'token' => $token,
+            'apiToken' => $user->getApiToken(),
+            'roles' => $user->getRoles(),
+        ]);
+    }
+    #[Route('/user', name: 'user_info', methods: ['GET'])]
+    #[OA\Get(
+        tags: ['Authentication'],
+        summary: 'compte utilisateur',
+        description: 'affiche les informations de l\'utilisateur connecté',
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'User information retrieved successfully',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'email', type: 'string', example: 'user@m iexample.com'),
+                        new OA\Property(property: 'token', type: 'string', example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'),
+                        new OA\Property(property: 'Role', type: 'string', example: 'ROLE_USER'),
+                    ]
+                )
+            ),
+            new OA\Response(response: 401, description: 'Unauthorized - invalid token', content: new OA\JsonContent(properties: [new OA\Property(property: 'message', type: 'string', example: 'non'),]))
+        ]
+    )]
+
+    public function userInfo(#[CurrentUser] ?User $user): JsonResponse
+    {
+        if (!$user) {
+            return new JsonResponse(['message' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        return new JsonResponse([
+            'email' => $user->getUserIdentifier(),
+            'token' => $user->getApiToken(),
+            'roles' => $user->getRoles(),
+            'firstName' => $user->getFirstName(),
+            'lastName' => $user->getLastName(),
+            'adress' => $user->getAdress(),
+            'phone' => $user->getPhone(),
+            'createdAt' => $user->getCreatedAt(),
+            'adressse' => $user->getAdress(),
+
         ]);
     }
 }

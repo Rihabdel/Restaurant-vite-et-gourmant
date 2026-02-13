@@ -1,36 +1,36 @@
-<div class="form-container mt-5 mb-5">
+<div class="form-container mt-5 mb-5" >
     <h2 class="text-center mb-4">Inscription</h2>
-    <form>
+    <form id="InscriptionForm">
         <div class="mb-3">
             <label for="NomInput" class="form-label">Nom</label>
-            <input type="text" class="form-control" id="NomInput" placeholder="Votre nom" name="Nom"> 
+            <input type="text" class="form-control" id="NomInput" placeholder="Votre nom" name="lastName"> 
         </div>
         <div class="mb-3">
             <label for="PrenomInput" class="form-label">Prénom</label>
-            <input type="text" class="form-control" id="PrenomInput" placeholder="Votre prénom" name="Prenom"> 
+            <input type="text" class="form-control" id="PrenomInput" placeholder="Votre prénom" name="firstName"> 
         </div>
         <div class="mb-3">
           <label for="gsmInput" class="form-label">Numéro Téléphone</label>
-          <input type="text" class="form-control" id="gsmInput" placeholder="Votre numéro de téléphone" name="NumeroTelephone"> 
+          <input type="text" class="form-control" id="gsmInput" placeholder="Votre numéro de téléphone" name="phone"> 
         </div>
         <div class="mb-3">
           <label for="AdressePostaleInput" class="form-label">Adresse postale</label>
-          <input type="text" class="form-control" id="AdressePostaleInput" placeholder="Votre adresse postale" name="AdressePostale"> 
+          <input type="text" class="form-control" id="AdressePostaleInput" placeholder="Votre adresse postale" name="Adress"> 
         </div>
         <div class="mb-3">
           <label for="EmailInput" class="form-label">Email</label>
-          <input type="email" class="form-control" id="EmailInput" placeholder="test@mail.fr" name="Email"> 
+          <input type="email" class="form-control" id="EmailInput" placeholder="test@mail.fr" name="email"> 
         </div>
         <div class="mb-3">
           <label for="PasswordInput" class="form-label">Mot de passe</label>
-          <input type="password" class="form-control" id="PasswordInput" name="Password">
+          <input type="password" class="form-control" id="PasswordInput" name="password">
         </div>
         <div class="mb-3">
             <label for="ValidatePasswordInput" class="form-label">Validez votre mot de passe</label>
-            <input type="password" class="form-control" id="ValidatePasswordInput" name="PasswordConfirm">
+            <input type="password" class="form-control" id="ValidatePasswordInput" name="passwordConfirm">
           </div>
         <div class="text-center">
-            <button type="submit" class="btn btn-primary">Inscription</button>
+            <button type="button" class="btn btn-primary" id="btnSubmitInscription">Inscription</button>
         </div>
     </form>
     <div class="text-center pt-3">
