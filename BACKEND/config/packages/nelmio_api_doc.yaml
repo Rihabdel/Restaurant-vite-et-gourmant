@@ -12,10 +12,7 @@ nelmio_api_doc:
                     in: header
         security:
             - X-AUTH-TOKEN: []
-        servers:
-            - url: "https://127.0.0.1:8000"
-              description: Local server
     areas:
         default:
             path_patterns:
-                - "^/api"
+                - ^/api(?!/doc$)
