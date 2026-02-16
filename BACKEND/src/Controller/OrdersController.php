@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use OpenApi\Attributes as OA;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 #[Route('api/orders', name: 'app_api_orders_')]
 final class OrdersController extends AbstractController
@@ -33,16 +34,68 @@ final class OrdersController extends AbstractController
     #[IsGranted('ROLE_USER')]
     #[OA\Post(
         tags: ["Orders"],
-        summary: "Créer une nouvelle commande"
+        summary: "Créer une nouvelle commande",
+        requestBody: new OA\RequestBody(
+            description: "Détails de la commande",
+            required: true,
+            content: new OA\JsonContent(
+                example: [
+                    "menu" => 1,
+                    "numberOfPeople" => 15,
+                    "deliveryAddress" => "123 Rue Exemple",
+                    "deliveryCity" => "Bordeaux",
+                    "deliveryPostalCode" => "33000",
+                    "deliveryDate" => "2026-03-31",
+                    "deliveryTime" => "19:00"
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 201,
+                description: "Commande créée avec succès",
+                content: new OA\JsonContent(
+                    example: [
+                        "id" => 1,
+                        "menu" => "Menu Dégustation",
+                        "number_of_people" => 15,
+                        "delivery_info" => [
+                            "address" => "123 Rue Exemple",
+                            "city" => "Bordeaux",
+                            "postal_code" => "33000",
+                            "date" => "2026-03-31",
+                            "time" => "19:00"
+                        ],
+                        "prices" => [
+                            "menu_price" => 100.0,
+                            "delivery_cost" => 0.0,
+                            "total_price" => 100.0
+                        ],
+                        "status" => "en_attente",
+                        "created_at" => "2024-11-01 12:00:00"
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 400,
+                description: "Requête invalide (ex: champ manquant, données invalides)"
+            ),
+            new OA\Response(
+                response: 500,
+                description: "Erreur serveur lors de la création de la commande"
+            )
+        ]
     )]
     public function new(Request $request): JsonResponse
     {
         try {
             $user = $this->getUser();
+
+
             $data = json_decode($request->getContent(), true);
 
             $requiredFields = [
-                'menu',
+                "menu",
                 'numberOfPeople',
                 'deliveryAddress',
                 'deliveryCity',
@@ -78,8 +131,8 @@ final class OrdersController extends AbstractController
                 return $this->json(['error' => 'La date de livraison doit être supérieure à la date actuelle'], Response::HTTP_BAD_REQUEST);
             }
 
-            if ($deliveryDateTime < $currentDate->modify('+' . $menu->getConditions() . ' hours')) {
-                return $this->json(['error' => "La date de livraison doit respecter le délai de préparation ({$menu->getConditions()} heures)"], Response::HTTP_BAD_REQUEST);
+            if ($deliveryDateTime < $currentDate->modify('+' . $menu->getOrderBefore() . ' hours')) {
+                return $this->json(['error' => "La date de livraison doit respecter le délai de préparation ({$menu->getOrderBefore()} heures)"], Response::HTTP_BAD_REQUEST);
             }
 
             $deliveryCost = $this->calculateDeliveryCost($data['deliveryCity'], $data['deliveryPostalCode']);
@@ -96,7 +149,7 @@ final class OrdersController extends AbstractController
                 ->setCreatedAt(new \DateTimeImmutable())
                 ->setDeliveryCost($deliveryCost)
                 ->setTotalPrice($menu->calculate_total_price($data['numberOfPeople']) + $deliveryCost)
-                ->setStatus(Status::PENDING->value);
+                ->setStatus(Status::en_attente->value);
 
             $errors = $this->validator->validate($order);
             if (count($errors) > 0) {
@@ -110,7 +163,7 @@ final class OrdersController extends AbstractController
             $this->entityManager->persist($order);
             $this->entityManager->flush();
 
-            $location = $this->generateUrl('api_orders_show', ['id' => $order->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+            $location = $this->generateUrl('app_api_orders_list', ['id' => $order->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
 
             return $this->json([
                 'id' => $order->getId(),
@@ -138,6 +191,50 @@ final class OrdersController extends AbstractController
 
     #[Route('/{id}', methods: ['GET'], name: 'show')]
     #[IsGranted('ROLE_USER')]
+    #[OA\Get(
+        tags: ["Orders"],
+        summary: "Afficher les détails d'une commande",
+        parameters: [
+            new OA\Parameter(
+                name: "id",
+                in: "path",
+                description: "ID de la commande à afficher",
+                required: true,
+                schema: new OA\Schema(type: "integer")
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Détails de la commande récupérés avec succès",
+                content: new OA\JsonContent(
+                    example: [
+                        "id" => 1,
+                        "menu" => "Menu Dégustation",
+                        "number_of_people" => 15,
+                        "delivery_info" => [
+                            "address" => "123 Rue Exemple",
+                            "city" => "Bordeaux",
+                            "postal_code" => "33000",
+                            "date" => "2026-03-31",
+                            "time" => "19:00"
+                        ],
+                        "prices" => [
+                            "menu_price" => 100.0,
+                            "delivery_cost" => 0.0,
+                            "total_price" => 100.0
+                        ],
+                        "status" => "en_attente",
+                        "created_at" => "2024-11-01 12:00:00"
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: "Commande non trouvée ou accès non autorisé"
+            )
+        ]
+    )]
     public function show(int $id, OrdersRepository $ordersRepository): JsonResponse
     {
         $order = $ordersRepository->find($id);
@@ -153,16 +250,78 @@ final class OrdersController extends AbstractController
         return new JsonResponse($data, Response::HTTP_OK, [], true);
     }
 
-    #[Route('/', methods: ['GET'], name: 'list')]
+    #[Route('/list', methods: ['GET'], name: 'list')]
     #[IsGranted('ROLE_USER')]
+    #[OA\Get(
+        tags: ["Orders"],
+        summary: "Lister les commandes de l'utilisateur connecté",
+        parameters: [
+            new OA\Parameter(
+                name: "status",
+                in: "query",
+                description: "Filtrer par statut (ex: en_attente, en_preparation, livre, annule)",
+                required: false,
+                schema: new OA\Schema(type: "string")
+            ),
+            new OA\Parameter(
+                name: "createdAt",
+                in: "query",
+                description: "Filtrer par date de création (format YYYY-MM-DD)",
+                required: false,
+                schema: new OA\Schema(type: "string", format: "date")
+            ),
+            new OA\Parameter(
+                name: "menu",
+                in: "query",
+                description: "Filtrer par ID de menu",
+                required: false,
+                schema: new OA\Schema(type: "integer")
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Liste des commandes récupérée avec succès",
+                content: new OA\JsonContent(
+                    example: [
+                        [
+                            "id" => 1,
+                            "menu" => "Menu Dégustation",
+                            "number_of_people" => 15,
+                            "delivery_info" => [
+                                "address" => "123 Rue Exemple",
+                                "city" => "Bordeaux",
+                                "postal_code" => "33000",
+                                "date" => "2026-03-31",
+                                "time" => "19:00"
+                            ],
+                            "prices" => [
+                                "menu_price" => 100.0,
+                                "delivery_cost" => 0.0,
+                                "total_price" => 100.0
+                            ],
+                            "status" => "en_attente",
+                            "created_at" => "2024-11-01 12:00:00"
+                        ]
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 400,
+                description: "Requête invalide (ex: filtre non valide)"
+            ),
+            new OA\Response(
+                response: 404,
+                description: "Aucune commande trouvée pour l'utilisateur"
+            )
+        ]
+    )]
     public function list(OrdersRepository $ordersRepository, Request $request): JsonResponse
     {
         $user = $this->getUser();
-        $userId = $user->getId();
-
         $filters = [
             'status' => $request->query->get('status'),
-            'user' => $userId,
+            'user' => $user->getUserIdentifier(),
             'date' => $request->query->get('createdAt'),
             'menu' => $request->query->get('menu'),
         ];
@@ -176,8 +335,9 @@ final class OrdersController extends AbstractController
         }
 
         $orders = empty(array_filter($filters))
-            ? $ordersRepository->findByUserId($userId)
+            ? $ordersRepository->findBy(['user' => $user])
             : $ordersRepository->findByFilters($filters);
+
 
         if (!$orders) {
             return $this->json(['message' => 'Aucune commande trouvée'], Response::HTTP_NOT_FOUND);
@@ -187,13 +347,147 @@ final class OrdersController extends AbstractController
         return new JsonResponse($data, Response::HTTP_OK, [], true);
     }
 
-    // Méthodes privées
+    // Méthodes auxiliaires
+    #[Route('/{id}/cancel', methods: ['POST'], name: 'cancel')]
+    #[IsGranted('ROLE_USER')]
+    #[OA\Post(
+        tags: ["Orders"],
+        summary: "Annuler une commande",
+        parameters: [
+            new OA\Parameter(
+                name: "id",
+                in: "path",
+                description: "ID de la commande à annuler",
+                required: true,
+                schema: new OA\Schema(type: "integer")
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Commande annulée avec succès"
+            ),
+            new OA\Response(
+                response: 400,
+                description: "La commande ne peut être annulée à ce stade"
+            ),
+            new OA\Response(
+                response: 403,
+                description: "Accès non autorisé"
+            ),
+            new OA\Response(
+                response: 404,
+                description: "Commande non trouvée"
+            )
+        ]
+    )]
+    public function cancel(Orders $order): JsonResponse
+    {
+        if (!$this->canAccessOrder($order)) {
+            return $this->json(['error' => 'Accès non autorisé'], Response::HTTP_FORBIDDEN);
+        }
+        //
+        if (!in_array($order->getStatus(), [Status::en_attente->value])) {
+            return $this->json(['error' => 'La commande ne peut être annulée à ce stade'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $order->setStatus(Status::annule->value);
+        $this->entityManager->flush();
+
+        return $this->json(['message' => 'Commande annulée avec succès'], Response::HTTP_OK);
+    }
+    #[Route('/{id}/edit', methods: ['PUT'], name: 'edit')]
+    #[IsGranted('ROLE_USER')]
+    #[OA\Put(
+        tags: ["Orders"],
+        summary: "Modifier une commande",
+        parameters: [
+            new OA\Parameter(
+                name: "id",
+                in: "path",
+                description: "ID de la commande à modifier",
+                required: true,
+                schema: new OA\Schema(type: "integer")
+            )
+        ],
+        requestBody: new OA\RequestBody(
+            description: "Détails à modifier (ex: numberOfPeople, deliveryAddress, etc.)",
+            required: true,
+            content: new OA\JsonContent(
+                example: [
+                    "numberOfPeople" => 20,
+                    "deliveryAddress" => "456 Rue Modifiée",
+                    "deliveryCity" => "Bordeaux",
+                    "deliveryPostalCode" => "33000",
+                    "deliveryDate" => "2026-04-01",
+                    "deliveryTime" => "20:00"
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Commande modifiée avec succès"
+            ),
+            new OA\Response(
+                response: 400,
+                description: "La commande ne peut être modifiée à ce stade ou données invalides"
+            ),
+            new OA\Response(
+                response: 403,
+                description: "Accès non autorisé"
+            ),
+            new OA\Response(
+                response: 404,
+                description: "Commande non trouvée"
+            )
+        ]
+    )]
+    public function edit(Orders $order, Request $request): JsonResponse
+    {
+        if (!$this->canAccessOrder($order)) {
+            return $this->json(['error' => 'Accès non autorisé'], Response::HTTP_FORBIDDEN);
+        }
+        if (!in_array($order->getStatus(), [Status::en_attente->value])) {
+            return $this->json(['error' => 'La commande ne peut être modifiée à ce stade'], Response::HTTP_BAD_REQUEST);
+        } else {
+            // Logique de modification de la commande (ex: changer le nombre de personnes, l'adresse de livraison, etc.)
+            $data = json_decode($request->getContent(), true);
+            if (isset($data['numberOfPeople'])) {
+                $order->setNumberOfPeople($data['numberOfPeople']);
+            }
+            if (isset($data['deliveryAddress'])) {
+                $order->setDeliveryAddress($data['deliveryAddress']);
+            }
+            if (isset($data['deliveryCity'])) {
+                $order->setDeliveryCity($data['deliveryCity']);
+            }
+            if (isset($data['deliveryPostalCode'])) {
+                $order->setDeliveryPostalCode($data['deliveryPostalCode']);
+            }
+            if (isset($data['deliveryDate'])) {
+                $order->setDeliveryDate(new \DateTime($data['deliveryDate']));
+            }
+            if (isset($data['deliveryTime'])) {
+                $order->setDeliveryTime(new \DateTime($data['deliveryTime']));
+            }
+            $this->entityManager->persist($order);
+            $this->entityManager->flush();
+
+            return $this->json(['message' => 'Commande modifiée avec succès'], Response::HTTP_OK);
+        }
+    }
+
+
+    // Logique de modification de la commande (ex: changer le nombre de personnes, l'adresse de livraison
+
 
     private function canAccessOrder(Orders $order): bool
     {
         $user = $this->getUser();
         return $user && ($user->getId() === $order->getUser()->getId() || $this->isGranted('ROLE_ADMIN') || $this->isGranted('ROLE_EMPLOYEE'));
     }
+
 
     private function calculateDeliveryCost(string $deliveryCity, string $deliveryPostalCode): float
     {
