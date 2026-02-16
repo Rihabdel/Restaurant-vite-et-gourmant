@@ -29,24 +29,23 @@ class MenusDishes
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'menusDishes')]
-
+    #[Groups(['menu_dish:list'])]
     #[ORM\JoinColumn(onDelete: "CASCADE")]
     private ?Menus $menu = null;
-
+    #[Groups(['menu_dish:list'])]
     #[ORM\ManyToOne(targetEntity: Dishes::class, inversedBy: 'menusDishes')]
-
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Dishes $dish = null;
 
     #[ORM\Column]
-
+    #[Groups(['menu_dish:list'])]
     private ?int $displayOrder = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
-    #[Groups(['menu_dish:list'])]
+
     public function getMenu(): ?Menus
     {
         return $this->menu;
@@ -58,6 +57,7 @@ class MenusDishes
 
         return $this;
     }
+
 
     public function getDish(): ?Dishes
     {
@@ -94,7 +94,7 @@ class MenusDishes
         return [
             'id' => $this->menu->getId(),
             'title' => $this->menu->getTitle(),
-            'description' => $this->menu->getDescription(),
+            'description' => $this->menu->getDescriptionMenu(),
             'theme' => $this->menu->getThemeMenu(),
             'diet' => $this->menu->getDietMenu(),
             'min_people' => $this->menu->getMinPeople(),
@@ -117,7 +117,7 @@ class MenusDishes
             'price' => $this->dish->getPrice()
         ];
     }
-    #[Groups(['menu_dish:detail', 'menu_dish:list'])]
+
     public function getMenuDishList(): ?string
     {
         if (!$this->menu || !$this->dish) {

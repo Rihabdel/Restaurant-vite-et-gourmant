@@ -21,17 +21,17 @@
         <li class="nav-item">
           <a class="nav-link" href="/menu">Nos menus</a>
         </li>
-                <li class="nav-item">
+            <li class="nav-item">
             <a class="nav-link" href="/order">Mes commandes</a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item" data-show="disconnected">
             <a class="nav-link" href="/connexion">Connexion</a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item" data-show="connected">
             <a class="nav-link" href="/monCompte">Mon Compte</a>
         </li>
-                <li class="nav-item">
-            <button id="signoutBtn" class="nav-link" href="">Deconnexion</button>
+                <li class="nav-item" data-show="connected">
+            <button id="SignoutBtn" class="nav-link" href="">Deconnexion</button>
         </li>
                 <li class="nav-item">
             <a class="nav-link" href="/contact">Contact</a>
@@ -108,7 +108,7 @@
     </div>
 </footer>
 <script type="module" src="Router/Router.js"></script>
-<script src="js/script.js"></script>
+<script type="module" src="js/script.js"></script>
 <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

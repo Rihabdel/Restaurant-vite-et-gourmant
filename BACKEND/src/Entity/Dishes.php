@@ -36,14 +36,14 @@ class Dishes
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['dish:list', 'dish:detail', 'dish:write', 'menu:detail'])]
+    #[Groups(['dish:list', 'dish:detail', 'dish:write', 'menu:detail', 'menu_dish:list'])]
     private ?string $description = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     #[Groups(['menu_dish:read', 'dish:list', 'dish:detail', 'dish:write', 'menu:detail'])]
     private ?string $price = null;
 
-    #[Groups(['menu_dish:read', 'dish:list', 'dish:detail', 'menu:detail'])]
+    #[Groups(['menu_dish:read', 'menu_dish:list', 'dish:list', 'dish:detail', 'menu:detail', 'dish:read'])]
     #[ORM\Column(enumType: CategoryDishes::class, nullable: false)]
     private ?CategoryDishes $category = null;
 
@@ -137,6 +137,7 @@ class Dishes
 
         return $this;
     }
+
     public function getCategory(): ?CategoryDishes
     {
         return $this->category;
@@ -221,7 +222,7 @@ class Dishes
     {
         return $this->menusDishes->count();
     }
-    #[Groups(['menu_dish:detail'])]
+
     public function getListOfAllergensFromDishes(): array
     {
         $allergens = [];

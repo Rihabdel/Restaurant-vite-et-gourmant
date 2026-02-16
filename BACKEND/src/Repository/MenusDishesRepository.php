@@ -101,4 +101,15 @@ class MenusDishesRepository extends ServiceEntityRepository
 
         return $result ?: 0;
     }
+    public function findDishesByMenu(Menus $menu): array
+    {
+        return $this->createQueryBuilder('md')
+            ->join('md.dish', 'd')
+            ->addSelect('d')
+            ->where('md.menu = :menu')
+            ->setParameter('menu', $menu)
+            ->orderBy('md.display_order', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

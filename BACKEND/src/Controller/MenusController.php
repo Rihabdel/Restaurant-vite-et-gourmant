@@ -7,8 +7,6 @@ use App\Entity\Menus;
 use App\Enum\Theme;
 use App\Enum\Diet;
 use App\Repository\MenusRepository;
-use App\Entity\MenusDishes;
-use App\Entity\Dishes;
 use App\Repository\MenusDishesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use DateTimeImmutable;
@@ -20,11 +18,9 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use symfony\component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use OpenApi\Attributes as OA;
-
-
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/menu', name: 'app_api_menus_')]
 final class MenusController extends AbstractController
@@ -35,6 +31,8 @@ final class MenusController extends AbstractController
         private ValidatorInterface $validator,
 
     ) {}
+    #ISadmin
+    //#[IsGranted('ROLE_ADMIN', 'ROLE_EMPLLOYE')]
     #[Route('/new', name: 'new', methods: ['POST'])]
     #[OA\Post(
         tags: ['Menu'],
@@ -287,7 +285,7 @@ final class MenusController extends AbstractController
         $responseData = $this->serializer->serialize($menus, 'json', ['groups' => 'menu:read']);
         return new JsonResponse($responseData, Response::HTTP_OK, [], true);
     }
-
+    //#[IsGranted('ROLE_ADMIN', 'ROLE_EMPLLOYE')]
     #[Route('/{id}', methods: ['PUT'], name: 'edit')]
     #[OA\Put(
         tags: ['Menu'],
@@ -371,6 +369,7 @@ final class MenusController extends AbstractController
             new OA\Response(response: 404, description: 'Menu non trouvé')
         ]
     )]
+    //#[IsGranted('ROLE_ADMIN', 'ROLE_EMPLLOYE')]
     public function delete(EntityManagerInterface $entityManager, int $id): Response
     {
 

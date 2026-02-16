@@ -6,6 +6,8 @@ use App\Entity\MenusDishes;
 use App\Entity\Menus;
 use App\Entity\Dishes;
 use App\Entity\DishAllergen;
+use App\Repository\MenusDishesRepository;
+use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
@@ -15,6 +17,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use OpenApi\Attributes as OA;
+use SebastianBergmann\CodeCoverage\DeadCodeDetectionNotSupportedException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/menus-dishes', name: 'app_api_menus_dishes_')]
@@ -176,7 +179,7 @@ class MenusDishesController extends AbstractController
 
 
     // afficher la liste des plats d'un menu
-    #[Route('/{menuId}/list', methods: ['GET'], name: 'list')]
+    #[Route('/{id}/list', methods: ['GET'], name: 'list')]
     #[OA\Get(
         tags: ['MenuDish'],
         summary: 'Récupérer la liste des plats d\'un menu',
@@ -194,19 +197,18 @@ class MenusDishesController extends AbstractController
                                 [
                                     'id' => 1,
                                     'name' => 'nom du plat',
-                                    'description' => ' description du plat.',
-                                    'price' => 12.99,
+                                    'description' => 'description du plat.',
+                                    'price' => '12.99',
                                     'category' => 'entree',
                                     'allergens' => [
-                                        ['id' => 1, 'nom allergene si il y en a'],
-                                        ['id' => 2, 'nom allergene si il y en a']
+                                        ['id' => 1, 'nom allergene si il y en a']
                                     ]
                                 ],
                                 [
                                     'id' => 2,
                                     'name' => 'nom du plat',
-                                    'description' => ' description du plat.',
-                                    'price' => 9.99,
+                                    'description' => 'description du plat.',
+                                    'price' => '9.99',
                                     'category' => 'plat',
                                 ]
                             ]
@@ -234,9 +236,9 @@ class MenusDishesController extends AbstractController
             )
         ]
     )]
-    public function getMenuDishList(int $menuId): JsonResponse
+    public function getMenuWithDishes(int $id, EntityManagerInterface $em): JsonResponse
     {
-        $menu = $this->entityManager->getRepository(Menus::class)->find($menuId);
+        $menu = $this->entityManager->getRepository(Menus::class)->find($id);
         if (!$menu) {
             return new JsonResponse(
                 ['message' => 'Menu non trouvé'],
@@ -250,13 +252,12 @@ class MenusDishesController extends AbstractController
         $responseData = $this->serializer->serialize(
             $menusDishes,
             'json',
-            ['groups' => ['menu_dish:read', 'menu_dish:list', 'dish_allergen:read']]
+            ['groups' => ['dish:read', 'menu_dish:list']]
         );
         return new JsonResponse($responseData, Response::HTTP_OK, [], true);
     }
-
     // afficher menu avec plats et allergenes EN DETAIL
-    #[Route('/{menuId}/detail', methods: ['GET'], name: 'detail')]
+    #[Route('/{id}/detail', methods: ['GET'], name: 'detail')]
     #[OA\Get(
         tags: ['MenuDish'],
         summary: 'Récupérer les détails d\'un menu avec ses plats et allergènes',
@@ -314,19 +315,20 @@ class MenusDishesController extends AbstractController
             )
         ]
     )]
-    public function detail(int $menuId): JsonResponse
+    public function detail(int $id): JsonResponse
     {
-        $menu = $this->entityManager->getRepository(Menus::class)->find($menuId);
+        $menu = $this->entityManager->getRepository(Menus::class)->find($id);
         if (!$menu) {
-            return new JsonResponse(
-                ['message' => 'Menu non trouvé'],
-                Response::HTTP_NOT_FOUND
-            );
+            return new JsonResponse(['error' => 'Menu non trouvé'], Response::HTTP_NOT_FOUND);
         }
+        $menusDishes = $this->entityManager->getRepository(MenusDishes::class)->findBy(
+            ['menu' => $menu],
+            ['displayOrder' => 'ASC']
+        );
         $responseData = $this->serializer->serialize(
-            $menu,
+            $menusDishes,
             'json',
-            ['groups' => ['menu:detail', 'dish:detail', 'menu_dish:detail', 'allergen:read']]
+            ['groups' => ['dish:read', 'menu_dish:detail', 'dish_allergen:read']]
         );
         return new JsonResponse($responseData, Response::HTTP_OK, [], true);
     }

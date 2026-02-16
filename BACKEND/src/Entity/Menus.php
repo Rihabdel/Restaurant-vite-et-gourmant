@@ -25,7 +25,7 @@ class Menus
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['menu_dish:read', 'menu:read', 'menu:list', 'order:read'])]
+    #[Groups(['menu_dish:read', 'menu:read', 'menu:list', 'order:read',])]
     private ?int $id = null;
 
     #[Groups(['menu_dish:read', 'menu:read', 'menu:write', 'menu:list', 'menu:detail', 'order:read'])]
@@ -97,12 +97,11 @@ class Menus
         $this->menusDishes = new ArrayCollection();
         $this->orders = new ArrayCollection();
     }
-
     public function getId(): ?int
     {
         return $this->id;
     }
-    #[Groups(['menu_dish:list'])]
+
     public function getTitle(): ?string
     {
         return $this->title;
@@ -114,7 +113,7 @@ class Menus
 
         return $this;
     }
-    #[Groups(['menu_dish:list'])]
+
     public function getDescriptionMenu(): ?string
     {
         return $this->descriptionMenu;
@@ -156,7 +155,7 @@ class Menus
         $this->dietMenu = $dietMenu;
         return $this;
     }
-    #[Groups(['menu_dish:list'])]
+
     public function getMinPeople(): ?int
     {
         return $this->minPeople;
@@ -168,7 +167,6 @@ class Menus
 
         return $this;
     }
-    #[Groups(['menu_dish:list'])]
     public function getPrice(): ?string
     {
         return $this->price;
@@ -180,7 +178,6 @@ class Menus
 
         return $this;
     }
-    #[Groups(['menu_dish:list'])]
     public function getConditions(): ?string
     {
         return $this->conditions;
@@ -297,7 +294,6 @@ class Menus
         return $this->menusDishes->count();
     }
 
-    #[Groups(['menu:detail'])]
     public function getCategories(): array
     {
         $categories = [];
@@ -343,7 +339,7 @@ class Menus
         return $this;
     }
     //liste des plats d'un menu
-    #[Groups(['menu_dish:detail', 'menu_dish:list'])]
+
     public function getListOfDishesFromMenu(): array
     {
         $dishes = [];
