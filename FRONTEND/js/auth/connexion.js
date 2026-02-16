@@ -1,47 +1,42 @@
-
-const mailInput = document.getElementById("EmailInput");
+import { setToken, setCookie, showAndHideElementsForRoles, roleCookieName } from "../script.js";
+const emailInput = document.getElementById("EmailInput");
 const passwordInput = document.getElementById("PasswordInput");
 const btnConnexion = document.getElementById("BtnLogin");
-btnConnexion.addEventListener("click", function(event){
-    event.preventDefault();
-    checkCredentials();
-});
-function checkCredentials(){
-    let dataForm = new FormData(document.getElementById("ConnexionForm"));
-    
+const formConnexion = document.getElementById("FormConnexion");
+
+btnConnexion.addEventListener("click", (e) => checkCredentials(e)); 
+
+function checkCredentials(e) {
+    e.preventDefault();
+
+    let dataForm = new FormData(formConnexion);
     let myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
-
-    let raw = JSON.stringify({
-        "username": dataForm.get("email"),
-        "password": dataForm.get("password")
+    const raw = JSON.stringify({
+        username: dataForm.get("email"),  
+        password: dataForm.get("password")
     });
-
-    let requestOptions = {
-        method: 'POST',
-        headers: myHeaders,
-        body: raw,
-        redirect: 'follow'
-    };
-
-    fetch("https://127.0.0.1:8000/api/login", requestOptions)
+    const requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: raw,
+};
+fetch("https://127.0.0.1:8000/api/login", requestOptions)
     .then(response => {
-        if(response.ok){
-            return response.json();
-        }
-        else{
-            mailInput.classList.add("is-invalid");
-            passwordInput.classList.add("is-invalid");
-        }
+        if (!response.ok) throw new Error(response.status); 
+        return response.json();
     })
     .then(result => {
         const token = result.apiToken;
         setToken(token);
-        //placer ce token en cookie
-        setCookie(tokenCookieName, token, 7);
-
         setCookie(roleCookieName, result.roles[0], 7);
+        showAndHideElementsForRoles();
         globalThis.location.replace("/");
     })
-    .catch(error => console.log('error', error));
+    .catch(error => {
+        console.error("Error:", error);
+        alert("Identifiants incorrects. Veuillez réessayer.");
+    });
 }
+
+
