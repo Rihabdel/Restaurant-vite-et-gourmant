@@ -1,5 +1,4 @@
 
-**/.env
 **/.env.local
 **/.env.dev
 **/.env.test
@@ -19,3 +18,4 @@
 Thumbs.db
 .vscode/
 .idea/
+
