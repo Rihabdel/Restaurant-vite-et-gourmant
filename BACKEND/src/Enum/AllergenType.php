@@ -2,7 +2,7 @@
 
 namespace App\Enum;
 
-enum AllergenTypeEnum: string
+enum AllergenType: string
 {
     case GLUTEN = 'gluten';
     case LACTOSE = 'lactose';

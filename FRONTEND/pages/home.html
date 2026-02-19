@@ -14,7 +14,7 @@
             </div>
             <p class="founder-mention">— Fondé par Julie et José, passionnés de gastronomie bordelaise</p>
             
-            <div class="mt-4">
+            <div class="mt-4" >
                 <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseWidthHistory" aria-expanded="false" aria-controls="collapseWidthHistory">
                     En savoir plus <i class="bi bi-chevron-down more-content-icon"></i>
                 </button>
@@ -54,7 +54,7 @@
             <h2 class="section-title">Nos prestations pour vos événements</h2>
             <p class="section-subtitle">Que ce soit pour un mariage, un séminaire d'entreprise ou une réception familiale, nous créons des expériences culinaires mémorables sur mesure.</p>
             <!-- Button trigger modal -->
-            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#editionEventModal">
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#editionEventModal" data-show="ROLE_ADMIN,ROLE_EMPLOYEE" style="display: none;">
             Ajouter un évènement
             </button>
             </div>
@@ -64,9 +64,9 @@
                     <div class="prestation-card">
                         <div class="card-image">
                             <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Traiteur Mariage">
-                            <div class="action-image-buttons">
-                                <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#editioncarteModal"><i class="bi bi-pencil"></i>Modifier</button>
-                                <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#deletecarteModal"><i class="bi bi-trash"></i>Supprimer</button>
+                            <div class="action-image-buttons" data-show="ROLE_ADMIN,ROLE_EMPLOYEE" style="display: none;">
+                                <button type="button" class="btn btn-outline-light edit-event-btn" data-bs-toggle="modal" data-bs-target="#editionEventModal"><i class="bi bi-pencil" ></i>Modifier</button>
+                                <button type="button" class="btn btn-outline-light delete-event-btn" data-bs-toggle="modal" data-bs-target="#deleteEventModal"><i class="bi bi-trash"></i>Supprimer</button>
                             </div>
                         </div>
                         <div class="card-body">
@@ -81,10 +81,10 @@
                         <div class="card-footer">
                             <button type="button" class="cta-button" data-bs-toggle="modal" data-bs-target="#devisModal">Obtenir un devis</button>
                         </div>
-                        <div class="action-card-buttons text-center mb-3">
-                        <button type="button" class="btn btn-success text-center" data-bs-toggle="modal" data-bs-target="#editionEventModal">
+                        <div class="action-card-buttons text-center mb-3" data-show="ROLE_ADMIN,ROLE_EMPLOYEE" style="display: none;">
+                        <button type="button" class="btn btn-success text-center edit-event-btn" data-bs-toggle="modal" data-bs-target="#editionEventModal">
                         Modifier</button>
-                    <button type="button" class="btn btn-danger text-center" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                    <button type="button" class="btn btn-danger text-center delete-event-btn" data-bs-toggle="modal" data-bs-target="#deleteEventModal">
                     Supprimer</button>
                         </div>
                     </div>
@@ -95,9 +95,9 @@
                         <div class="card-image">
                             <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Événement d'entreprise">
                             <p class="card-title">Titre</p>
-                            <div class="action-image-buttons">
-                                <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#editioncarteModal"><i class="bi bi-pencil"></i>Modifier</button>
-                                <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#deletecarteModal"><i class="bi bi-trash"></i>Supprimer</button>
+                            <div class="action-image-buttons" data-show="ROLE_ADMIN,ROLE_EMPLOYEE" style="display: none;">
+                                <button type="button" class="btn btn-outline-light edit-event-btn" data-bs-toggle="modal" data-bs-target="#editionEventModal"><i class="bi bi-pencil" ></i>Modifier</button>
+                                <button type="button" class="btn btn-outline-light delete-event-btn" data-bs-toggle="modal" data-bs-target="#deleteEventModal"><i class="bi bi-trash"></i>Supprimer</button>
                             </div>
                         </div>
                         <div class="card-body">
@@ -118,10 +118,10 @@
                         <div class="card-footer">
                             <button type="button" class="cta-button" data-bs-toggle="modal" data-bs-target="#devisModal">Obtenir un devis</button>
                         </div>
-                        <div class="action-card-buttons text-center mb-3">
-                        <button type="button" class="btn btn-success text-center" data-bs-toggle="modal" data-bs-target="#editionEventModal">
+                        <div class="action-card-buttons text-center mb-3" data-show="ROLE_ADMIN,ROLE_EMPLOYEE" style="display: none;">
+                        <button type="button" class="btn btn-success text-center edit-event-btn" data-bs-toggle="modal" data-bs-target="#editionEventModal">
                         Modifier</button>
-                    <button type="button" class="btn btn-danger text-center" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                    <button type="button" class="btn btn-danger text-center delete-event-btn" data-bs-toggle="modal" data-bs-target="#deleteEventModal">
                     Supprimer</button>
                         </div>
                     </div>
@@ -132,9 +132,9 @@
                         <div class="card-image">
                             <img src="https://images.unsplash.com/photo-1530103862676-de8c9debad1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Réception familiale">
                             <p class="card-title">Titre</p>
-                            <div class="action-image-buttons">
-                                <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#editioncarteModal"><i class="bi bi-pencil"></i>Modifier</button>
-                                <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#deletecarteModal"><i class="bi bi-trash"></i>Supprimer</button>
+                            <div class="action-image-buttons" data-show="ROLE_ADMIN,ROLE_EMPLOYEE" style="display: none;">
+                                <button type="button" class="btn btn-outline-light edit-event-btn" data-bs-toggle="modal" data-bs-target="#editionEventModal"><i class="bi bi-pencil"></i>Modifier</button>
+                                <button type="button" class="btn btn-outline-light delete-event-btn" data-bs-toggle="modal" data-bs-target="#deleteEventModal"><i class="bi bi-trash"></i>Supprimer</button>
                             </div>
                         </div>
                         <div class="card-body">
@@ -155,10 +155,10 @@
                         <div class="card-footer">
                             <button type="button" class="cta-button" data-bs-toggle="modal" data-bs-target="#devisModal">Obtenir un devis</button>
                         </div>
-                        <div class="action-card-buttons text-center mb-3">
-                        <button type="button" class="btn btn-success text-center" data-bs-toggle="modal" data-bs-target="#editionEventModal">
+                        <div class="action-card-buttons text-center mb-3" data-show="ROLE_ADMIN,ROLE_EMPLOYEE" style="display: none;">
+                        <button type="button" class="btn btn-success text-center edit-event-btn" data-bs-toggle="modal" data-bs-target="#editionEventModal">
                         Modifier</button>
-                    <button type="button" class="btn btn-danger text-center" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                    <button type="button" class="btn btn-danger text-center delete-event-btn" data-bs-toggle="modal" data-bs-target="#deleteEventModal">
                     Supprimer</button>
                         </div>
                     </div>
@@ -204,16 +204,16 @@
                 <p class="section-subtitle">Découvrez l'éventail complet de nos services conçus pour rendre votre expérience Vite & Gourmand inoubliable.</p>
             </div>
         </div>
-         <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#ajouterServiceModal">
+         <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#ajouterServiceModal" data-show="ROLE_ADMIN,ROLE_EMPLOYEE">
             Ajouter un service
         </button>
         <div class="row">
         <!-- Service 1 -->
             <div class="col-lg-4 col-md-6 p-3">
                 <div class="card service-card h-100 border-0 shadow-sm">
-                    <div class="action-image-buttons">
+                    <div class="action-image-buttons" data-show="ROLE_ADMIN,ROLE_EMPLOYEE" style="display: none;">
                                 <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#ajouterServiceModal"><i class="bi bi-pencil"></i>Modifier</button>
-                                <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="bi bi-trash"></i>Supprimer</button>
+                                <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#deleteServiceModal"><i class="bi bi-trash"></i>Supprimer</button>
                             </div>
                     <div class="card-body text-center p-4">
                         <div class="service-icon mb-3">
@@ -231,9 +231,9 @@
         <!-- Service 2 -->
             <div class="col-lg-4 col-md-6 p-3">
                 <div class="card service-card h-100 border-0 shadow-sm">
-                    <div class="action-image-buttons">
+                    <div class="action-image-buttons" data-show="ROLE_ADMIN,ROLE_EMPLOYEE" style="display: none;">
                                 <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#ajouterServiceModal"><i class="bi bi-pencil"></i>Modifier</button>
-                                <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="bi bi-trash"></i>Supprimer</button>
+                                <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#deleteServiceModal"><i class="bi bi-trash"></i>Supprimer</button>
                             </div>
                     <div class="card-body text-center p-4">
                         <div class="service-icon mb-3">
@@ -250,9 +250,9 @@
             <!-- Service 3 -->
             <div class="col-lg-4 col-md-6 p-3">
                 <div class="card service-card h-100 border-0 shadow-sm">
-                    <div class="action-image-buttons">
+                    <div class="action-image-buttons" data-show="ROLE_ADMIN,ROLE_EMPLOYEE" style="display: none;">
                                 <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#ajouterServiceModal"><i class="bi bi-pencil"></i>Modifier</button>
-                                <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="bi bi-trash"></i>Supprimer</button>
+                                <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#deleteServiceModal"><i class="bi bi-trash"></i>Supprimer</button>
                             </div>
                     <div class="card-body text-center p-4">
                         <div class="service-icon mb-3">
@@ -368,7 +368,7 @@
             
         </form>
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer" data-show="admin,employee">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
         <button type="button" class="btn btn-primary">Enregistrer les modifications</button>
       </div>

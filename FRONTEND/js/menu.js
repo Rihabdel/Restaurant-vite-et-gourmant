@@ -26,7 +26,7 @@ function displayMenus(menus) {
             <div class="menu-card h-100">
                 <div class="card-image">
                     <img src="${imageUrl}" class="card-img-top" alt="${menu.title}">
-                    <div class="action-image-buttons" data-role="admin,employee" style="display: none;">
+                    <div class="action-image-buttons" ddata-show="ROLE_ADMIN,ROLE_EMPLOYEE" style="display:none">
                         <button class="btn btn-outline-light edit-menu-btn" data-id="${menu.id}"><i class="bi bi-pencil"></i>Modifier</button>
                         <button class="btn btn-outline-light delete-menu-btn" data-id="${menu.id}"><i class="bi bi-trash"></i>Supprimer</button>
                     </div>
@@ -41,8 +41,8 @@ function displayMenus(menus) {
                 </div>
                 <div class="card-footer">
                     <button class="btn btn-primary view-detail-btn" data-id="${menu.id}">Voir le détail</button>
-                </div>
-                <div class="action-card-buttons" >
+                            </div>
+                            <div class="action-card-buttons" data-show="ROLE_ADMIN,ROLE_EMPLOYEE" style="display: none;">
                     <button class="btn btn-success edit-menu-btn" data-id="${menu.id}"><i class="bi bi-pencil"></i>Modifier</button>
                     <button class="btn btn-danger delete-menu-btn" data-id="${menu.id}"><i class="bi bi-trash"></i>Supprimer</button>
                 </div>
