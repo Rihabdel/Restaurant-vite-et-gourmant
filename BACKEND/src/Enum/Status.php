@@ -7,7 +7,7 @@ enum Status: string
     case en_attente = 'en attente';
     case accepte = 'accepté';
     case en_preparation = 'en préparation';
-    case livraison = 'livraison';
+    case livrée = 'livrée';
     case en_attente_de_retour = 'en attente de retour';
     case termine = 'terminé';
     case annule = 'annulé';
@@ -22,7 +22,7 @@ enum Status: string
             self::en_attente => 'En attente',
             self::accepte => 'Accepté',
             self::en_preparation => 'En préparation',
-            self::livraison => 'Livraison',
+            self::livrée => 'Livrée',
             self::en_attente_de_retour => 'En attente de retour',
             self::termine => 'Terminé',
             self::annule => 'Annulé',
@@ -34,7 +34,7 @@ enum Status: string
             'En attente' => self::en_attente,
             'Accepté' => self::accepte,
             'En préparation' => self::en_preparation,
-            'Livraison' => self::livraison,
+            'Livrée' => self::livrée,
             'En attente de retour' => self::en_attente_de_retour,
             'Terminé' => self::termine,
             'Annulé' => self::annule,
@@ -47,7 +47,7 @@ enum Status: string
             self::en_attente => 'gray',
             self::accepte => 'blue',
             self::en_preparation => 'orange',
-            self::livraison => 'purple',
+            self::livrée => 'purple',
             self::en_attente_de_retour => 'teal',
             self::termine => 'green',
             self::annule => 'red',

@@ -21,6 +21,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use symfony\Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 #[Route('/api/menu', name: 'app_api_menus_')]
 final class MenusController extends AbstractController
@@ -31,8 +32,8 @@ final class MenusController extends AbstractController
         private ValidatorInterface $validator,
 
     ) {}
-    #ISadmin
-    //#[IsGranted('ROLE_ADMIN', 'ROLE_EMPLLOYE')]
+
+    #[IsGranted('ROLE_ADMIN', 'ROLE_EMPLLOYE')]
     #[Route('/new', name: 'new', methods: ['POST'])]
     #[OA\Post(
         tags: ['Menu'],
@@ -92,9 +93,20 @@ final class MenusController extends AbstractController
                 Response::HTTP_UNPROCESSABLE_ENTITY
             );
         }
+        $imageContent = null;
+        if (isset($data['picture']) && !empty($data['picture'])) {
+            // Supprimer le préfixe éventuel (data:image/png;base64,)
+            $pictureBase64 = preg_replace('/^data:image\/\w+;base64,/', '', $data['picture']);
+            $imageContent = base64_decode($pictureBase64);
+            if ($imageContent === false) {
+                return new JsonResponse(['erreurs' => 'Image invalide'], Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+        }
         //supprimer les champs enum du tableau
         unset($data['themeMenu']);
         unset($data['dietMenu']);
+        unset($data['picture']);
+
         //reecreer un json sans enum
         $jsonSansEnum = json_encode($data);
         //deserializer le json en entité
@@ -106,6 +118,9 @@ final class MenusController extends AbstractController
         //assigner les enums
         $menu->setThemeMenu($themeMenu);
         $menu->setDietMenu($dietMenu);
+        if ($imageContent) {
+            $menu->setPicture($imageContent);
+        }
         //valider l'entité
 
         $errors = $this->validator->validate($menu);
@@ -285,6 +300,7 @@ final class MenusController extends AbstractController
         $responseData = $this->serializer->serialize($menus, 'json', ['groups' => 'menu:read']);
         return new JsonResponse($responseData, Response::HTTP_OK, [], true);
     }
+
     //#[IsGranted('ROLE_ADMIN', 'ROLE_EMPLLOYE')]
     #[Route('/{id}', methods: ['PUT'], name: 'edit')]
     #[OA\Put(
@@ -337,7 +353,15 @@ final class MenusController extends AbstractController
             'json',
             [AbstractNormalizer::OBJECT_TO_POPULATE => $menus]
         );
-
+        if (isset($data['picture']) && !empty($data['picture'])) {
+            // Supprimer le préfixe éventuel (data:image/png;base64,)
+            $pictureBase64 = preg_replace('/^data:image\/\w+;base64,/', '', $data['picture']);
+            $imageContent = base64_decode($pictureBase64);
+            if ($imageContent === false) {
+                return new JsonResponse(['erreurs' => 'Image invalide'], Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+            $menus->setPicture($imageContent);
+        }
         $menus->setUpdatedAt(new DateTimeImmutable());
         $entityManager->persist($menus);
         $entityManager->flush();
@@ -369,7 +393,7 @@ final class MenusController extends AbstractController
             new OA\Response(response: 404, description: 'Menu non trouvé')
         ]
     )]
-    //#[IsGranted('ROLE_ADMIN', 'ROLE_EMPLLOYE')]
+    #[IsGranted('ROLE_ADMIN', 'ROLE_EMPLLOYE')]
     public function delete(EntityManagerInterface $entityManager, int $id): Response
     {
 
@@ -386,5 +410,42 @@ final class MenusController extends AbstractController
             ['message' => 'Menus deleted successfully'],
             Response::HTTP_OK
         );
+    }
+
+    #[Route('/{id}/picture', name: 'picture', methods: ['GET'])]
+    #[OA\Get(
+        tags: ['Menu'],
+        summary: 'Récupérer l\'image d\'un menu',
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                in: 'path',
+                description: 'ID du menu dont on veut récupérer l\'image',
+                required: true,
+                schema: new OA\Schema(type: 'integer')
+            )
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Image du menu'),
+            new OA\Response(response: 404, description: 'Menu ou image non trouvée')
+        ]
+    )]
+    public function picture(Menus $menu): Response
+    {
+        $picture = $menu->getPicture();
+        if (!$picture) {
+            throw $this->createNotFoundException('Image non trouvée');
+        }
+
+        // Convertir la ressource en string si nécessaire
+        if (is_resource($picture)) {
+            $picture = stream_get_contents($picture);
+        }
+
+        // Détecter le type MIME (ou stockez-le en base)
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->buffer($picture);
+
+        return new Response($picture, 200, ['Content-Type' => $mimeType]);
     }
 }

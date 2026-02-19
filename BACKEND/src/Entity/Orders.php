@@ -56,7 +56,7 @@ class Orders
     private ?string $status = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['orders:read'])]
+    #[Groups(['orders:write'])]
     private ?string $cancellationReason = null;
 
     #[ORM\Column]
@@ -222,7 +222,7 @@ class Orders
 
         return $this;
     }
-
+    #[Groups(['orders:read'])]
     public function getMenu(): ?Menus
     {
         return $this->menu;

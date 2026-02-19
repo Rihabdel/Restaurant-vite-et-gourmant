@@ -1,4 +1,4 @@
-import  Route  from "./Route.js";
+import  Route  from "/Router/Route.js";
 import { allRoutes, websiteName } from "./allRoutes.js";
 import { showAndHideElementsForRoles, isConnected, getRole } from "../js/script.js";
 
@@ -28,10 +28,11 @@ const LoadContentPage = async () => {
       }
     }
     else{
-      const roleUser = getRole();
-        if(!allRolesArray.includes(roleUser)){
-        globalThis.location.replace("/");
+      if(!isConnected()){
+        globalThis.location.replace("/connexion");
+        return;
       }
+
     }
   }
 
@@ -76,3 +77,5 @@ globalThis.route = routeEvent;
 // Chargement du contenu de la page au chargement initial
 LoadContentPage();
 export { LoadContentPage };
+
+

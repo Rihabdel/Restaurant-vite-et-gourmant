@@ -14,6 +14,7 @@ use ApiPlatform\Metadata\ApiResource;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
+
 #[ORM\Entity(repositoryClass: MenusRepository::class)]
 #[ApiResource(
     uriTemplate: '/menu',
@@ -371,5 +372,13 @@ class Menus
         $this->isAvailable = $isAvailable;
 
         return $this;
+    }
+    public function getPictureBase64(): ?string
+    {
+        if (!$this->picture) {
+            return null;
+        }
+        $content = is_resource($this->picture) ? stream_get_contents($this->picture) : $this->picture;
+        return base64_encode($content);
     }
 }

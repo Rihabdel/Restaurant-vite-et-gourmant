@@ -189,7 +189,7 @@ final class OrdersController extends AbstractController
         }
     }
 
-    #[Route('/{id}', methods: ['GET'], name: 'show')]
+    #[Route('{id}', methods: ['GET'], name: 'show')]
     #[IsGranted('ROLE_USER')]
     #[OA\Get(
         tags: ["Orders"],
@@ -197,7 +197,7 @@ final class OrdersController extends AbstractController
         parameters: [
             new OA\Parameter(
                 name: "id",
-                in: "path",
+                in: "query",
                 description: "ID de la commande à afficher",
                 required: true,
                 schema: new OA\Schema(type: "integer")
@@ -230,24 +230,49 @@ final class OrdersController extends AbstractController
                 )
             ),
             new OA\Response(
+                response: 403,
+                description: "Accès non autorisé à cette commande"
+            ),
+            new OA\Response(
                 response: 404,
-                description: "Commande non trouvée ou accès non autorisé"
+                description: "Commande non trouvée"
             )
         ]
     )]
     public function show(int $id, OrdersRepository $ordersRepository): JsonResponse
     {
         $order = $ordersRepository->find($id);
+
         if (!$order) {
             return $this->json(['error' => 'Commande non trouvée'], Response::HTTP_NOT_FOUND);
         }
-
         if (!$this->canAccessOrder($order)) {
-            return $this->json(['error' => 'Accès non autorisé'], Response::HTTP_FORBIDDEN);
+            return $this->json(['error' => 'Accès non autorisé à cette commande'], Response::HTTP_FORBIDDEN);
         }
-
         $data = $this->serializer->serialize($order, 'json', ['groups' => ['orders:read', 'menu:read']]);
         return new JsonResponse($data, Response::HTTP_OK, [], true);
+    }
+    #[Route('', methods: ['GET'], name: 'index')]
+    #[IsGranted('ROLE_USER')]
+    #[OA\Get(
+        tags: ["Orders"],
+        summary: "Lister toutes les commandes",
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Liste des commandes récupérée avec succès"
+            ),
+            new OA\Response(
+                response: 403,
+                description: "Accès non autorisé"
+            )
+        ]
+    )]
+    public function index(OrdersRepository $ordersRepository): JsonResponse
+    {
+        $orders = $ordersRepository->findAll();
+
+        return $this->json($orders, Response::HTTP_OK, [], ['groups' => ['orders:read', 'menu:read']]);
     }
 
     #[Route('/list', methods: ['GET'], name: 'list')]
@@ -484,8 +509,9 @@ final class OrdersController extends AbstractController
 
     private function canAccessOrder(Orders $order): bool
     {
+        // Seul le propriétaire de la commande, les admins et les employés peuvent accéder aux détails d'une commande
         $user = $this->getUser();
-        return $user && ($user->getId() === $order->getUser()->getId() || $this->isGranted('ROLE_ADMIN') || $this->isGranted('ROLE_EMPLOYEE'));
+        return $user instanceof User && ($order->getUser()->getId() === $user->getId() || in_array('ROLE_ADMIN', $user->getRoles()) || in_array('ROLE_EMPLOYE', $user->getRoles()));
     }
 
 

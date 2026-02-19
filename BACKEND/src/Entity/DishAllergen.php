@@ -23,7 +23,7 @@ class DishAllergen
     #[ORM\Column]
     private ?int $id = null;
 
-    #[Groups(['dish_allergen:read', 'dish:detail'])]
+    #[Groups(['dish:detail'])]
     #[ORM\ManyToOne(inversedBy: 'dishAllergens')]
     private ?Dishes $dish = null;
 

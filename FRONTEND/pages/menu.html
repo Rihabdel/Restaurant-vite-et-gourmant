@@ -74,34 +74,34 @@
     <div class="menu-section-content">
     <div class="text-center mb-4">
       <!-- Button trigger modal -->
-      <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#editMenuModal">
+      <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#editMenuModal" id="add-Menu-Btn">
           Ajoutez une nouvelle carte de menu
       </button>
     </div>
 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 menu-cards" id="menu-cards-container">
 <div class="col">
     <div class="menu-card h-100">
-        <div class="card-image">
+      <div class="card-image">
     <img src="/scss/images/38f4dbfaeaa1ef70459774f52e75713a.jpg" class="card-img-top" alt="...">
         <div class="action-image-buttons" data-role="admin,employee" style="display: none;">
-            <button class="btn btn-outline-light edit-menu-btn" data-id="1"><i class="bi bi-pencil"></i>Modifier</button>
-            <button class="btn btn-outline-light delete-menu-btn" data-id="1"><i class="bi bi-trash"></i>Supprimer</button>
+            <button class="btn btn-outline-light edit-menu-btn" data-id="${menu.id}"><i class="bi bi-pencil"></i>Modifier</button>
+            <button class="btn btn-outline-light delete-menu-btn" data-id="${menu.id}"><i class="bi bi-trash"></i>Supprimer</button>
         </div>
-    </div>
+      </div>
     <div class="card-body">
-        <h5 class="card-title">Titre de menu</h5>
-        <p class="card-description">Description de menu </p>
+        <h5 class="card-title">${menu.title}</h5>
+        <p class="card-description">${menu.description || 'Description de menu'}</p>
         <ul>
-        <li>Minimum pour [20-50] personnes</li>
-        <li>Prix: 45 Euros/ personnes</li>
+        <li>Minimum pour ${menu.minPersons} personnes</li>
+        <li>Prix: ${menu.price} Euros/ personnes</li>
         </ul>
     </div>
     <div class="card-footer">
-        <button class="btn btn-primary view-detail-btn" data-id="1" data-bs-toggle="modal" data-bs-target="#detailscarteModal">voir le détail de menu</button>
+        <button class="btn btn-primary view-detail-btn" data-id="${menu.id}" data-bs-toggle="modal" data-bs-target="#detailscarteModal">voir le détail de menu</button>
     </div>
-    <div class="action-card-buttons" data-role="admin,employee" style="display: none;">
-            <button class="btn btn-success edit-menu-btn" data-id="1" data-bs-toggle="modal" data-bs-target="#editMenuModal"><i class="bi bi-pencil"></i>Modifier</button>
-            <button class="btn btn-danger delete-menu-btn" data-id="1" data-bs-toggle="modal" data-bs-target="#deleteMenuModal"><i class="bi bi-trash"></i>Supprimer</button>
+    <div class="action-card-buttons" >
+            <button class="btn btn-success edit-menu-btn" data-id="${menu.id}" data-bs-toggle="modal" data-bs-target="#editMenuModal"><i class="bi bi-pencil"></i>Modifier</button>
+            <button class="btn btn-danger delete-menu-btn" data-id="${menu.id}" data-bs-toggle="modal" data-bs-target="#deleteMenuModal"><i class="bi bi-trash"></i>Supprimer</button>
       </div>
     </div>
 </div>
@@ -119,32 +119,36 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form>
+        <form id="editMenuForm">
+            <div class="mb-3">
+              <label for="menuPicture" class="form-label">Image du menu</label>
+              <input type="file" class="form-control" id="menuPicture" name="picture" accept="scss/images/*">
+            </div>
+            <div id="currentPictureContainer" class="mb-3" style="display: none;">
+              <img id="currentPicture" src="" alt="Image actuelle" style="max-width: 200px;">
+              <button type="button" class="btn btn-sm btn-danger" id="removePictureBtn">Supprimer l'image</button>
+            </div>
             <div class="mb-3">
                 <label for="menuTitle" class="form-label">Titre du menu</label>
-                <input type="text" class="form-control" id="menuTitle" placeholder="Entrez le titre du menu">
+                <input type="text" class="form-control" id="editMenuTitle" placeholder="Entrez le titre du menu">
             </div>
             <div class="mb-3">
                 <label for="menuDescription" class="form-label">Description du menu</label>
-                <textarea class="form-control" id="menuDescription" rows="3" placeholder="Entrez la description du menu"></textarea>
+                <textarea class="form-control" id="editMenuDescription" rows="3" placeholder="Entrez la description du menu"></textarea>
             </div>
             <div class="mb-3">
-                <label for="nbPersonnes" class="form-label">Minimum pour :</label>
-                <input type="number" class="form-control" id="nbPersonnes" placeholder="Entrez le nombre minimum de personnes">
+                <label for="minPersons" class="form-label">Minimum pour :</label>
+                <input type="number" class="form-control" id="editMenuMinPersons" placeholder="Entrez le nombre minimum de personnes">
             </div>
             <div class="mb-3">
                 <label for="menuPrice" class="form-label">Prix par personne</label>
-                <input type="number" class="form-control" id="menuPrice" placeholder="Entrez le prix par personne">
-            </div>
-            <div class="mb-3">
-                <label for="menuImage" class="form-label">Image du menu</label>
-                <input class="form-control" type="file" id="menuImage">
+                <input type="number" class="form-control" id="editMenuPrice" placeholder="Entrez le prix par personne">
             </div>
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-        <button type="button" class="btn btn-primary">Enregistrer les modifications</button>
+        <button type="button" class="btn btn-primary" id="saveMenuBtn">Enregistrer les modifications</button>
       </div>
     </div>
   </div>
@@ -230,7 +234,7 @@
       </div>
       <div class="modal-footer d-flex justify-content-center">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ajouter au panier</button>
-        <button class="btn btn-primary" data-bs-target="#recapCommandeModal" data-bs-toggle="modal">Commander</button>
+        <button class="btn btn-primary" data-bs-target="#recapCommandeModal" data-bs-toggle="modal" id="confirm-order-btn">Commander</button>
       </div>
       <div class ="modal-footer d-flex justify-content-center"  data-role="admin,employee">
         <button type="button" class="btn btn-success" data-bs-target="#editCarteMenu" data-bs-toggle="modal">modifier la carte </button>
@@ -318,51 +322,32 @@
 </div>
 </div>
 <!--détails de la commande-->
-<div class="modal fade" id="detailsCommandeModal" aria-hidden="true" aria-labelledby="detailsCommandeModalLabel" tabindex="-1">
+<div class="modal fade" id="OrderDetailsModal" aria-hidden="true" aria-labelledby="detailsCommandeModalLabel" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered details-commande-modal*">
     <div class="modal-content">
       <div class="modal-body">
-        <div class="container commande">
-            <h2 class="text-center mb-4">Récapitulatif de votre commande</h2>
-            <div class="commande-details">
-              <ul>
-                <li><strong>Nom du client :</strong> [Nom]</li>
-                <li><strong>Prénom du client :</strong> [Prénom]</li>
-                <li><strong>Email du client :</strong> [Email]</li>
-                <li><strong>Numéro de téléphone :</strong> [Téléphone]</li>
-                <li><strong>Adresse de facturation :</strong> [Adresse]</li>
-                <li><strong>Date de facturation :</strong> [Date]</li>
-                <li><strong>Adresse de livraison :</strong> [Adresse]</li>
-                <li><strong>Date de livraison :</strong> [Date]</li>
-                <li><strong>Heure de livraison :</strong> [Heure]</li>
-              </ul>
-            </div>
-            <div class="ordered-menu">
-              <h3>Menu commandé :</h3>
-              <form>
-                
-              </form>
-              <ul>
-                <li><strong>Titre du menu :</strong> [Titre]</li>
-                <li><strong>Nombre de personnes :</strong> [Nombre]</li>
-                <li>Description du menu : [Description]</li>
-                <li>Prix par personne : [Prix] €</li>
-                <li>Frais de livraison : [Frais] €</li>
-                <li>Réduction appliquée : [Réduction] €</li>
-              </ul>
-                <small>Une réduction de 10% pour tout commande ayant 5 personnes de plus que le nombre minimum</small>
-            </div>
-            <div class="total-amount">
-                <h3>Total à payer : [Montant] €</h3>
-            </div>
-        </div>
-      </div>
+        <h5>Détails de votre commande :</h5>
+        <p>Voici un récapitulatif de votre commande avant confirmation :</p>
+        <ul>
+          <li><strong>Nom du client :</strong> <span id="detailsName"></span></li>
+          <li><strong>Prénom du client :</strong> <span id="detailsPrenom"></span></li>
+          <li><strong>Email du client :</strong> <span id="detailsEmail"></span></li>
+          <li><strong>Numéro de téléphone :</strong> <span id="detailsPhone"></span></li>
+          <li><strong>Menu commandé :</strong> <span id="detailsMenu"></span></li>
+          <li><strong>Nombre de personnes :</strong> <span id="detailsQuantity"></span></li>
+          <li><strong>Date de livraison :</strong> <span id="detailsDeliveryDate"></span></li>
+          <li><strong>Heure de livraison :</strong> <span id="detailsDeliveryTime"></span></li>
+          <li><strong>Adresse de livraison :</strong> <span id="detailsAddress"></span></li>
+          <li><strong>Coût total :</strong> <span id="detailsTotalPrice"></span></li>
+        </ul>
+        <p class="text-danger">Veuillez vérifier les détails de votre commande avant de confirmer. Toute modification après confirmation peut entraîner des frais supplémentaires.</p>
+          </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#recapCommandeModal">Retour</button>
-        <button type="button" class="btn btn-primary" data-bs-target="#paiementModal" data-bs-dismiss="modal">Payer</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Retour</button>
+        <button type="button" class="btn btn-primary" id="pay-order-btn" data-bs-dismiss="modal" id="pay-order-btn">payer</button>
       </div>
     </div>
-  </div>
+  </div>  
 </div>
 
 <!---modal paiement de menu-->
@@ -505,37 +490,6 @@
   </div>
 </div>
 
-<!-- Exemple : section où les menus apparaîtront -->
-<div id="menus-container" class="row"></div>
 
 
 <script type="module" src="../js/menu.js"></script>
-
-
-const detailsMenuButton= document.getElementById('DetailsMenuButton');
-detailsMenuButton.addEventListener('click', async (event) => {
-    const modal = document.getElementById('detailscarteModal');
-    if (!modal) {
-        console.error('Modal detailscarteModal introuvable');
-        return;
-    }
-    detailsMenuButton.addEventListener('click', async (event) => detailsMenu(event));
-    function detailsMenu(event) {
-        let menuId = event.currentTarget.dataset.id;
-        let dataId = event.currentTarget.getAttribute('data-id');
-        console.log('Menu ID:', menuId);
-        console.log('Data ID:', dataId);
-    try {
-        // Appeler l'API pour récupérer les plats
-        const dishes = await getMenuDishes(menuId);
-        // Remplir la modale avec les plats (et éventuellement d'autres infos du menu)
-        fillDetailModal(dishes, menuId);
-        
-        // Ouvrir la modale Bootstrap
-        const modal = new bootstrap.Modal(document.getElementById('detailscarteModal'));
-        modal.show();
-    } catch (error) {
-        console.error(error);
-        alert('Impossible de charger les détails du menu.');
-    }
-    }});

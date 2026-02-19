@@ -12418,7 +12418,7 @@ h2, .h2 {
   flex-direction: column;
   gap: 20px;
   justify-content: center;
-  align-items: center; /* Added for better alignment */
+  align-items: center;
 }
 
 table {
