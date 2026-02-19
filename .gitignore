@@ -1,2 +1,5 @@
-node_modules
-images
+/backend/vendor/
+/backend/var/
+/backend/.env.local
+/FRONTEND/node_modules/
+.DS_Store

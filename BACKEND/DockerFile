@@ -1,0 +1,31 @@
+# On part d'une version de PHP officielle avec Apache (le serveur web)
+FROM php:8.2-apache
+
+# On installe les outils nécessaires pour que Symfony soit content
+RUN apt-get update && apt-get install -y \
+    libicu-dev \
+    libzip-dev \
+    zip \
+    unzip \
+    git \
+    && docker-php-ext-install intl pdo_mysql zip opcache
+
+# On active le module "rewrite" d'Apache pour que les routes Symfony fonctionnent
+RUN a2enmod rewrite
+
+# On configure Apache pour qu'il regarde le dossier /public de Symfony
+ENV APACHE_DOCUMENT_ROOT /var/www/html/public
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/000-default.conf
+
+# On installe Composer (le gestionnaire de paquets PHP)
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# On copie tout ton dossier back-symfony dans le conteneur
+WORKDIR /var/www/html
+COPY . .
+
+# On installe les dépendances PHP
+RUN composer install --no-dev --optimize-autoloader
+
+# On donne les bonnes permissions pour que Symfony puisse écrire ses logs
+RUN chown -R www-data:www-data /var/www/html/var
