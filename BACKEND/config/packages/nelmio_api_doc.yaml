@@ -1,0 +1,18 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: Restaurant Vite et Gourmant API
+            description: This is an awesome app!
+            version: 1.0.0
+        components:
+            securitySchemes:
+                X-AUTH-TOKEN:
+                    type: apiKey
+                    name: X-AUTH-TOKEN
+                    in: header
+        security:
+            - X-AUTH-TOKEN: []
+    areas:
+        default:
+            path_patterns:
+                - ^/api(?!/doc$)

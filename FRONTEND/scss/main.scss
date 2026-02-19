@@ -11,12 +11,12 @@ footer {
     position: absolute;
     background-color: $secondary;
     width: 100%;
-    font-family: 'Playfair Display', serif;
+    font-family: 'Hind Madurai', serif;
     font-size: 15px;
 }
 }
 body{
-
+    background-color: white !important;
     margin: 0;
     font-family: 'Playfair Display', serif;
     font-size: 20px;
@@ -393,8 +393,8 @@ body{
         padding: 20px;
         background-color: white;
         border-radius: 10px;
+        border-color: rgba(212, 167, 106, 0.2);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        background-color: $body-bg;
         
     }
     
@@ -410,7 +410,7 @@ body{
         border-radius: 5px;
         border: 1px solid #ccc; 
         margin-bottom: 15px;
-        background-color: white;
+        background-color: white !important;
     }
 
 .inscription-link , a {
@@ -451,7 +451,7 @@ body{
             flex-direction: column;
             gap: 20px;
             justify-content: center;
-            align-items: center; /* Added for better alignment */
+            align-items: center;
         }
 table{
     width: 100%;

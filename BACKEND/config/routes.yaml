@@ -1,0 +1,4 @@
+# Import routes defined as PHP attributes in controller classes
+controllers:
+    resource: "../src/Controller/"
+    type: attribute

@@ -1,5 +1,19 @@
-/backend/vendor/
-/backend/var/
-/backend/.env.local
-/FRONTEND/node_modules/
+# Sécurité : On ignore les fichiers d'environnement partout
+.env
+.env.local
+.env.dev
+.env.test
+.env.*
+.env.local.php
+
+# Dépendances : On ignore les dossiers lourds (Backend & Frontend)
+**/vendor/
+**/var/
+**/node_modules/
+**/dist/
+
+# Configuration Editeur et Système
 .DS_Store
+Thumbs.db
+.vscode/
+.idea/git status

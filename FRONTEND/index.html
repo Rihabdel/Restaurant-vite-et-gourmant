@@ -16,25 +16,25 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav ms-auto mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="/">Accueil</a>
+          <a class="nav-link active" aria-current="page" href="/" onclick="route(event)">Accueil</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/menu">Nos menus</a>
+          <a class="nav-link" href="/menu" onclick="route(event)">Nos menus</a>
         </li>
-                <li class="nav-item">
-            <a class="nav-link" href="/order">Mes commandes</a>
+            <li class="nav-item">
+            <a class="nav-link" href="/order" data-show="connected" onclick="route(event)">Mes commandes</a>
+        </li>
+        <li class="nav-item" >
+            <a class="nav-link" href="/connexion" data-show="disconnected" onclick="route(event)">Connexion</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="/connexion">Connexion</a>
+            <a class="nav-link" href="/monCompte" data-show="connected" onclick="route(event)">Mon Compte</a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link" href="/monCompte">Mon Compte</a>
-        </li>
-                <li class="nav-item">
-            <a class="nav-link" href="#">Deconnexion</a>
+                <li class="nav-item" data-show="connected">
+            <button id="SignoutBtn" class="nav-link" href="">Deconnexion</button>
         </li>
                 <li class="nav-item">
-            <a class="nav-link" href="/contact">Contact</a>
+            <a class="nav-link" href="/contact" onclick="route(event)">Contact</a>
         </li>
       </ul>
   </div>
@@ -108,7 +108,9 @@
     </div>
 </footer>
 <script type="module" src="Router/Router.js"></script>
-<script src="scss/js/script.js"></script>
+<script type="module" src="js/script.js"></script>
+<script type="module" src="js/menu.js"></script>
+<script type="module" src="js/auth/order.js"></script>
 <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

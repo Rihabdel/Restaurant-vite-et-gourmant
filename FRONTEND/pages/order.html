@@ -2,66 +2,11 @@
   <div class="container">
     <h2 class="text-center mb-4">Mes Commandes</h2>
         <div class="text-center mb-4">
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#orderModal">
-          Passer une nouvelle commande</button>
+        <button type="button" class="btn btn-primary"id="new-order-btn">
+  <i class="bi bi-plus"></i> Passer une nouvelle commande
+</button>
         </div> 
-<!--détails de la commande-->
-        <div class="container order-recap">
-            <h2 class="text-center mb-4">Récapitulatif de votre commande du [date] à [heure] </h2> 
-            <span>Vous pouvez modifié ou annuler votre commande avant qu'elle soit acceptée.</span>
-            <span>Merci de vérifier les informations de votre commande ci-dessous :</span>
-            <div class="commande-details">
-            <div class="order-info">
-              <h3>Vos coordonnées :</h3>
-            <div class="row customer-info">
-              <div class="col mb-3">
-                <p><strong>Nom du client :</strong> [Nom]</p>
-              </div>
-              <div class="col mb-3">
-                <p><strong>Prénom du client :</strong> [Prénom]</p>
-              </div>
-              </div>
-              <div class="row customer-info">
-                <div class="col mb-3">
-                  <p><strong>Email du client :</strong> [Email]</p>
-                </div>
-                <div class="col mb-3">
-                  <p><strong>Numéro de téléphone :</strong> [Téléphone]</p>
-                </div>
-              </div>
-              <div class="row customer-info">
-                <div class="col mb-3">
-                  <p><strong>Adresse de facturation :</strong> [Adresse]</p>
-                </div>
-                <div class="col mb-3">
-                  <p><strong>Date de facturation :</strong> [Date]</p>
-                </div>
-              </div>
-            </div>
-            <div class="ordered-menu">   
-              <div class="row">
-            <div class="menu-item col mb-3">
-                <h3>Détails du menu commandé :</h3>
-                <p><strong>Menu :</strong> [Nom du menu]</p>
-                <p><strong>Nombre de personnes :</strong> [Quantité]</p>
-            </div>
-            <div class="delivery-info col mb-3">
-                <h3>Informations de livraison :</h3>
-                <p><strong>Adresse de livraison :</strong> [Adresse]</p>
-                <p><strong>Date de livraison :</strong> [Date]</p>
-                <p><strong>Heure de livraison :</strong> [Heure]</p>
-            </div>
-            </div>
-            <div class="total-paid">
-            <h3>Total payé: [Montant] €</h3>
-            </div>  
-            <div class="action-order-buttons text-center mb-4">
-            <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#editCommandeModal"><i class="bi bi-pencil"></i>Modifier</button>
-            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteCommandeModal"><i class="bi bi-trash"></i>Supprimer</button>
-                    </div>
-            </div>
-            </div>
-        </div>
+
     <div class="table-valided-orders mt-5">
       <h3 class="mb-4">Historique de vos commandes :</h3>
       <p>Vous pouvez suivre l'état de vos commandes passées ci-dessous :</p>
@@ -76,38 +21,7 @@
           <th scope="col">Statut</th>
         </tr>
       </thead>
-      <tbody>
-        <tr>
-          <th scope="row">1</th>
-          <td>Menu Dégustation</td>
-          <td>2024-06-15</td>
-          <td><button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editCommandeModal">Modifier</button></td>
-          <td><button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteCommandeModal">Annuler</button></td>
-          <td>
-              <select>
-              <option value="en-cours" selected>En cours</option>
-              <option value="acceptée">Acceptée</option>
-              <option value="livrée">Terminé</option>
-              <option value="annulée">Annulée</option>
-              </select>
-          </td>
-        </tr>
-        <tr>
-          <th scope="row">2</th>
-          <td>Menu Végétarien</td>
-          <td>2024-06-10</td>
-          <td><button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editCommandeModal">Modifier</button></td>
-          <td><button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteCommandeModal">Annuler</button></td>
-          <td>
-            <select>
-              <option value="en-cours">En cours</option>
-              <option value="acceptée" selected>Acceptée</option>
-              <option value="livrée">Terminé</option>
-              <option value="annulée">Annulée</option>
-              </select>
-          </td>
-        </tr>
-        
+      <tbody id="orders-tbody">
       </tbody>
     </table>
   </div>
@@ -118,63 +32,64 @@
   <div class="modal-dialog modal-dialog-centered edit-commande-modal*">
     <div class="modal-content">
       <div class="modal-body">
-        <form>
+        <form id="edit-order-Form">
+          <input type="hidden" id="edit-order-id" name="orderId">
           <div class="container-fluid">
           <div class="row">Modifier votre commande :</div>
           <div class="row">
             <div class="col mb-3">
-                <label for="customerName" class="form-label">Nom du client</label>
-                <input type="text" class="form-control" id="customerName" placeholder="Entrez votre nom">
+                <label for="edit-customerName" class="form-label">Nom du client</label>
+                <input type="text" class="form-control" id="edit-customerName" placeholder="Entrez votre nom">
             </div>
             <div class="col mb-3">
-                <label for="customerPrenom" class="form-label">Prénom du client</label>
-                <input type="text" class="form-control" id="customerPrenom" placeholder="Entrez votre prénom">
+                <label for="edit-customerPrenom" class="form-label">Prénom du client</label>
+                <input type="text" class="form-control" id="edit-customerPrenom" placeholder="Entrez votre prénom">
             </div>
           </div>
           <div class="row">
             <div class="col mb-3">
-                <label for="customerEmail" class="form-label">Email du client</label>
-                <input type="email" class="form-control" id="customerEmail" placeholder="Entrez votre email">
+                <label for="edit-customerEmail" class="form-label">Email du client</label>
+                <input type="email" class="form-control" id="edit-customerEmail" placeholder="Entrez votre email">
             </div>
             <div class="col mb-3">
-                <label for="customerPhone" class="form-label">Numéro de téléphone</label>
-                <input type="tel" class="form-control" id="customerPhone" placeholder="Entrez votre numéro de téléphone">
+                <label for="edit-customerPhone" class="form-label">Numéro de téléphone</label>
+                <input type="tel" class="form-control" id="edit-customerPhone" placeholder="Entrez votre numéro de téléphone">
             </div>
           </div>
           <div class="row facture">
             <div class="col mb-3">
-                <label for="customerAddress" class="form-label">Adresse de facturation</label>
-                <input type="text" class="form-control" id="customerAddress" placeholder="Entrez votre adresse">
+                <label for="edit-customerAddress" class="form-label">Adresse de facturation</label>
+                <input type="text" class="form-control" id="edit-customerAddress" placeholder="Entrez votre adresse">
             </div>
             <div class="col mb-3">
-                <label for="factDate" class="form-label">Date de facturation</label>
-                <input type="text" class="form-control" id="factDate" placeholder="Entrez votre adresse">
+                <label for="edit-factDate" class="form-label">Date de facturation</label>
+                <input type="text" class="form-control" id="edit-factDate" placeholder="Entrez votre adresse">
             </div>
             </div>
             <div class="delivery row">
             <div class="mb-3">
-                <label for="deliveryAddress" class="form-label">Adresse de livraison</label>
-                <input type="text" class="form-control" id="deliveryAddress" placeholder="Entrez votre adresse">
+                <label for="edit-deliveryAddress" class="form-label">Adresse de livraison</label>
+                <input type="text" class="form-control" id="edit-deliveryAddress" placeholder="Entrez votre adresse">
                 <small class="form-text">5 euros de livraison majoré de 59 centimes par kilomètre parcourus</small>
             </div>
             <div class="col mb-3">
-                <label for="deliveryDate" class="form-label">Date de livraison</label>
-                <input type="date" class="form-control" id="deliveryDate">
+                <label for="edit-deliveryDate" class="form-label">Date de livraison</label>
+                <input type="date" class="form-control" id="edit-deliveryDate">
             </div>
             <div class="col mb-3">
-                <label for="deliveryTime" class="form-label">Heure de livraison</label>
-                <input type="time" class="form-control" id="deliveryTime">
+                <label for="edit-deliveryTime" class="form-label">Heure de livraison</label>
+                <input type="time" class="form-control" id="edit-deliveryTime">
             </div>
             </div>
             <div class="row">
             <div class="col mb-3">
                 <label for="menuSelect" class="form-label">Votre menu commandé :</label>
-                <p>Menu [Nom du menu]</p>
-                <p>Description du menu [description]</p>
+                <p aria-readonly="true">Menu: ></p>
+                <p>Description du menu: </p>
             </div>
             <div class="col mb-3">
-                <label for="menuQuantity" class="form-label"placeholder="minimum">Nombre de personnes :</label>
-                <input type="number" class="form-control" id="menuQuantity" placeholder="Entrez le nombre de personnes">
+                <label for="edit-menuQuantity" class="form-label"placeholder="minimum">Nombre de personnes :</label>
+                <input type="number" class="form-control" id="edit-menuQuantity" placeholder="Entrez le nombre de personnes">
                 <small class="form-text">Minimum de [20-50] personnes</small></br>
             </div>
           </div>
@@ -186,7 +101,7 @@
     </div>
   </div>
 </div>
-</div>
+
 
 
 <!--delete modal commande-->
@@ -205,11 +120,11 @@
   </div>
 </div>
 <!--order modal -->
-<div class="modal fade" id="orderModal" aria-hidden="true" aria-labelledby="orderModalLabel" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered order-modal*">
+<div class="modal fade" id="OrderModal" aria-hidden="true" aria-labelledby="orderModalLabel" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered order-modal">
     <div class="modal-content">
       <div class="modal-body">
-        <form>
+        <form id="orderForm">
           <div class="container-fluid">
           <div class="row">Passer une nouvelle commande :</div>
           <div class="row">
@@ -233,53 +148,80 @@
             </div>
           </div>
           <div class="row facture">
-            <div class="col mb-3">
                 <label for="customerAddress" class="form-label">Adresse de facturation</label>
-                <input type="text" class="form-control" id="customerAddress" placeholder="Entrez votre adresse">
-            </div>
-            <div class="col mb-3">
-                <label for="factDate" class="form-label">Date de facturation</label>
-                <input type="text" class="form-control" id="factDate" placeholder="Entrez votre adresse">
-            </div>
+                <input type="text" class="form-control" id="customerAddress" placeholder="Entrez votre adresse" name="adress">
             </div>
             <div class="delivery row">
             <div class="mb-3">
                 <label for="deliveryAddress" class="form-label">Adresse de livraison</label>
-                <input type="text" class="form-control" id="deliveryAddress" placeholder="Entrez votre adresse">
+                <input type="text" class="form-control" id="deliveryAddress" placeholder="Entrez votre adresse" name="deliveryAddress">
                 <small class="form-text">5 euros de livraison majoré de 59 centimes par kilomètre parcourus</small>
             </div>
+            <div class="mb-3">
+                <label for="deliveryCity" class="form-label">Ville de livraison</label>
+                <input type="text" class="form-control" id="deliveryCity" placeholder="Entrez votre ville" name="deliveryCity">
+                <span>Livraison gratuite à bordeaux</span>
+              </div>
             <div class="col mb-3">
                 <label for="deliveryDate" class="form-label">Date de livraison</label>
-                <input type="date" class="form-control" id="deliveryDate">
+                <input type="date" class="form-control" id="deliveryDate" name="deliveryDate">
             </div>
             <div class="col mb-3">
                 <label for="deliveryTime" class="form-label">Heure de livraison</label>
-                <input type="time" class="form-control" id="deliveryTime">
+                <input type="time" class="form-control" id="deliveryTime" name="deliveryTime">
+            </div>
+            <div class="col mb-3">
+                <label for="deliveryPostalCode" class="form-label">Code postal de livraison</label>
+                <input type="text" class="form-control" id="deliveryPostalCode" placeholder="Entrez votre code postal" name="deliveryPostalCode">
             </div>
             </div>
             <div class="row">
             <div class="col mb-3">
                 <label for="menuSelect" class="form-label">Votre menu commandé :</label>
-                <select class="form-select" id="menuSelect">
-                  <option selected>Choisissez votre menu</option>
-                  <option value="1">Menu Dégustation</option>
-                  <option value="2">Menu Végétarien</option>
-                  <option value="3">Menu Tradition</option>
+                <select class="form-select" id="menuSelect" name="menuId">
+                  
                 </select>
             </div>
             <div class="col mb-3">
                 <label for="menuQuantity" class="form-label"placeholder="minimum">Nombre de personnes :</label>
-                <input type="number" class="form-control" id="menuQuantity" placeholder="Entrez le nombre de personnes">
+                <input type="number" class="form-control" id="menuQuantity" placeholder="Entrez le nombre de personnes" name="numberOfPeople">
                 <small class="form-text">Minimum de [20-50] personnes</small></br>
             </div>
           </div>
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary"  data-bs-target="#detailsCommandeModal" data-bs-toggle="modal">Confirmer votre commande</button>
+        <button type="button"class="btn btn-primary" id="confirm-order-btn">Confirmer votre commande</button>
       </div>
     </div>
   </div>
 </div>
-</div>
 
+<!--détails de la commande-->
+<div class="modal fade" id="OrderDetailsModal" aria-hidden="true" aria-labelledby="detailsCommandeModalLabel" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered details-commande-modal*">
+    <div class="modal-content">
+      <div class="modal-body">
+        <h5>Détails de votre commande :</h5>
+        <p>Voici un récapitulatif de votre commande avant confirmation :</p>
+        <ul>
+          <li><strong>Nom du client :</strong> <span id="detailsName"></span></li>
+          <li><strong>Prénom du client :</strong> <span id="detailsPrenom"></span></li>
+          <li><strong>Email du client :</strong> <span id="detailsEmail"></span></li>
+          <li><strong>Numéro de téléphone :</strong> <span id="detailsPhone"></span></li>
+          <li><strong>Menu commandé :</strong> <span id="detailsMenu"></span></li>
+          <li><strong>Nombre de personnes :</strong> <span id="detailsQuantity"></span></li>
+          <li><strong>Date de livraison :</strong> <span id="detailsDeliveryDate"></span></li>
+          <li><strong>Heure de livraison :</strong> <span id="detailsDeliveryTime"></span></li>
+          <li><strong>Adresse de livraison :</strong> <span id="detailsAddress"></span></li>
+          <li><strong>Coût total :</strong> <span id="detailsTotalPrice"></span></li>
+        </ul>
+        <p class="text-danger">Veuillez vérifier les détails de votre commande avant de confirmer. Toute modification après confirmation peut entraîner des frais supplémentaires.</p>
+          </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Retour</button>
+        <button type="button" class="btn btn-primary" id="pay-order-btn" data-bs-dismiss="modal">payer</button>
+      </div>
+    </div>
+  </div>  
+</div>
