@@ -1,2 +1,21 @@
-node_modules
-images
+
+**/.env
+**/.env.local
+**/.env.dev
+**/.env.test
+**/.env.*
+**/.env.local.php
+
+# On ignore les dossiers lourds de Symfony
+**/vendor/
+**/var/
+
+# On ignore les dossiers lourds du Frontend (si tu as du React/Vue/Vite)
+**/node_modules/
+**/dist/
+
+# On ignore les fichiers système
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
