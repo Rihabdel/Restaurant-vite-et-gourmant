@@ -10,12 +10,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
-use ApiPlatform\Metadata\Delete;
 use Symfony\Component\Serializer\Attribute\Groups;
+use OpenApi\Attributes as OA;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ApiResource(
@@ -39,9 +35,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     const ROLE_EMPLOYE = 'ROLE_EMPLOYE';
     const ROLE_ADMIN = 'ROLE_ADMIN';
     #[ORM\Column]
-
-    #   [OA\Property(type: 'array', items: ['type' => 'string'])]
-
+    #[OA\Property(type: 'array', items: ['type' => 'string'])]
     private array $roles = [];
 
     /**
@@ -121,11 +115,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @see UserInterface
      */
+    #[Groups(['user:read', 'user:write'])]
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
+        // chaque utilisateur doit avoir au moins le rôle ROLE_USER
+        if (empty($roles)) {
+            $roles[] = self::ROLE_USER;
+        }
         return array_unique($roles);
     }
 

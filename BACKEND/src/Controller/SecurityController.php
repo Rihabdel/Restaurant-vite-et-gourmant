@@ -24,6 +24,37 @@ class SecurityController extends AbstractController
     public function __construct(private EntityManagerInterface $manager, private SerializerInterface $serializer) {}
 
     #[Route('/registration', name: 'registration', methods: 'POST')]
+    #[OA\Post(
+        tags: ['Authentication'],
+        description: 'User registration endpoint',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: 'email', type: 'string', example: 'user@example.com'),
+                    new OA\Property(property: 'password', type: 'string', example: 'password123'),
+                    new OA\Property(property: 'firstName', type: 'string', example: 'John'),
+                    new OA\Property(property: 'lastName', type: 'string', example: 'Doe'),
+                    new OA\Property(property: 'adress', type: 'string', example: '123 Main Street'),
+                    new OA\Property(property: 'phone', type: 'integer', example: 1234567890),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 201,
+                description: 'User registered successfully',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'user', type: 'string'),
+                        new OA\Property(property: 'apiToken', type: 'string'),
+
+                    ]
+                )
+            ),
+            new OA\Response(response: 400, description: 'Bad request - invalid data provided')
+        ]
+    )]
     public function register(Request $request, UserPasswordHasherInterface $passwordHasher): JsonResponse
     {
         $user = $this->serializer->deserialize($request->getContent(), User::class, 'json');

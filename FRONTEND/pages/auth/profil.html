@@ -2,8 +2,22 @@
   <div class="container text-center">
     <h2 class="mb-4">Bienvenue sur votre profil, [Nom d'utilisateur] !</h2>
 <section class="info-section mt-5">
-  <div class="container">
+  <div class="container" id="profileInfo">
     <h2 class="text-center mb-4">Informations Personnelles</h2>
+    <div id="welcomeMessage" class="text-center mb-4"></div>
+    <h4 class="mb-3">Détails du Profil</h4>
+    <p class="mb-2"><strong>Nom :</strong> <span id="profileName">[Nom]</span></p>
+    <p class="mb-2"><strong>Prénom :</strong> <span id="profileFirstName">[Prénom]</span></p>
+    <p class="mb-2"><strong>Email :</strong> <span id="profileEmail">[Email]</span></p>
+    <p class="mb-2"><strong>Numéro de téléphone :</strong> <span id="profilePhone">[Numéro de téléphone]</span></p>
+    <p class="mb-2"><strong>Adresse postale :</strong> <span id="profileAddress">[Adresse postale]</span></p>
+  </div>
+  </div>
+
+<button class="btn btn-primary mt-4" data-bs-toggle="collapse" data-bs-target="#editProfileForm" aria-expanded="false" aria-controls="editProfileForm">
+  Modifier les informations
+</button>
+<div class="collapse mt-4" id="editProfileForm">
     <form id="profileForm">
         <div class="row row-cols-2">
 
@@ -25,27 +39,18 @@
           <label for="AdressePostaleInput" class="form-label">Adresse postale</label>
           <input type="text" class="form-control" id="AdressePostaleInput" placeholder="Votre adresse postale" name="AdressePostale"> 
         </div>
-        <div class="col-4 mb-3">
-          <label for="CodePostaleInput" class="form-label">Code postale</label>
-          <input type="text" class="form-control" id="CodePostaleInput" placeholder="Votre code postale" name="CodePostale"> 
+        <div class="mb-3 col-4">
+          <label for="EmailInput" class="form-label" >Email</label>
+          <input type="email" class="form-control" id="EmailInput" placeholder="test@mail.fr" name="Email" readonly> 
         </div>
         </div>
-        <div class="row row-cols-2">
-        <div class="mb-3">
-          <label for="EmailInput" class="form-label">Email</label>
-          <input type="email" class="form-control" id="EmailInput" placeholder="test@mail.fr" name="Email"> 
-        </div>
-        <div class="mb-3">
-          <label for="AllergeneInput" class="form-label">Allergène</label>
-          <input type="text" class="form-control" id="AllergeneInput" name="Allergene" placeholder="Vos allergènes">
-        </div>
-  </div>
         <div class="text-center">
             <button type="submit" class="btn btn-primary" >Mettre à jour les informations</button>
         </div>
     </form>
-</section>
-
+</div>
+</div>  
+</section>  
 <section class="settings-section mt-5 mb-5">
   <div class="container text-center">
     <h2 class="text-center mb-4">Paramètres du Compte</h2>
