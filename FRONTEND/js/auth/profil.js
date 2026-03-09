@@ -1,7 +1,6 @@
 import {getToken, showAndHideElementsForRoles } from '../script.js';
 import { getUserInfo, updateUserInfo } from '../api.js';
-
-const API_BASE = 'https://127.0.0.1:8000/api';
+import API_BASE from "../api.js";
 
 export default async function initProfil() {
     console.log("Initialisation page profil");

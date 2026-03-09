@@ -1,4 +1,4 @@
-
+import API_BASE from "../api.js";
 const inputNom= document.getElementById("NomInput");
 const inputPrenom= document.getElementById("PrenomInput");
 const inputEmail= document.getElementById("EmailInput");
@@ -105,7 +105,7 @@ const requestOptions = {
     redirect: "follow"
 };
 
-fetch("https://127.0.0.1:8000/api/registration", requestOptions)
+fetch(`${API_BASE}/registration`, requestOptions)
     .then(response =>{
         if(response.ok){
             return response.json();

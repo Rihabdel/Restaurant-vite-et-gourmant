@@ -1,0 +1,7 @@
+# .dockerignore
+vendor/
+var/cache/
+var/log/
+.git/
+.env.local
+.env.*.local

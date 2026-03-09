@@ -1,7 +1,7 @@
 import { getUserInfo, updateUserInfo } from './api.js';
 // Constantes
 // ----------------------------
-const API_BASE = 'https://127.0.0.1:8000/api'; 
+const API_BASE = 'http://127.0.0.1:8000/api'; 
 const tokenCookieName = "accesstoken";
 export const roleCookieName = 'role';
 const signoutBtn = document.getElementById("SignoutBtn");

@@ -1,6 +1,6 @@
 import { getMenus, getMenuById, getMenuDishes } from './api.js';
 import { getToken, showAndHideElementsForRoles } from './script.js';
-
+import API_BASE from "../api.js";
 
 // Initialisation de la page
 export default async function initMenu() {

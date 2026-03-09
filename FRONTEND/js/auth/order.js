@@ -1,7 +1,6 @@
 import { showAndHideElementsForRoles, getToken,isCnnected} from './script.js';
 import { fillMenuSelect } from './menu.js';
-
-const API_BASE = 'https://127.0.0.1:8000/api';
+import API_BASE from "../api.js";
 
 //ancien
 const tbody = document.getElementById("orders-tbody");

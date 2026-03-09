@@ -1,5 +1,6 @@
 import { getToken, isConnected } from './script.js';
-const API_BASE = 'https://127.0.0.1:8000/api';
+const API_BASE = 'http://127.0.0.1:8000/api';
+
 
 export async function getMenus(filters = {}) {
     const params = new URLSearchParams(filters);
@@ -59,7 +60,7 @@ const requestOptions = {
   body: raw,
 };
 
-fetch("https://127.0.0.1:8000/api/user/", requestOptions)
+fetch(`${API_BASE}/user`, requestOptions)
   .then((response) => response.text())
   .then((result) => console.log(result))
   .catch((error) => console.error(error));
@@ -79,7 +80,7 @@ const requestOptions = {
   headers: myHeaders,
   redirect: "follow"
 };
-const response = await fetch("https://127.0.0.1:8000/api/orders", requestOptions);
+const response = await fetch(`${API_BASE}/orders`, requestOptions);
 if (!response.ok) throw new Error('Erreur chargement commandes en cours');
 }
 

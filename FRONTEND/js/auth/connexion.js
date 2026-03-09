@@ -1,4 +1,6 @@
+
 import { setToken, setCookie, showAndHideElementsForRoles, roleCookieName } from "../script.js";
+const API_BASE = 'http://127.0.0.1:8000/api';
 const emailInput = document.getElementById("EmailInput");
 const passwordInput = document.getElementById("PasswordInput");
 const btnConnexion = document.getElementById("BtnLogin");
@@ -21,7 +23,7 @@ function checkCredentials(e) {
     headers: myHeaders,
     body: raw,
 };
-fetch("https://127.0.0.1:8000/api/login", requestOptions)
+fetch(`${API_BASE}/login`, requestOptions)
     .then(response => {
         if (!response.ok) throw new Error(response.status); 
         return response.json();

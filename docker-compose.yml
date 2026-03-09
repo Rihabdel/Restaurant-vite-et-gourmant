@@ -1,0 +1,40 @@
+services:
+  frontend:
+    build: ./FRONTEND
+    container_name: vite_gourmand_front
+    ports:
+      - "8080:80"
+
+  api:
+    build: ./BACKEND
+    container_name: vite_gourmand_back
+    ports:
+      - "8000:80"
+    volumes:
+      - ./BACKEND:/var/www/html
+    depends_on:
+      - database
+
+  # Ta base de données
+  database:
+    image: mysql:8
+    container_name: symfony_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: viteEtGourmand_clean
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  # phpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: symfony_pma
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: database
+
+volumes:
+  db_data:
