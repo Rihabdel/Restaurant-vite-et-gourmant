@@ -29,9 +29,9 @@ class MenusDishes
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'menusDishes')]
-    #[Groups(['menu_dish:list'])]
     #[ORM\JoinColumn(onDelete: "CASCADE")]
     private ?Menus $menu = null;
+
     #[Groups(['menu_dish:list'])]
     #[ORM\ManyToOne(targetEntity: Dishes::class, inversedBy: 'menusDishes')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
@@ -92,7 +92,6 @@ class MenusDishes
         }
 
         return [
-            'id' => $this->menu->getId(),
             'title' => $this->menu->getTitle(),
             'description' => $this->menu->getDescriptionMenu(),
             'theme' => $this->menu->getThemeMenu(),

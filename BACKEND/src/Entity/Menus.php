@@ -275,7 +275,7 @@ class Menus
         return $basePrice;
     }
     // Get all allergenes from the dishes in the menu
-
+    #[Groups(['menu:detail'])]
     public function getAllAllergenes(): array
     {
         $allergenes = [];
@@ -283,7 +283,7 @@ class Menus
             $dish = $menuDish->getDish();
             if ($dish) {
                 foreach ($dish->getDishAllergens() as $allergene) {
-                    $allergenes[$allergene->getId()] = $allergene;
+                    $allergenes[$allergene->getId()] = $allergene->getAllergen()->getName();
                 }
             }
         }

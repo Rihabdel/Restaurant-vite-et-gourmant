@@ -33,7 +33,7 @@ final class MenusController extends AbstractController
 
     ) {}
 
-    #[IsGranted('ROLE_ADMIN', 'ROLE_EMPLLOYE')]
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/new', name: 'new', methods: ['POST'])]
     #[OA\Post(
         tags: ['Menu'],

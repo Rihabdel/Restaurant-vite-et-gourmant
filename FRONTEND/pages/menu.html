@@ -74,7 +74,7 @@
     <div class="menu-section-content">
     <div class="text-center mb-4">
       <!-- Button trigger modal -->
-      <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#editMenuModal" id="add-Menu-Btn" data-show="ROLE_ADMIN,ROLE_EMPLOYEE" style="display: none;">
+      <button type="button" class="btn btn-success" id="add-Menu-Btn" data-show="ROLE_ADMIN,ROLE_EMPLOYEE" style="display: none;">
           Ajoutez une nouvelle carte de menu
       </button>
     </div>
@@ -82,15 +82,9 @@
 <div class="col">
     <div class="menu-card h-100">
       <div class="card-image">
-    <img src="/scss/images/38f4dbfaeaa1ef70459774f52e75713a.jpg" class="card-img-top" alt="...">
-        <div class="action-image-buttons" data-show="ROLE_ADMIN,ROLE_EMPLOYEE" style="display: none;">
-            <button class="btn btn-outline-light edit-menu-btn" data-id="${menu.id}" data-show="ROLE_ADMIN,ROLE_EMPLOYEE"><i class="bi bi-pencil"></i>Modifier</button>
-            <button class="btn btn-outline-light delete-menu-btn" data-id="${menu.id}" data-show="ROLE_ADMIN,ROLE_EMPLOYEE"><i class="bi bi-trash"></i>Supprimer</button>
-        </div>
-      </div>
-
+  
     <div class="card-footer">
-        <button class="btn btn-primary view-detail-btn" data-id="${menu.id}" data-bs-toggle="modal" data-bs-target="#detailscarteModal">voir le détail de menu</button>
+        <button class="btn btn-primary view-detail-btn" data-id="${menu.id}">voir le détail de menu</button>
     </div>
     <div class="action-card-buttons" data-show="ROLE_ADMIN,ROLE_EMPLOYEE" style="display: none;">
             <button class="btn btn-success edit-menu-btn" data-id="${menu.id}" data-bs-toggle="modal" data-bs-target="#editMenuModal"><i class="bi bi-pencil"></i>Modifier</button>
@@ -122,26 +116,58 @@
               <button type="button" class="btn btn-sm btn-danger" id="removePictureBtn">Supprimer l'image</button>
             </div>
             <div class="mb-3">
-                <label for="menuTitle" class="form-label">Titre du menu</label>
-                <input type="text" class="form-control" id="editMenuTitle" placeholder="Entrez le titre du menu">
+                <label for="editMenuTitle" class="form-label">Titre du menu</label>
+                <input type="text" class="form-control" id="editMenuTitle" placeholder="Entrez le titre du menu" name="title">
             </div>
             <div class="mb-3">
-                <label for="menuDescription" class="form-label">Description du menu</label>
-                <textarea class="form-control" id="editMenuDescription" rows="3" placeholder="Entrez la description du menu"></textarea>
+                <label for="editMenuDescription" class="form-label">Description du menu</label>
+                <textarea class="form-control" id="editMenuDescription" rows="3" placeholder="Entrez la description du menu" name="descriptionMenu"></textarea>
             </div>
             <div class="mb-3">
-                <label for="minPersons" class="form-label">Minimum pour :</label>
-                <input type="number" class="form-control" id="editMenuMinPersons" placeholder="Entrez le nombre minimum de personnes">
+                <label for="editMenuMinPersons" class="form-label">Minimum pour :</label>
+                <input type="number" class="form-control" id="editMenuMinPersons" placeholder="Entrez le nombre minimum de personnes" name="minPersons">
             </div>
             <div class="mb-3">
-                <label for="menuPrice" class="form-label">Prix par personne</label>
-                <input type="number" class="form-control" id="editMenuPrice" placeholder="Entrez le prix par personne">
+                <label for="editMenuPrice" class="form-label">Prix par personne</label>
+                <input type="string" class="form-control" id="editMenuPrice" placeholder="Entrez le prix par personne" name="priceMenu">
+            </div>
+            <div class="mb-3">
+                <label for="editMenuTheme" class="form-label">Thème du menu</label>
+                <select class="form-select" id="editMenuTheme" name="theme">
+                    <option value="" disabled selected>Choisissez un thème</option>
+                    <option value="anniversaire">Anniversaire</option>
+                    <option value="classique">Classique</option>
+                    <option value="mariage">Mariage</option>
+                    <option value="bapteme">Bapteme</option>
+                    <option value="entreprise">Entreprise</option>
+                    <option value="familiale">Familiale</option>
+                    <option value="noel">Noël</option>
+                    <option value="autres">Autres</option>
+                </select>
+            </div>
+            <div class ="mb-3">
+                <label for="editMenuDiet" class="form-label">Régime du menu</label>
+                <select class="form-select" id="editMenuDiet" name="diet">
+                    <option value="" disabled selected>Choisissez un régime</option>
+                    <option value="vegetarien">Végétarien</option>
+                    <option value="vegan">Vegan</option>
+                    <option value="sans-gluten">Sans gluten</option>
+                    <option value="autres">Autres</option>
+                </select>
+            </div>
+            <div class="mb-3">
+              <label for="editMenuOrderBefore" class="form-label">commander avant</label>
+              <input type="number" class="form-control" id="editMenuOrderBefore" name="orderBefore">
+            </div>
+            <div class="mb-3">
+              <label for="editMenuStock" class="form-label">Stock</label>
+              <input type="number" class="form-control" id="editMenuStock" name="stock">
             </div>
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-        <button type="button" class="btn btn-primary" id="saveMenuBtn">Enregistrer les modifications</button>
+        <button type="submit" class="btn btn-primary" id="saveMenuBtn">Enregistrer les modifications</button>
       </div>
     </div>
   </div>
@@ -173,7 +199,7 @@
     <div class="modal-content">
       <div class="modal-body" id="detailsMenuContent">
           <div class="container menu-card-detail">
-                      <h2 class="Menu-title text-center ">titre du menu</h2>
+                      <h2 class="Menu-title text-center " id="detailscarteModalLabel">titre du menu</h2>
                         <div class="menu-category" id="entrees-container">
                             <h3><i class="bi bi-egg-fried"></i> Entrées</h3>
                             <div class="menu-item">
@@ -212,17 +238,7 @@
             </div>
           </div>
       </div>
-      <div class="container mb-4 info-section">
-          <div class="info-header">
-              <h5>Allergènes et informations supplémentaires :</h5>
-          <div class="info-content">
-            <ul>
-        <li><i class="bi bi-info-circle-fill"></i><small> Ce menu est conçu pour un minimum de [20-50] personnes.</small></li>
-        <li><i class="bi bi-exclamation-triangle-fill"></i><small>Ce menu nécessite une commande x jours à l'avance.</small></li>
-      <li><i class="bi bi-exclamation-triangle-fill"></i><small> Merci de consulter notre liste complète des allergènes pour éviter tout risque.</small></li>
-      <li><i class="bi bi-info-circle-fill"></i><small>Contactez notre équipe pour toute demande spéciale ou question concernant le menu.</small></li>
-            </ul>
-          </div>
+      
           </div>
       </div>
       <div class="modal-footer d-flex justify-content-center">
@@ -477,7 +493,7 @@
               </div>
               <div class="mb-3">
                 <label for="platPrixEdit" class="form-label">Prix du plat</label>
-                <input type="number" class="form-control" id="platPrixEdit" value="Prix du plat">
+                <input type="string" class="form-control" id="platPrixEdit" value="Prix du plat">
               </div>
             </form>
   </div>

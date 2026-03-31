@@ -173,6 +173,7 @@ class Dishes
     /**
      * @return Collection<int, DishAllergen>
      */
+
     public function getDishAllergens(): Collection
     {
         return $this->dishAllergens;
@@ -217,12 +218,12 @@ class Dishes
     {
         return $this->menusDishes->count();
     }
-
+    #[Groups(['dish:detail'])]
     public function getListOfAllergensFromDishes(): array
     {
         $allergens = [];
         foreach ($this->dishAllergens as $dishAllergen) {
-            $allergens[] = $dishAllergen->getAllergen();
+            $allergens[] = $dishAllergen->getAllergen()->getName();
         }
         return $allergens;
     }
