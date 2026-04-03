@@ -1,89 +1,111 @@
-import { getToken, isConnected } from './script.js';
-const API_BASE = 'http://127.0.0.1:8000/api';
+import { getToken} from './script.js';
+export const API_BASE = "http://localhost:8000/api";
 
 
 export async function getMenus(filters = {}) {
     const params = new URLSearchParams(filters);
-    const response = await fetch(`${API_BASE}/menu/list?${params}`);
+    const response = await fetch(`${API_BASE}/menu/list?${params.toString()}`, {
+        method: 'GET',
+         headers: { 
+            'Content-Type': 'application/json',
+},
+});
     if (!response.ok) throw new Error('Erreur chargement menus');
-    return response.json();
+    return await response.json();
 }
 
 export async function getMenuById(id) {
-    const response = await fetch(`${API_BASE}/menu/${id}`);
-    if (!response.ok) throw new Error('Erreur chargement menu');
-    return response.json();
+    const response = await fetch(`${API_BASE}/menu/${id}`,{
+        method: 'GET',
+        headers: {
+            'content-Type': 'application/json'
+        },
+    });
+    if (!response.ok) {
+        throw new Error('Erreur d\'affichage de menu');
+    }
+    return await response.json();
 }
 export async function getMenuDishes(id) {
-    const response = await fetch(`${API_BASE}/menus-dishes/${id}/list`);
-    if (!response.ok) throw new Error(`Erreur ${response.status}`);
-    return response.json();
+    const response = await fetch(`${API_BASE}/menus-dishes/${id}/list`,{
+        method: 'GET',
+        headers: {
+            'content-Type': 'application/json'
+        },
+    });
+    if (!response.ok) {
+        throw new Error('Erreur d\'affichage des plats du menu');
+    }
+    return await response.json();
+}
+export async function getDishById(id) {
+    const response = await fetch(`${API_BASE}/dishes/${id}`,{
+        method: 'GET',
+        headers: {
+            'content-Type': 'application/json'
+        },
+    }); 
+    if (!response.ok) {
+        throw new Error('Erreur d\'affichage du plat');
+    }
+    return await response.json();
 }
 export async function getDishAllergenes(id) {
-    const response = await fetch(`${API_BASE}/dish-allergen/${id}/allergenes`);
-    if (!response.ok) throw new Error(`Erreur ${response.status}`);
-    return response.json();
-}
-export async function getUserInfo() {
-    const token = getToken();
-    if (!token) return null;
-    try {
-        const response = await fetch(`${API_BASE}/user`, {
-            headers: { 'X-AUTH-TOKEN': token }
-        });
-        if (!response.ok) throw new Error('Erreur chargement profil');
-        return await response.json();
-    } catch (error) {
-        console.error(error);
-        return null;
+    const response = await fetch(`${API_BASE}/dish_allergen/${id}`,{
+        method: 'GET',  
+        headers: {
+            'content-Type': 'application/json'
+        },
+    });
+    if (!response.ok) {
+        throw new Error('Erreur d\'affichage des allergènes du plat');
     }
-}
-export async function updateUserInfo(profileForm) {
-    getUserInfo();
-    const token = getToken();
-    let formData=new FormData(profileForm);
-    const myHeaders = new Headers();
-myHeaders.append("Content-Type", "application/json");
-myHeaders.append("X-AUTH-TOKEN", token);
-
-const raw = JSON.stringify({
-    "email": formData.get("email"),
-    "firstName": formData.get("prenom"),
-    "lastName": formData.get("nom"),
-    "phone": formData.get("NumeroTelephone"),
-    "adresse": formData.get("adressePostale"),
-});
-
-const requestOptions = {
-  method: "PUT",
-  headers: myHeaders,
-  body: raw,
-};
-
-fetch(`${API_BASE}/user`, requestOptions)
-  .then((response) => response.text())
-  .then((result) => console.log(result))
-  .catch((error) => console.error(error));
+    return await response.json();
 }
 
+export async function enregistrerMenu(menuData) {
+    
+    const response = await fetch(`${API_BASE}/menu/new`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-AUTH-TOKEN': getToken()
+        },
+        body: JSON.stringify(menuData) 
+    });
 
-export async function getUserOrders() {
-  let formData = new FormData();
-    const token = getToken();
-    if (!token) return null;
-const myHeaders = new Headers();
-myHeaders.append("Content-Type", "application/json");
-myHeaders.append("X-AUTH-TOKEN", token);
-
-const requestOptions = {
-  method: "GET",
-  headers: myHeaders,
-  redirect: "follow"
-};
-const response = await fetch(`${API_BASE}/orders`, requestOptions);
-if (!response.ok) throw new Error('Erreur chargement commandes en cours');
+    if (!response.ok) {
+        throw new Error('Erreur d\'ajout du menu');
+    }
+    return await response.json();
 }
-
+export async function updateMenu(id, menuData) {
+    const response = await fetch(`${API_BASE}/menu/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-AUTH-TOKEN': getToken()
+        },
+        body: JSON.stringify(menuData) 
+    });
+    if (!response.ok) {
+        throw new Error('Erreur de mise à jour du menu');
+    }
+    return await response.json();
+}
+export async function deleteMenu(id) {
+    const response = await fetch(`${API_BASE}/menu/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-AUTH-TOKEN': getToken()
+        },
+    });
+    if (!response.ok) {
+        throw new Error('Erreur de suppression du menu');
+    }
+    return await response.json();
+}
 
 export async function createOrder(orderForm) {
     let formData = new FormData(orderForm);
@@ -113,4 +135,3 @@ export async function createOrder(orderForm) {
     if (!response.ok) throw new Error('Erreur lors de la création de la commande');
     return await response.json();
 }
-

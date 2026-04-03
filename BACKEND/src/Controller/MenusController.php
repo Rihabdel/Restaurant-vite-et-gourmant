@@ -48,7 +48,6 @@ final class MenusController extends AbstractController
                     new OA\Property(property: 'price', type: 'string', format: 'float', example: 19.99),
                     new OA\Property(property: 'minPeople', type: 'integer', example: 10),
                     new OA\Property(property: 'orderBefore', type: 'integer', example: 24),
-                    new OA\Property(property: 'conditions', type: 'string', example: 'Aucune annulation possible après 24h avant la date de livraison'),
                     new OA\Property(property: 'stock', type: 'integer', example: 10),
                     new OA\Property(property: 'themeMenu', type: 'string', enum: ['classique', 'noel', 'anniversaire', 'mariage', 'paques'], example: 'classique'),
                     new OA\Property(property: 'dietMenu', type: 'string', enum: ['classique', 'vegetarien', 'vegan', 'sans_gluten', 'autres'], example: 'vegetarien'),
@@ -301,7 +300,7 @@ final class MenusController extends AbstractController
         return new JsonResponse($responseData, Response::HTTP_OK, [], true);
     }
 
-    //#[IsGranted('ROLE_ADMIN', 'ROLE_EMPLLOYE')]
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/{id}', methods: ['PUT'], name: 'edit')]
     #[OA\Put(
         tags: ['Menu'],
@@ -393,7 +392,7 @@ final class MenusController extends AbstractController
             new OA\Response(response: 404, description: 'Menu non trouvé')
         ]
     )]
-    #[IsGranted('ROLE_ADMIN', 'ROLE_EMPLLOYE')]
+    #[IsGranted("ROLE_ADMIN")]
     public function delete(EntityManagerInterface $entityManager, int $id): Response
     {
 
@@ -404,12 +403,19 @@ final class MenusController extends AbstractController
                 Response::HTTP_NOT_FOUND
             );
         }
-        $entityManager->remove($menus);
-        $entityManager->flush();
-        return new JsonResponse(
-            ['message' => 'Menus deleted successfully'],
-            Response::HTTP_OK
-        );
+        try {
+            $entityManager->remove($menus);
+            $entityManager->flush();
+            return new JsonResponse(
+                ['message' => 'Menu supprimé avec succès'],
+                Response::HTTP_OK
+            );
+        } catch (\Exception $e) {
+            return new JsonResponse(
+                ['message' => 'Erreur lors de la suppression du menu', 'error' => $e->getMessage()],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
     }
 
     #[Route('/{id}/picture', name: 'picture', methods: ['GET'])]

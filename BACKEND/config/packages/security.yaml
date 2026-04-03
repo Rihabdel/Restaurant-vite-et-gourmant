@@ -19,7 +19,7 @@ security:
         main:
             lazy: true
             provider: app_user_provider
-            stateless: true
+            stateless: false
             custom_authenticator: App\Security\ApiTokenAuthenticator
             json_login:
                 check_path: app_api_login
@@ -34,6 +34,10 @@ security:
             # switch_user: true
 
     # Note: Only the *first* matching rule is applied
+    role_hierarchy:
+        ROLE_ADMIN: [ROLE_EMPLOYEE, ROLE_USER]
+        ROLE_EMPLOYEE: [ROLE_USER]
+        ROLE_USER: []
 
     access_control:
         - { path: ^/api/doc, roles: PUBLIC_ACCESS }
@@ -41,7 +45,7 @@ security:
         - { path: ^/api/registration, roles: PUBLIC_ACCESS }
         - { path: ^/api/menu, roles: PUBLIC_ACCESS }
         - { path: ^/admin, roles: ROLE_ADMIN }
-        - { path: ^/api/menu/\d+/picture, roles: PUBLIC_ACCESS }
+
 when@test:
     security:
         password_hashers:

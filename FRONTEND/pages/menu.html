@@ -74,25 +74,24 @@
     <div class="menu-section-content">
     <div class="text-center mb-4">
       <!-- Button trigger modal -->
-      <button type="button" class="btn btn-success" id="add-Menu-Btn" data-show="ROLE_ADMIN,ROLE_EMPLOYEE" style="display: none;">
+      <button type="button" class="btn btn-success" id="add-Menu-Btn" data-show="ROLE_ADMIN" style="display: none;">
           Ajoutez une nouvelle carte de menu
       </button>
     </div>
 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 menu-cards" id="menu-cards-container">
 <div class="col">
     <div class="menu-card h-100">
-      <div class="card-image">
+      <div class="card-image"></div>
   
     <div class="card-footer">
         <button class="btn btn-primary view-detail-btn" data-id="${menu.id}">voir le détail de menu</button>
     </div>
-    <div class="action-card-buttons" data-show="ROLE_ADMIN,ROLE_EMPLOYEE" style="display: none;">
-            <button class="btn btn-success edit-menu-btn" data-id="${menu.id}" data-bs-toggle="modal" data-bs-target="#editMenuModal"><i class="bi bi-pencil"></i>Modifier</button>
-            <button class="btn btn-danger delete-menu-btn" data-id="${menu.id}" data-bs-toggle="modal" data-bs-target="#deleteMenuModal"><i class="bi bi-trash"></i>Supprimer</button>
+    <div class="action-card-buttons" data-show="ROLE_ADMIN" style="display: none;">
+            <button class="btn btn-success edit-menu-btn" data-id="${menu.id}" ><i class="bi bi-pencil"></i>Modifier</button>
+            <button class="btn btn-danger delete-menu-btn" data-id="${menu.id}"><i class="bi bi-trash"></i>Supprimer</button>
       </div>
     </div>
 </div>
-
 </div>
     </div>
 </section>
@@ -107,10 +106,6 @@
       </div>
       <div class="modal-body">
         <form id="editMenuForm">
-            <div class="mb-3">
-              <label for="menuPicture" class="form-label">Image du menu</label>
-              <input type="file" class="form-control" id="menuPicture" name="picture" accept="scss/images/*">
-            </div>
             <div id="currentPictureContainer" class="mb-3" style="display: none;">
               <img id="currentPicture" src="" alt="Image actuelle" style="max-width: 200px;">
               <button type="button" class="btn btn-sm btn-danger" id="removePictureBtn">Supprimer l'image</button>
@@ -136,7 +131,7 @@
                 <select class="form-select" id="editMenuTheme" name="theme">
                     <option value="" disabled selected>Choisissez un thème</option>
                     <option value="anniversaire">Anniversaire</option>
-                    <option value="classique">Classique</option>
+                    <option value="classique">classique</option>
                     <option value="mariage">Mariage</option>
                     <option value="bapteme">Bapteme</option>
                     <option value="entreprise">Entreprise</option>
@@ -150,7 +145,7 @@
                 <select class="form-select" id="editMenuDiet" name="diet">
                     <option value="" disabled selected>Choisissez un régime</option>
                     <option value="vegetarien">Végétarien</option>
-                    <option value="vegan">Vegan</option>
+                    <option value="vegan">vegan</option>
                     <option value="sans-gluten">Sans gluten</option>
                     <option value="autres">Autres</option>
                 </select>
@@ -163,36 +158,15 @@
               <label for="editMenuStock" class="form-label">Stock</label>
               <input type="number" class="form-control" id="editMenuStock" name="stock">
             </div>
+             <button type="submit" class="btn btn-primary" id="saveMenuBtn">Enregistrer les modifications</button>
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-        <button type="submit" class="btn btn-primary" id="saveMenuBtn">Enregistrer les modifications</button>
-      </div>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>+
     </div>
   </div>
 </div>
-<!-- Modal de suppression de menu-->
-<div class="modal fade" id="deleteMenuModal" tabindex="-1" aria-labelledby="deleteMenuModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="deleteMenuModalLabel">Supprimer la carte de menu</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="mb-3">
-            <p>Êtes-vous sûr de vouloir supprimer cette carte de menu ? Cette action est irréversible.</p>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-          <button type="button" class="btn btn-danger">Supprimer</button>
-        </div>
-    </div>
-  </div>
 </div>
-
 <!-- modal details de la carte de menu -->
 <div class="modal fade" id="detailscarteModal" aria-hidden="true" aria-labelledby="detailscarteModalToggleLabel" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered modal-lg details">
@@ -210,7 +184,7 @@
                                 <p class="menu-item-description">Préparé selon la recette familiale, servi avec sa confiture d'oignons et toast brioché</p>
                                 <small ><i class="bi bi-exclamation-triangle-fill"></i> Contient de $allergene</small>
                             </div> 
-                          </div>    
+                        </div>    
                         <div class="menu-category" id ="plats-container">
                             <h3><i class="bi bi-cup-hot"></i> Plats Principaux</h3>
                             <div class="menu-item">
@@ -232,26 +206,22 @@
                                 <p class="menu-item-description">Spécialité bordelaise, dorés et caramélisés à l'extérieur, moelleux à l'intérieur</p>
                                 <small ><i class="bi bi-exclamation-triangle-fill"></i> Contient de $allergene</small>
                             </div>
-                          </div>
+                        </div>
                           <div class="totalPrice">
-            <h4 class="text-center mt-4">Prix total par personne : 45 Euros</h4>
-            </div>
-          </div>
-      </div>
-      
+                            <h4 class="text-center mt-4">Prix total par personne : 45 Euros</h4>
+                          </div>
           </div>
       </div>
       <div class="modal-footer d-flex justify-content-center">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ajouter au panier</button>
         <button class="btn btn-primary" data-bs-target="#recapCommandeModal" data-bs-toggle="modal" id="confirm-order-btn">Commander</button>
       </div>
+    </div>  
+  </div>
       <div class ="modal-footer d-flex justify-content-center"  data-role="admin,employee">
         <button type="button" class="btn btn-success" data-bs-target="#editCarteMenu" data-bs-toggle="modal">modifier la carte </button>
         <button type="button" class="btn btn-danger" data-bs-target="#deleteMenuModal" data-bs-toggle="modal">supprimer la carte </button>  
       </div>
-  
-  </div>
-</div>
 </div>
 
 <!---modal recap de la commande de menu-->
@@ -497,8 +467,25 @@
               </div>
             </form>
   </div>
+  </div>  
+  
+
+<div class="modal fade" id="deleteMenuModal" tabindex="-1" aria-labelledby="deleteMenuModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="deleteMenuModalLabel">Supprimer la carte de menu</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Êtes-vous sûr de vouloir supprimer cette carte de menu ? Cette action est irréversible.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+        <button type="button" class="btn btn-danger confirmDeleteMenu">Supprimer</button>
+      </div>
+    </div>
+  </div>
 </div>
-
-
 
 <script type="module" src="../js/menu.js"></script>

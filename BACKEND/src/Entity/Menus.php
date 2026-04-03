@@ -83,7 +83,7 @@ class Menus
     /**
      * @var Collection<int, Orders>
      */
-    #[ORM\OneToMany(targetEntity: Orders::class, mappedBy: 'menu', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Orders::class, mappedBy: 'menu')]
     private Collection $orders;
 
     #[ORM\Column(nullable: false)]

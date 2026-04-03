@@ -31,7 +31,7 @@ class SecurityController extends AbstractController
             required: true,
             content: new OA\JsonContent(
                 properties: [
-                    new OA\Property(property: 'email', type: 'string', example: 'user@example.com'),
+                    new OA\Property(property: 'email', type: 'string', example: 'user@mail.com'),
                     new OA\Property(property: 'password', type: 'string', example: 'password123'),
                     new OA\Property(property: 'firstName', type: 'string', example: 'John'),
                     new OA\Property(property: 'lastName', type: 'string', example: 'Doe'),
@@ -48,6 +48,7 @@ class SecurityController extends AbstractController
                     properties: [
                         new OA\Property(property: 'user', type: 'string'),
                         new OA\Property(property: 'apiToken', type: 'string'),
+                        new OA\Property(property: 'roles', type: 'array', items: new OA\Items(type: 'string')),
 
                     ]
                 )
@@ -57,6 +58,7 @@ class SecurityController extends AbstractController
     )]
     public function register(Request $request, UserPasswordHasherInterface $passwordHasher): JsonResponse
     {
+
         $user = $this->serializer->deserialize($request->getContent(), User::class, 'json');
         $user->setPassword($passwordHasher->hashPassword($user, $user->getPassword()));
         $user->setCreatedAt(new DateTimeImmutable());
@@ -90,7 +92,6 @@ class SecurityController extends AbstractController
                     properties: [
                         new OA\Property(property: 'email', type: 'string', example: 'user@example.com'),
                         new OA\Property(property: 'token', type: 'string', example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'),
-                        new OA\Property(property: 'Role', type: 'string', example: 'ROLE_USER'),
                     ]
                 )
             ),
@@ -121,10 +122,11 @@ class SecurityController extends AbstractController
                 description: 'User information retrieved successfully',
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: 'email', type: 'string', example: 'user@m iexample.com'),
-                        new OA\Property(property: 'token', type: 'string', example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'),
-                        new OA\Property(property: 'Role', type: 'string', example: 'ROLE_USER'),
+                        new OA\Property(property: 'email', type: 'string', example: 'user@example.com'),
+                        new OA\Property(property: 'token', type: 'string', example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c')
+
                     ]
+
                 )
             ),
             new OA\Response(response: 401, description: 'Unauthorized - invalid token', content: new OA\JsonContent(properties: [new OA\Property(property: 'message', type: 'string', example: 'non'),]))
@@ -146,7 +148,6 @@ class SecurityController extends AbstractController
             'adress' => $user->getAdress(),
             'phone' => $user->getPhone(),
             'createdAt' => $user->getCreatedAt(),
-            'adressse' => $user->getAdress(),
 
         ]);
     }
@@ -184,10 +185,9 @@ class SecurityController extends AbstractController
                 properties: [
                     new OA\Property(property: 'firstName', type: 'string', example: 'John'),
                     new OA\Property(property: 'lastName', type: 'string', example: 'Doe'),
-                    new OA\Property(property: 'phone', type: 'string', example: '+1234567890'),
+                    new OA\Property(property: 'phone', type: 'int', example: 1234567890),
                     new OA\Property(property: 'address', type: 'string', example: '123 Main St'),
                     new OA\Property(property: 'postalCode', type: 'string', example: '12345'),
-                    new OA\Property(property: 'email', type: 'string', example: 'john.doe@example.com'),
                 ]
             )
         ),
@@ -206,6 +206,7 @@ class SecurityController extends AbstractController
             )
         ]
     )]
+    //modification du profil de l'utilisateur connecté
     public function edit(Request $request, UserPasswordHasherInterface $passwordHasher): JsonResponse
     {
         $user = $this->serializer->deserialize(
@@ -214,6 +215,7 @@ class SecurityController extends AbstractController
             'json',
             [AbstractNormalizer::OBJECT_TO_POPULATE => $this->getUser()],
         );
+
         $user->setUpdatedAt(new DateTimeImmutable());
 
         if (isset($request->toArray()['password'])) {
