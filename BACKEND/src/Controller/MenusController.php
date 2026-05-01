@@ -21,7 +21,10 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use symfony\Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+
 
 #[Route('/api/menu', name: 'app_api_menus_')]
 final class MenusController extends AbstractController
@@ -51,6 +54,7 @@ final class MenusController extends AbstractController
                     new OA\Property(property: 'stock', type: 'integer', example: 10),
                     new OA\Property(property: 'themeMenu', type: 'string', enum: ['classique', 'noel', 'anniversaire', 'mariage', 'paques'], example: 'classique'),
                     new OA\Property(property: 'dietMenu', type: 'string', enum: ['classique', 'vegetarien', 'vegan', 'sans_gluten', 'autres'], example: 'vegetarien'),
+                    new OA\Property(property: 'available', type: 'boolean', example: true)
                 ]
             )
         ),
@@ -59,52 +63,34 @@ final class MenusController extends AbstractController
             new OA\Response(response: 422, description: 'Erreur de validation')
         ]
     )]
-
     public function new(Request $request): JsonResponse
     {
         //decoder le json
         $data = json_decode($request->getContent(), true);
-        if (!isset($data['themeMenu'])) {
-            return new JsonResponse(
-                ['erreurs' => 'Le thème est obligatoire'],
-                Response::HTTP_UNPROCESSABLE_ENTITY
-            );
-        }
-        $themeMenu = Theme::tryFrom($data['themeMenu']);
-
-        if (!$themeMenu) {
-            return new JsonResponse(
-                ['erreurs' => 'Thème invalide'],
-                Response::HTTP_UNPROCESSABLE_ENTITY
-            );
-        }
-        if (!isset($data['dietMenu'])) {
-            return new JsonResponse(
-                ['erreurs' => 'Le régime est obligatoire'],
-                Response::HTTP_UNPROCESSABLE_ENTITY
-            );
-        }
-        $dietMenu = Diet::tryFrom($data['dietMenu']);
-
-        if (!$dietMenu) {
-            return new JsonResponse(
-                ['erreurs' => 'Régime invalide'],
-                Response::HTTP_UNPROCESSABLE_ENTITY
-            );
-        }
-        $imageContent = null;
-        if (isset($data['picture']) && !empty($data['picture'])) {
-            // Supprimer le préfixe éventuel (data:image/png;base64,)
-            $pictureBase64 = preg_replace('/^data:image\/\w+;base64,/', '', $data['picture']);
-            $imageContent = base64_decode($pictureBase64);
-            if ($imageContent === false) {
-                return new JsonResponse(['erreurs' => 'Image invalide'], Response::HTTP_UNPROCESSABLE_ENTITY);
+        //
+        if (isset($data['themeMenu']) || isset($data['dietMenu'])) {
+            $themeMenu = Theme::tryFrom($data['themeMenu']  ?? '');
+            $dietMenu = Diet::tryFrom($data['dietMenu'] ?? '');
+            if (!$themeMenu || !$dietMenu) {
+                return $this->json([
+                    'erreurs' => 'Thème ou Régime invalide/manquant',
+                    'recu' => [
+                        'theme' => $data['themeMenu'] ?? null,
+                        'diet' => $data['dietMenu'] ?? null
+                    ]
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
             }
+        } else {
+            return new JsonResponse(
+                ['erreurs' => 'Thème et régime sont requis'],
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            );
         }
+
+
         //supprimer les champs enum du tableau
         unset($data['themeMenu']);
         unset($data['dietMenu']);
-        unset($data['picture']);
 
         //reecreer un json sans enum
         $jsonSansEnum = json_encode($data);
@@ -115,11 +101,13 @@ final class MenusController extends AbstractController
             'json'
         );
         //assigner les enums
+        if (!isset($data['isAvailable'])) {
+            $menu->setIsAvailable(0);
+        } else {
+            $menu->setIsAvailable($data['isAvailable']);
+        }
         $menu->setThemeMenu($themeMenu);
         $menu->setDietMenu($dietMenu);
-        if ($imageContent) {
-            $menu->setPicture($imageContent);
-        }
         //valider l'entité
 
         $errors = $this->validator->validate($menu);
@@ -136,18 +124,17 @@ final class MenusController extends AbstractController
         }
         //persist et flush
         $menu->setCreatedAt(new DateTimeImmutable());
+
         $this->entityManager->persist($menu);
         $this->entityManager->flush();
         //serialize et return JsonResponse
-        $responseData = $this->serializer->serialize($menu, 'json');
-        $location = $this->generateUrl(
-            'app_api_menus_show',
-            ['id' => $menu->getId()],
-            UrlGeneratorInterface::ABSOLUTE_URL
-        );
-        return new JsonResponse($responseData, Response::HTTP_CREATED, [
-            'Location' => $location
-        ], true);
+        return  $this->json($menu, Response::HTTP_CREATED, [
+            'Location' => $this->generateUrl(
+                'app_api_menus_show',
+                ['id' => $menu->getId()],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            )
+        ], ['groups' => 'menu:list']);
     }
 
     #[Route('/list', name: 'list', methods: ['GET'])]
@@ -207,6 +194,7 @@ final class MenusController extends AbstractController
                 'theme' => $request->query->get('theme'),
                 'diet' => $request->query->get('diet'),
                 'min_persons' => $request->query->get('min_persons'),
+                'isAvailable' => $request->query->get('isAvailable')
             ];
 
             // Si pas de filtres, retourner tout
@@ -217,32 +205,17 @@ final class MenusController extends AbstractController
                 $menusDishes = $this->entityManager->getRepository(MenusDishesRepository::class)->findAll();
 
                 $responseData = $this->serializer->serialize($menusDishes, 'json', [
-                    'groups' => ['menu:list', 'dish:read'],
+                    'groups' => ['menu:list'],
                 ]);
                 return new JsonResponse($responseData, Response::HTTP_OK, [], true);
             }
-
-            // Convertir les enums si présents
+            // Convertir les enums 
             if (isset($filters['theme'])) {
-                $themeEnum = Theme::tryFrom($filters['theme']);
-                if ($themeEnum === null) {
-                    return new JsonResponse(
-                        ['message' => 'Thème invalide. Valeurs acceptées: ' . implode(', ', array_column(Theme::cases(), 'value'))],
-                        Response::HTTP_UNPROCESSABLE_ENTITY
-                    );
-                }
-                $filters['theme'] = $themeEnum;
+                $filters['theme'] = Theme::tryFrom($filters['theme']);
             }
 
             if (isset($filters['diet'])) {
-                $dietEnum = Diet::tryFrom($filters['diet']);
-                if ($dietEnum === null) {
-                    return new JsonResponse(
-                        ['message' => 'Régime invalide. Valeurs acceptées: ' . implode(', ', array_column(Diet::cases(), 'value'))],
-                        Response::HTTP_UNPROCESSABLE_ENTITY
-                    );
-                }
-                $filters['diet'] = $dietEnum;
+                $filters['diet'] = Diet::tryFrom($filters['diet']);
             }
 
             //Appeler la méthode de filtrage du repository
@@ -257,11 +230,9 @@ final class MenusController extends AbstractController
             }
 
             // 6. Sérialiser la réponse
-            $responseData = $this->serializer->serialize($menu, 'json', [
-                'groups' => 'menu:list'
+            return $this->json($menu, Response::HTTP_OK, [], [
+                'groups' => ['menu:list', 'dish:list']
             ]);
-
-            return new JsonResponse($responseData, Response::HTTP_OK, [], true);
         } catch (\Exception $e) {
             return new JsonResponse(
                 ['error' => 'Erreur lors de la récupération des menus', 'message' => $e->getMessage()],
@@ -296,8 +267,19 @@ final class MenusController extends AbstractController
                 Response::HTTP_NOT_FOUND
             );
         }
-        $responseData = $this->serializer->serialize($menus, 'json', ['groups' => 'menu:read']);
-        return new JsonResponse($responseData, Response::HTTP_OK, [], true);
+
+        return $this->json(
+            $menus,
+            Response::HTTP_OK,
+            [
+                'Location' => $this->generateUrl(
+                    'app_api_menus_show',
+                    ['id' => $menus->getId()],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                ),
+                'groups' => ['menu:detail', 'dish:read', 'menu_dish:read']
+            ]
+        );
     }
 
     #[IsGranted('ROLE_ADMIN')]
@@ -328,6 +310,8 @@ final class MenusController extends AbstractController
                     new OA\Property(property: 'stock', type: 'integer', example: 10),
                     new OA\Property(property: 'themeMenu', type: 'string', enum: ['classique', 'noel', 'anniversaire', 'mariage', 'paques'], example: 'classique'),
                     new OA\Property(property: 'dietMenu', type: 'string', enum: ['classique', 'vegetarien', 'vegan', 'sans_gluten', 'autres'], example: 'vegetarien'),
+                    new OA\Property(property: 'available', type: 'boolean', example: true),
+                    new OA\Property(property: 'picture', type: 'string', format: 'base64', example: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA...')
                 ]
             )
         ),
@@ -337,7 +321,7 @@ final class MenusController extends AbstractController
             new OA\Response(response: 422, description: 'Erreur de validation')
         ]
     )]
-    public function edit(EntityManagerInterface $entityManager, int $id): JsonResponse
+    public function edit(EntityManagerInterface $entityManager, int $id, Request $request): JsonResponse
     {
         $menus = $entityManager->getRepository(Menus::class)->find($id);
         if (!$menus) {
@@ -346,33 +330,51 @@ final class MenusController extends AbstractController
                 Response::HTTP_NOT_FOUND
             );
         }
-        $menus = $this->serializer->deserialize(
-            file_get_contents('php://input'),
+        //decoder le json
+        $data = json_decode($request->getContent(), true);
+        if (!$data) {
+            return new JsonResponse(
+                ['message' => 'Invalid JSON'],
+                Response::HTTP_BAD_REQUEST
+            );
+        }
+        $this->serializer->deserialize(
+            json_encode($data),
             Menus::class,
             'json',
             [AbstractNormalizer::OBJECT_TO_POPULATE => $menus]
         );
-        if (isset($data['picture']) && !empty($data['picture'])) {
-            // Supprimer le préfixe éventuel (data:image/png;base64,)
-            $pictureBase64 = preg_replace('/^data:image\/\w+;base64,/', '', $data['picture']);
-            $imageContent = base64_decode($pictureBase64);
-            if ($imageContent === false) {
-                return new JsonResponse(['erreurs' => 'Image invalide'], Response::HTTP_UNPROCESSABLE_ENTITY);
+        if (isset($data['themeMenu'])) {
+            $themeMenu = Theme::tryFrom($data['themeMenu']);
+            if (!$themeMenu) {
+                return new JsonResponse(
+                    ['erreurs' => 'Thème invalide'],
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
             }
-            $menus->setPicture($imageContent);
+            $menus->setThemeMenu($themeMenu);
         }
+        if (isset($data['dietMenu'])) {
+            $dietMenu = Diet::tryFrom($data['dietMenu']);
+            if (!$dietMenu) {
+                return new JsonResponse(
+                    ['erreurs' => 'Régime invalide'],
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+            }
+            $menus->setDietMenu($dietMenu);
+        }
+
         $menus->setUpdatedAt(new DateTimeImmutable());
         $entityManager->persist($menus);
         $entityManager->flush();
-        $responseData = $this->serializer->serialize($menus, 'json');
-        $location = $this->generateUrl(
-            'app_api_menus_show',
-            ['id' => $menus->getId()],
-            UrlGeneratorInterface::ABSOLUTE_URL
-        );
-        return new JsonResponse($responseData, Response::HTTP_OK, [
-            'Location' => $location
-        ], true);
+        return $this->json($menus, Response::HTTP_OK, [
+            'Location' => $this->generateUrl(
+                'app_api_menus_show',
+                ['id' => $menus->getId()],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            )
+        ], ['groups' => 'menu:list']);
     }
     #[Route('/{id}', methods: ['DELETE'], name: 'delete')]
     #[OA\Delete(
@@ -418,40 +420,92 @@ final class MenusController extends AbstractController
         }
     }
 
-    #[Route('/{id}/picture', name: 'picture', methods: ['GET'])]
-    #[OA\Get(
-        tags: ['Menu'],
-        summary: 'Récupérer l\'image d\'un menu',
-        parameters: [
-            new OA\Parameter(
-                name: 'id',
-                in: 'path',
-                description: 'ID du menu dont on veut récupérer l\'image',
+
+    #[Route('/{id}/picture', name: 'picture', methods: ['POST'])]
+    #[
+        OA\Post(
+            tags: ['Menu'],
+            summary: 'Uploader une image pour un menu',
+            parameters: [
+                new OA\Parameter(
+                    name: 'id',
+                    in: 'path',
+                    description: 'ID du menu',
+                    required: true,
+                    schema: new OA\Schema(type: 'integer')
+                )
+            ],
+            requestBody: new OA\RequestBody(
                 required: true,
-                schema: new OA\Schema(type: 'integer')
-            )
-        ],
-        responses: [
-            new OA\Response(response: 200, description: 'Image du menu'),
-            new OA\Response(response: 404, description: 'Menu ou image non trouvée')
-        ]
-    )]
-    public function picture(Menus $menu): Response
+                content: new OA\MediaType(
+                    mediaType: 'multipart/form-data',
+                    schema: new OA\Schema(
+                        type: 'object',
+                        properties: [
+                            new OA\Property(
+                                property: 'picture',
+                                type: 'string',
+                                format: 'binary',
+                                description: 'Fichier image à uploader'
+                            )
+                        ]
+                    )
+                )
+            ),
+            responses: [
+                new OA\Response(response: 200, description: 'Image uploadée avec succès'),
+                new OA\Response(response: 400, description: 'Aucun fichier reçu ou erreur de validation'),
+                new OA\Response(response: 404, description: 'Menu introuvable'),
+                new OA\Response(response: 500, description: 'Erreur lors de l\'enregistrement de l\'image')
+            ]
+        )
+    ]
+    #[IsGranted("ROLE_ADMIN")]
+    public function uploadPicture(int $id, Request $request, EntityManagerInterface $em): JsonResponse
     {
-        $picture = $menu->getPicture();
-        if (!$picture) {
-            throw $this->createNotFoundException('Image non trouvée');
+        $menu = $em->getRepository(Menus::class)->find($id);
+
+        if (!$menu) {
+            return new JsonResponse(['error' => 'Menu introuvable'], 404);
         }
 
-        // Convertir la ressource en string si nécessaire
-        if (is_resource($picture)) {
-            $picture = stream_get_contents($picture);
+        $file = $request->files->get('picture');
+
+        if (!$file) {
+            return new JsonResponse(['error' => 'Aucun fichier reçu'], 400);
         }
 
-        // Détecter le type MIME (ou stockez-le en base)
-        $finfo = new \finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $finfo->buffer($picture);
+        if (!in_array($file->getMimeType(), ['image/jpeg', 'image/png', 'image/webp'])) {
+            return new JsonResponse(['error' => 'Format invalide'], 400);
+        }
 
-        return new Response($picture, 200, ['Content-Type' => $mimeType]);
+        $extension = $file->guessExtension() ?: 'jpg';
+        $fileName = uniqid() . '.' . $extension;
+
+        try {
+            $file->move(
+                $this->getParameter('menus_pictures_directory'),
+                $fileName
+            );
+
+            if ($menu->getPicture()) {
+                $oldPath = rtrim($this->getParameter('menus_pictures_directory'), '/')
+                    . '/' . $menu->getPicture();
+
+                if (file_exists($oldPath)) {
+                    unlink($oldPath);
+                }
+            }
+
+            $menu->setPicture($fileName);
+            $em->flush();
+        } catch (FileException $e) {
+            return new JsonResponse(['error' => 'Erreur upload'], 500);
+        }
+
+        return new JsonResponse([
+            'message' => 'Image enregistrée avec succès',
+            'path' => $fileName
+        ]);
     }
 }

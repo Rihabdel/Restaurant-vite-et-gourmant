@@ -1,0 +1,407 @@
+<section class="admin-container">
+    <h3 class="text-center bg-dark text-white py-3">Administration - Restaurant Vite et Gourmand</h3>
+</section>
+<div class="container-fluid">
+    <div class="row admin-container-fluid">
+                <div class="col-12 col-md-3 col-lg-2 mb-3">
+                    <div class="nav nav-pills me-3 flex-md-column flex-row" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                        <button class="nav-link active" id="v-pills-Home-tab" data-bs-toggle="pill" data-bs-target="#v-pills-home" type="button" role="tab" aria-controls="v-pills-home" aria-selected="true">Home</button>
+                        <button class="nav-link" id="v-pills-Dishes-tab" data-bs-toggle="pill" data-bs-target="#v-pills-dishes" type="button" role="tab" aria-controls="v-pills-dishes" aria-selected="false">Plats</button>
+                        <button class="nav-link" id="v-pills-Menus-tab" data-bs-toggle="pill" data-bs-target="#v-pills-menus" type="button" role="tab" aria-controls="v-pills-menus" aria-selected="false">Menus</button>
+                        <button class="nav-link" id="v-pills-Employees-tab" data-bs-toggle="pill" data-bs-target="#v-pills-employees" type="button" role="tab" aria-controls="v-pills-employees" aria-selected="false">Employés</button>
+                        <button class="nav-link" id="v-pills-Commandes-tab" data-bs-toggle="pill" data-bs-target="#v-pills-commandes" type="button" role="tab" aria-controls="v-pills-commandes" aria-selected="false">Commandes</button>
+                        <button class="nav-link" id="v-pills-Mssages-tab" data-bs-toggle="pill" data-bs-target="#v-pills-messages" type="button" role="tab" aria-controls="v-pills-messages" aria-selected="false">Messages</button>
+                        <button class="nav-link" id="v-pills-Devis-tab" data-bs-toggle="pill" data-bs-target="#v-pills-Devis" type="button" role="tab" aria-controls="v-pills-Devis" aria-selected="false">Devis</button>
+                    </div>
+                </div>  
+                <div class="tab-content col-12 col-md-9 col-lg-10" id="v-pills-tabContent">
+                    <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab" tabindex="0">
+                        <!-- ACCUEIL -->
+                        <div class="admin-home text-center">
+                            <h2 class="text-center">Bienvenue dans votre espace d'administration</h2>
+                            
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="v-pills-dishes" role="tabpanel" aria-labelledby="v-pills-dishes-tab" tabindex="0">
+                        <!-- LISTE PLATS -->
+                        <div class="admin-gestion mb-3" id="gestion-dishes">
+                            <h2 class="mb-4">Gestion des plats</h2>
+                            <table class="table table-striped table-hover align-middle">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Catégorie</th>
+                                        <th>Nom</th>
+                                        <th>Description</th>
+                                        <th>Prix</th>
+                                        <th>Allergènes</th>
+                                        <th>Ajouter un allergène à un plat</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dishList"></tbody>
+                            </table>
+                        </div>
+                        <div class="text-center">
+                            <button class="btn btn-primary" id="addDishButton">Ajouter un plat</button>
+                        </div>
+                        <!-- Modals pour ajouter et modifier un plat -->
+                        <div class="modal fade" id="addDishModal" tabindex="-1" aria-labelledby="addDishModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        <form id="addDishForm">
+                                            <div class="mb-3">
+                                                <label for="dishName" class="form-label">Nom du plat</label>
+                                                <input type="text" class="form-control" id="dishName" name="dishName" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="dishDescription" class="form-label">Description</label>
+                                                <textarea class="form-control" id="dishDescription" name="dishDescription" rows="3" required></textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="dishPrice" class="form-label">Prix</label>
+                                                <input type="number" step="0.01" class="form-control" id="dishPrice" name="dishPrice" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="dishCategory" class="form-label">Catégorie</label>
+                                                <select class="form-select" id="dishCategory" name="dishCategory" required>
+                                                    <option value="">Sélectionnez une catégorie</option>
+                                                    <option value="entree">Entrée</option>
+                                                    <option value="plat">Plat principal</option>
+                                                    <option value="dessert">Dessert</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="dishAllergens" class="form-label">Allergènes (sélection multiple possible)</label>
+                                                <select multiple class="form-select" id="dishAllergens" name="dishAllergens">
+                                                    <option value="gluten">Gluten</option>
+                                                    <option value="lactose">Lactose</option>
+                                                    <option value="fruits à coque">Fruits à coque</option>
+                                                    <option value="oeufs">Oeufs</option>
+                                                    <option value="poisson">Poisson</option>
+                                                    <option value="crustacés">Crustacés</option>
+                                                    <option value="mollusques">Mollusques</option>
+                                                    <option value="soja">Soja</option>
+                                                    <option value="sésame">Sésame</option>
+                                                </select>
+                                            </div>
+                                            <div class="text-center">
+                                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--modalpour suppprimer un plat -->
+                        <div class="modal fade" id="deleteDishModal" tabindex="-1" aria-labelledby="deleteDishModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        <p>Êtes-vous sûr de vouloir supprimer ce plat ?</p>
+                                        <div class="text-center">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                            <button type="button" class="btn btn-danger" id="confirmDeleteDishBtn" data-id="${dish.id}">Supprimer</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>  
+                    <div class="tab-pane fade" id="v-pills-menus" role="tabpanel" aria-labelledby="v-pills-menus-tab" tabindex="0">
+                        <!-- LISTE MENUS -->    
+                        <div class="admin-gestion" id="menu-table-admin">
+                            <h2 class="mb-4">Gestion des menus</h2>
+                            <table class="table table-striped admin-table table-hover align-middle">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Titre</th>
+                                        <th>Description</th>
+                                        <th>Minimum</th>
+                                        <th>Stock</th>
+                                        <th>Plats dans le menu</th>
+                                        <th>Ajouter un plat au menu</th>
+                                        <th>Disponible</th>
+                                        <th>Allergènes</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="menuList"></tbody>
+                            </table>
+                        </div>
+                        <div class="text-center">
+                            <button class="btn btn-primary" id="addMenuButton">Ajouter un menu</button>
+                        </div>
+                        <!-- Modal d'ajout ou modification de menu-->
+                        <div class="modal fade" id="editMenuModal" tabindex="-1" aria-labelledby="editMenuModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="editMenuModalLabel">Ajouter ou Modifier la carte de menu</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="editMenuForm">
+                                    <div class="mb-3">
+                                        <label for="editMenuPicture" class="form-label">Image du menu</label>
+                                        <input type="file" class="form-control" id="editMenuPicture" name="picture">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="editMenuTitle" class="form-label">Titre du menu</label>
+                                        <input type="text" class="form-control" id="editMenuTitle" placeholder="Entrez le titre du menu" name="title">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="editMenuDescription" class="form-label">Description du menu</label>
+                                        <textarea class="form-control" id="editMenuDescription" rows="3" placeholder="Entrez la description du menu" name="descriptionMenu"></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="editMenuMinPersons" class="form-label">Minimum pour :</label>
+                                        <input type="number" class="form-control" id="editMenuMinPersons" placeholder="Entrez le nombre minimum de personnes" name="minPersons">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="editMenuPrice" class="form-label">Prix par personne</label>
+                                        <input type="number" class="form-control" id="editMenuPrice" placeholder="Entrez le prix par personne" name="priceMenu" step="0.01">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="editMenuTheme" class="form-label">Thème du menu</label>
+                                        <select class="form-select" id="editMenuTheme" name="themeMenu">
+                                            <option value="" disabled selected>Choisissez un thème</option>
+                                            <option value="classique">classique</option>
+                                            <option value="anniversaire">Anniversaire</option>
+                                            <option value="mariage">Mariage</option>
+                                            <option value="bapteme">Bapteme</option>
+                                            <option value="entreprise">Entreprise</option>
+                                            <option value="familiale">Familiale</option>
+                                            <option value="noel">Noël</option>
+                                            <option value="paques">Pâques</option>
+                                            <option value="halloween">Halloween</option>
+                                            <option value="autres">Autres</option>
+                                        </select>
+                                    </div>
+                                    <div class ="mb-3">
+                                        <label for="editMenuDiet" class="form-label">Régime du menu</label>
+                                        <select class="form-select" id="editMenuDiet" name="dietMenu">
+                                            <option value="" disabled selected>Choisissez un régime</option>
+                                            <option value="vegetarien">Végétarien</option>
+                                            <option value="vegan">vegan</option>
+                                            <option value="sans-gluten">Sans gluten</option>
+                                            <option value="autres">Autres</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                    <label for="editMenuOrderBefore" class="form-label">commander avant</label>
+                                    <input type="number" class="form-control" id="editMenuOrderBefore" name="orderBefore">
+                                    </div>
+                                    <div class="mb-3">
+                                    <label for="editMenuStock" class="form-label">Stock</label>
+                                    <input type="number" class="form-control" id="editMenuStock" name="stock">
+                                    </div>
+                                    <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="editMenuAvailable" name="isAvailable">
+                                    <label class="form-check-label" for="editMenuAvailable">Disponible</label>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary" id="saveMenuBtn">Enregistrer les modifications</button>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                            </div>
+                        </div>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="v-pills-employees" role="tabpanel" aria-labelledby="v-pills-employees-tab" tabindex="0">
+                        <div class="admin-gestion mb-3">
+                            <h2 class="mb-4">Gestion des employés</h2>
+                            <div class="table-responsive">
+                                <table class="table table-striped admin-table table-employees">
+                                    <thead>
+                                        <tr><th>Nom</th><th>Prénom</th><th class="d-none d-md-table-cell">Email</th><th>Numéro de téléphone</th><th class="d-none d-md-table-cell">Adresse postale</th><th>Action</th></tr>
+                                    </thead>
+                                    <tbody id="employeeList">
+                                        <tr>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <!-- CREATION EMPLOYE -->
+                            <div class="container mb-3">
+                                <h2 class="mb-4">Créer un compte employé</h2>
+                                <div class="row justify-content-center">
+                                    <form id="newEmployeeForm" method="POST" class="mx-auto" style="max-width: 400px;">
+                                        <div class="mb-3">
+                                            <label for="RoleInput" class="form-label">Role</label>
+                                            <input type="text" class="form-control" id="RoleInput" placeholder="Rôle de l'employé" name="role" value="ROLE_EMPLOYEE" readonly>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="NomInput" class="form-label">Nom</label>
+                                            <input type="text" class="form-control" id="NomInput" placeholder="Votre nom" name="lastName">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="PrenomInput" class="form-label">Prénom</label>
+                                            <input type="text" class="form-control" id="PrenomInput" placeholder="Votre prénom" name="firstName">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="gsmInput" class="form-label">Numéro Téléphone</label>
+                                            <input type="text" class="form-control" id="gsmInput" placeholder="Votre numéro de téléphone" name="phone">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="AdressePostaleInput" class="form-label">Adresse postale</label>
+                                            <input type="text" class="form-control" id="AdressePostaleInput" placeholder="Votre adresse postale" name="address">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="EmailInput" class="form-label">Email</label>
+                                            <input type="email" class="form-control" id="EmailInput" placeholder="test@mail.fr" name="email">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="PasswordInput" class="form-label">Mot de passe</label>
+                                            <input type="password" class="form-control" id="PasswordInput" name="password">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="ValidatePasswordInput" class="form-label">Validez votre mot de passe</label>
+                                            <input type="password" class="form-control" id="ValidatePasswordInput" name="passwordConfirm">
+                                        </div>
+                                        <div class="text-center">
+                                            <button type="submit" class="btn btn-primary" id="btnNewEmployee">Créer un compte</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            </div>  
+                    </div>  
+                    <div class="tab-pane fade" id="v-pills-commandes" role="tabpanel" aria-labelledby="v-pills-commandes-tab" tabindex="0">
+                        <!--liste des commandes -->
+                            <div class="admin-gestion mb-3">
+                                    <h2 class="mb-4">Gestion des Commandes</h2>  
+                                    <div class="table-responsive" id="order-cards-container">
+                                        <table class="table table-striped admin-table table-hover align-middle" id="historyOrdersTableAdmin">
+                                            <thead >
+                                                <tr>
+                                                <th class="d-none d-md-table-cell" scope="col">N°</th>
+                                                <th scope="col">commande</th>
+                                                <th scope="col">Date de livraison</th>
+                                                <th scope="col">Heure de livraison</th>
+                                                <th scope="col">Nombre de personnes</th>
+                                                <th scope="col">Adresse de livraison</th>
+                                                <th scope="col">Ville de livraison</th>
+                                                <th scope="col" class="d-none d-md-table-cell">Annulé par</th>
+                                                <th scope="col">Modification</th>
+                                                <th scope="col">Annulation</th>
+                                                <th scope="col">Statut de la commande</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="ordersList">
+                                                <tr></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                            </div>
+                    <div class="modal fade" id="editOrderModal" tabindex="-1" aria-labelledby="editOrderModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editOrderModalLabel">Modifier une commande</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="editOrderForm">
+                                    <input type="hidden" id="editOrderId" name="editOrderId">
+
+                                    <div class="mb-3">
+                                        <label for="menuSelectEdit" class="form-label">Menu</label>
+                                        <select class="form-select" id="menuSelectEdit" name="menuSelectEdit" required>
+                                            <option value="">Sélectionnez un menu</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="numberOfPeople" class="form-label">Nombre de personnes</label>
+                                        <input type="number" class="form-control" id="numberOfPeople" name="numberOfPeople" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="deliveryCity" class="form-label">Ville de livraison</label>
+                                        <input type="text" class="form-control" id="deliveryCity" name="deliveryCity" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="deliveryAddress" class="form-label">Adresse de livraison</label>
+                                        <input type="text" class="form-control" id="deliveryAddress" name="deliveryAddress" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="deliveryDate" class="form-label">Date de livraison</label>
+                                        <input type="date" class="form-control" id="deliveryDate" name="deliveryDate" required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="deliveryTime" class="form-label">Heure de livraison</label>
+                                        <input type="time" class="form-control" id="deliveryTime" name="deliveryTime" required>
+                                    </div>
+
+                                    <div class="text-center">
+                                        <button type="submit" class="btn btn-primary">
+                                            Enregistrer les modifications
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+
+                        </div>
+                    </div>
+                    </div>
+                    </div>
+                    <div class="tab-pane fade" id="v-pills-disabled" role="tabpanel" aria-labelledby="v-pills-disabled-tab" tabindex="0"                  >
+                        <p>Content for Disabled tab.</p>
+                    </div>
+                    <div class="tab-pane fade" id="v-pills-devis" role="tabpanel" aria-labelledby="v-pills-messages-tab" tabindex="0">
+                        <!--liste des messages -->
+                        <div class="admin-gestion">
+                            <h2 class="mb-4">Gestion des devis</h2>
+                            <div class="table-responsive">
+                                <table class="table table-striped admin-table">
+                                    <thead>
+                                        <tr><th>Email</th><th>Message</th><th>Date</th></tr>
+                                    </thead>
+                                    <tbody id="messageList">
+                                        <tr>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>   
+    </div>
+ </div>
+
+
+
+<!-- Modal pour ajouter des plats à un menu -->
+<div class="modal fade" id="editDishMenuModale" tabindex="-1" aria-labelledby="editDishMenuModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body">
+        <form id="editDishMenuForm">
+          <div class="mb-3">
+            
+
+          </div>
+
+          <div class="text-center">
+            <button type="submit" class="btn btn-primary">
+              Enregistrer
+            </button>
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modals modifier une commande -->
+
+
+
+<script type="module" src="../js/admin.js"></script>

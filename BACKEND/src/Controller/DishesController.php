@@ -43,9 +43,8 @@ final class DishesController extends AbstractController
                     example: [
                         'name' => 'Pizza Margherita',
                         'description' => 'Une pizza classique avec sauce tomate, mozzarella et basilic.',
-                        'price' => 12.99,
-                        'category' => 'main_course',
-                        'allergens' => [1, 2] // IDs des allergènes associés
+                        'price' => "12.99",
+                        'category' => 'plat'
                     ]
                 )
             ),
@@ -59,18 +58,10 @@ final class DishesController extends AbstractController
                             'name' => 'Pizza Margherita',
                             'description' => 'Une pizza classique avec sauce tomate, mozzarella et basilic.',
                             'price' => 12.99,
-                            'category' => 'main_course',
-                            'createdAt' => '2024-06-01T12:00:00Z',
-                            'allergens' => [
-                                ['id' => 1, 'name' => 'Gluten'],
-                                ['id' => 2, 'name' => 'Lactose']
-                            ]
+                            'category' => 'plat',
+                            'createdAt' => '2024-06-01T12:00:00Z'
                         ]
                     )
-                ),
-                new OA\Response(
-                    response: 400,
-                    description: 'Requête invalide'
                 ),
                 new OA\Response(
                     response: 422,
@@ -82,21 +73,17 @@ final class DishesController extends AbstractController
                 )
             ]
         )
-
     ]
     public function new(Request $request): JsonResponse
     {
         try {
             $data = json_decode($request->getContent(), true);
-
-            // Validation des champs obligatoires
-            if (!isset($data['name']) || !isset($data['description']) || !isset($data['price'])) {
+            if (!$data) {
                 return new JsonResponse(
-                    ['error' => 'Les champs nom du plat, description et prix sont obligatoires'],
+                    ['error' => 'Données JSON invalides'],
                     Response::HTTP_BAD_REQUEST
                 );
             }
-
             // Validation de la catégorie
             if (!isset($data['category'])) {
                 return new JsonResponse(
@@ -114,15 +101,20 @@ final class DishesController extends AbstractController
                 );
             }
             $allergenIds = [];
-            if (isset($data['allergens'])) {
-                if (is_array($data['allergens'])) {
+            $dish = new Dishes();
+            if (!empty($allergenIds)) {
+                foreach ($allergenIds as $allergenId) {
+                    $allergen = $this->entityManager
+                        ->getRepository(Allergens::class)
+                        ->find($allergenId);
 
-                    $allergenIds = $data['allergens'];
-                } else {
-                    return new JsonResponse(
-                        ['error' => 'Le champ allergènes doit être un tableau d\'IDs'],
-                        Response::HTTP_UNPROCESSABLE_ENTITY
-                    );
+                    if ($allergen) {
+                        $dishAllergen = new DishAllergen();
+                        $dishAllergen->setDish($dish);
+                        $dishAllergen->setAllergen($allergen);
+                        $dish->addDishAllergen($dishAllergen);
+                        $this->entityManager->persist($dishAllergen);
+                    }
                 }
             }
 
@@ -177,7 +169,7 @@ final class DishesController extends AbstractController
             $this->entityManager->flush();
 
             $responseData = $this->serializer->serialize($dish, 'json', [
-                'groups' => ['dish:read']
+                'groups' => ['dish:read', 'dish:write']
             ]);
 
             $location = $this->generateUrl(
@@ -196,7 +188,47 @@ final class DishesController extends AbstractController
             );
         }
     }
-    #[Route('/{id}', methods: ['GET'], name: 'show')]
+
+    #[Route('/list', methods: ['GET'], name: 'list')]
+    #[
+        OA\Get(
+            tags: ['Dish'],
+            summary: 'Lister tous les plats',
+            description: 'Cette endpoint permet de récupérer la liste de tous les plats disponibles.',
+            responses: [
+                new OA\Response(
+                    response: 200,
+                    description: 'Liste des plats récupérée avec succès',
+                    content: new OA\JsonContent(
+
+                        example: [
+                            "id" => 1,
+                            "name" => "La Salade Landaise",
+                            "description" => " Gésiers, magret fumé et/ou foie gras poêlé.",
+                            "price" => "12.99",
+                            "category" => "entree",
+                            "allergenName" => [
+                                "Arachides"
+                            ]
+                        ]
+                    )
+                ),
+                new OA\Response(
+                    response: 500,
+                    description: 'Erreur serveur'
+                )
+            ]
+        )
+    ]
+    public function list(EntityManagerInterface $entityManager): Response
+    {
+        $dishes = $entityManager->getRepository(Dishes::class)->findAll();
+        return $this->json($dishes, 200, [], [
+            'groups' => ['dish:detail']
+        ]);
+    }
+
+    #[Route('/{id}', methods: ['GET'], requirements: ['id' => '\d+'], name: 'show')]
     #[OA\Get(
         tags: ['Dish'],
         summary: 'Afficher les détails d\'un plat',
@@ -217,14 +249,14 @@ final class DishesController extends AbstractController
                 content: new OA\JsonContent(
                     example: [
                         'id' => 1,
-                        'name' => 'nom du plat',
-                        'description' => 'description du plat.',
+                        'name' => 'Pizza Margherita',
+                        'description' => 'Une pizza classique avec sauce tomate, mozzarella et basilic.',
                         'price' => 12.99,
-                        'category' => 'entree',
+                        'category' => 'plat',
                         'createdAt' => '2024-06-01T12:00:00Z',
                         'allergens' => [
-                            ['id' => 1, 'name' => 'nom de l\'allergène'],
-                            ['id' => 2, 'name' => 'nom de l\'allergène']
+                            ['id' => 1, 'name' => 'Gluten'],
+                            ['id' => 2, 'name' => 'Lactose']
                         ]
                     ]
                 )
@@ -239,9 +271,7 @@ final class DishesController extends AbstractController
             )
         ]
     )]
-
-    public function show(int $id, EntityManagerInterface $em): Response
-
+    public function show($id, EntityManagerInterface $em): Response
     {
         $dish = $em->getRepository(Dishes::class)->find($id);
         if (!$dish) {
@@ -250,15 +280,9 @@ final class DishesController extends AbstractController
                 Response::HTTP_NOT_FOUND
             );
         }
-        return new JsonResponse(
-            $this->serializer->serialize($dish, 'json', ['groups' => ['dish:detail']]),
-            Response::HTTP_OK,
-            [],
-            true
-        );
+        return $this->json($dish, 200, [], ['groups' => ['dish:detail']]);
     }
-
-    #[Route('/{id}', methods: ['PUT'], name: 'edit')]
+    #[Route('/{id}', methods: ['PUT'], requirements: ['id' => '\d+'], name: 'update')]
     #[OA\Put(
         tags: ['Dish'],
         summary: 'Mettre à jour un plat',
@@ -276,11 +300,10 @@ final class DishesController extends AbstractController
             required: true,
             content: new OA\JsonContent(
                 example: [
-                    'name' => 'plat à mettre à jour',
-                    'description' => 'description à mettre à jour.',
-                    'price' => 14.99,
-                    'category' => 'ENTREE',
-                    'allergens' => [1, 2] // IDs des allergènes associés
+                    'name' => 'Pizza Margherita',
+                    'description' => 'Une pizza classique avec sauce tomate, mozzarella et basilic.',
+                    'price' => "12.99",
+                    'category' => 'plat'
                 ]
             )
         ),
@@ -291,14 +314,14 @@ final class DishesController extends AbstractController
                 content: new OA\JsonContent(
                     example: [
                         'id' => 1,
-                        'name' => 'nom du plat mis à jour',
-                        'description' => 'description du plat mis à jour.',
-                        'price' => 14.99,
-                        'category' => 'ENTREE',
+                        'name' => 'Pizza Margherita',
+                        'description' => 'Une pizza classique avec sauce tomate, mozzarella et basilic.',
+                        'price' => 12.99,
+                        'category' => 'plat',
                         'createdAt' => '2024-06-01T12:00:00Z',
                         'allergens' => [
-                            ['id' => 1, 'name' => 'nom de l\'allergène'],
-                            ['id' => 2, 'name' => 'nom de l\'allergène']
+                            ['id' => 1, 'name' => 'Gluten'],
+                            ['id' => 2, 'name' => 'Lactose']
                         ]
                     ]
                 )
@@ -329,36 +352,39 @@ final class DishesController extends AbstractController
     ): Response {
 
         $dish = $em->getRepository(Dishes::class)->find($id);
-
         if (!$dish) {
-            return $this->json(['error' => 'Dish not found'], 404);
+            return new JsonResponse(
+                ['message' => 'Dish not found'],
+                Response::HTTP_NOT_FOUND
+            );
         }
-
         $data = json_decode($request->getContent(), true);
-
-        // Mettre à jour l'entité
-        if (isset($data['name'])) {
-            $dish->setName($data['name']);
+        if (!$data) {
+            return new JsonResponse(
+                ['error' => 'Données JSON invalides'],
+                Response::HTTP_BAD_REQUEST
+            );
         }
-
-        // Validation
-        $errors = $validator->validate($dish);
-
-        if (count($errors) > 0) {
-            $errorMessages = [];
-            foreach ($errors as $error) {
-                $errorMessages[$error->getPropertyPath()] = $error->getMessage();
+        if (isset($data['category'])) {
+            $category = CategoryDishes::tryFrom($data['category']);
+            if (!$category) {
+                return new JsonResponse(
+                    ['error' => 'La catégorie est invalide. Les valeurs possibles sont: ' .
+                        implode(', ', array_map(fn($e) => $e->value, CategoryDishes::cases()))],
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
             }
-
-            return $this->json([
-                'error' => 'Validation failed',
-                'errors' => $errorMessages
-            ], 400);
+            $dish->setCategory($category);
         }
-
+        $jsonSansEnum = json_encode($data);
+        $this->serializer->deserialize(
+            $jsonSansEnum,
+            Dishes::class,
+            'json',
+            [AbstractNormalizer::OBJECT_TO_POPULATE => $dish]
+        );
         $em->flush();
-
-        return $this->json($dish, 200, [], ['groups' => ['dish:read']]);
+        return $this->json($dish, 200, [], ['groups' => ['dish:detail']]);
     }
 
     #[Route('/{id}', methods: ['DELETE'], name: 'delete')]

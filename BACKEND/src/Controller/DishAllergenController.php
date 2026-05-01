@@ -237,7 +237,7 @@ final class DishAllergenController extends AbstractController
         $responseData = $this->serializer->serialize(
             $allergenList,
             'json',
-            ['groups' => ['dish_allergen:read', 'allergen:read']]
+            ['groups' => ['dish_allergen:read', 'allergen:read', 'dish_allergen:detail']]
         );
         return new JsonResponse($responseData, Response::HTTP_OK, [], true);
     }

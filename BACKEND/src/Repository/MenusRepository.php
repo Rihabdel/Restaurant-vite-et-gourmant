@@ -54,6 +54,10 @@ class MenusRepository extends ServiceEntityRepository
             $qb->andWhere('m.minPeople >= :min_persons')
                 ->setParameter('min_persons', $filters['min_persons']);
         }
+        if (isset($filters['isAvailable'])) {
+            $qb->andWhere('m.isAvailable = :isAvailable')
+                ->setParameter('isAvailable', $filters['isAvailable']);
+        }
         return $qb->getQuery()->getResult();
 
         // src/Repository/MenusRepository.php

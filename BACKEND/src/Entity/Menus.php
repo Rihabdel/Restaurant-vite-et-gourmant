@@ -37,9 +37,9 @@ class Menus
     #[ORM\Column(type: Types::TEXT, nullable: false)]
     private ?string $descriptionMenu = null;
 
-    #[Groups(['menu:read', 'menu:list', 'menu:detail', 'order:read'])]
-    #[ORM\Column(type: Types::BLOB, nullable: true)]
-    private mixed $picture = null;
+
+    #[ORM\Column(type: 'text', length: 255, nullable: true)]
+    private ?string $picture = null;
 
 
     #[Assert\Positive]
@@ -67,16 +67,17 @@ class Menus
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[Groups(['menu:read', 'menu:detail'])]
+    #[Groups(['menu:read', 'menu:detail', 'menu:list'])]
     #[ORM\Column(type: "string", enumType: Theme::class, nullable: true)]
     private ?Theme $themeMenu = null;
 
-    #[Groups(['menu:read', 'menu:detail'])]
+    #[Groups(['menu:read', 'menu:detail', 'menu:list'])]
     #[ORM\Column(type: "string", enumType: Diet::class, nullable: true)]
     private ?Diet $dietMenu = null;
     /**
      * @var Collection<int, MenusDishes>
      */
+    #[Groups(['menu:read', 'menu:detail'])]
     #[ORM\OneToMany(targetEntity: MenusDishes::class, mappedBy: 'menu', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $menusDishes;
 
@@ -86,11 +87,13 @@ class Menus
     #[ORM\OneToMany(targetEntity: Orders::class, mappedBy: 'menu')]
     private Collection $orders;
 
+    #[Groups(['menu:read'])]
     #[ORM\Column(nullable: false)]
     private ?int $orderBefore = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?bool $isAvailable = null;
+    #[Groups(['menu:read', 'menu:detail', 'menu:list'])]
+    #[ORM\Column(type: Types::BOOLEAN, options: ["default" => false])]
+    private bool $isAvailable = false;
 
 
     public function __construct()
@@ -127,12 +130,11 @@ class Menus
         return $this;
     }
 
-    public function getPicture(): mixed
+    public function getPicture(): ?string
     {
         return $this->picture;
     }
-
-    public function setPicture(mixed $picture): static
+    public function setPicture(?string $picture): static
     {
         $this->picture = $picture;
 
@@ -203,7 +205,16 @@ class Menus
         return $this;
     }
 
+    public function getIsAvailable(): bool
+    {
+        return $this->isAvailable;
+    }
 
+    public function setIsAvailable(bool $isAvailable): self
+    {
+        $this->isAvailable = $isAvailable;
+        return $this;
+    }
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
@@ -257,11 +268,9 @@ class Menus
 
         return $this;
     }
-    public function is_available(): bool
-    {
-        return $this->stock > 0;
-    }
-    public function calculate_total_price(int $numberOfPeople): float
+
+    #[Groups(['menu:detail', 'order:read', 'menu:list'])]
+    public function getTotalPriceEstimate(int $numberOfPeople): float
     {
         $basePrice = $this->getPrice() * $numberOfPeople;
 
@@ -275,7 +284,7 @@ class Menus
         return $basePrice;
     }
     // Get all allergenes from the dishes in the menu
-    #[Groups(['menu:detail'])]
+    #[Groups(['menu:detail', 'menu:list'])]
     public function getAllAllergenes(): array
     {
         $allergenes = [];
@@ -340,7 +349,7 @@ class Menus
         return $this;
     }
     //liste des plats d'un menu
-
+    #[Groups(['menu:detail', 'dish:list'])]
     public function getListOfDishesFromMenu(): array
     {
         $dishes = [];
@@ -362,23 +371,16 @@ class Menus
         return $this;
     }
 
-    public function isAvailable(): ?bool
+    public function isAvailable(): bool
     {
         return $this->isAvailable;
     }
-
-    public function setIsAvailable(?bool $isAvailable): static
-    {
-        $this->isAvailable = $isAvailable;
-
-        return $this;
-    }
-    public function getPictureBase64(): ?string
+    #[Groups(['menu:list', 'menu:detail'])]
+    public function getPictureUrl(): ?string
     {
         if (!$this->picture) {
             return null;
         }
-        $content = is_resource($this->picture) ? stream_get_contents($this->picture) : $this->picture;
-        return base64_encode($content);
+        return '/uploads/menus/' . $this->picture;
     }
 }

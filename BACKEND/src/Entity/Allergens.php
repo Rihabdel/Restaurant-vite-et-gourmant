@@ -22,19 +22,19 @@ class Allergens
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['allergen:read', 'allergen:write'])]
+    #[Groups(['dish_allergen:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
-    #[Groups(['allergen:read', 'allergen:write'])]
+    #[Groups(['dish_allergen:read'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['allergen:detail', 'allergen:write'])]
+    #[Groups(['dish_allergen:read'])]
     private ?string $icon = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['allergen:detail', 'allergen:write'])]
+    #[Groups(['dish_allergen:read'])]
     private ?string $description = null;
 
     #[ORM\Column]
@@ -43,7 +43,7 @@ class Allergens
     /**
      * @var Collection<int, DishAllergen>
      */
-    #[Groups(['allergen_dish:read'])]
+
     #[ORM\OneToMany(targetEntity: DishAllergen::class, mappedBy: 'allergen', cascade: ['persist', 'remove'])]
     private Collection $dishAllergens;
 

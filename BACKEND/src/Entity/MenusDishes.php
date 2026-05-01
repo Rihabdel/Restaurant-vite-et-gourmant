@@ -28,17 +28,18 @@ class MenusDishes
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Groups(['menu_dish:read'])]
     #[ORM\ManyToOne(inversedBy: 'menusDishes')]
     #[ORM\JoinColumn(onDelete: "CASCADE")]
     private ?Menus $menu = null;
 
-    #[Groups(['menu_dish:list'])]
+    #[Groups(['menu_dish:read'])]
     #[ORM\ManyToOne(targetEntity: Dishes::class, inversedBy: 'menusDishes')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Dishes $dish = null;
 
+    #[Groups(['menu_dish:read'])]
     #[ORM\Column]
-    #[Groups(['menu_dish:list'])]
     private ?int $displayOrder = null;
 
     public function getId(): ?int
@@ -57,7 +58,6 @@ class MenusDishes
 
         return $this;
     }
-
 
     public function getDish(): ?Dishes
     {
@@ -82,46 +82,5 @@ class MenusDishes
         $this->displayOrder = $displayOrder;
 
         return $this;
-    }
-
-    #[Groups(['menu_dish:detail'])]
-    public function getMenuDetails(): ?array
-    {
-        if (!$this->menu) {
-            return null;
-        }
-
-        return [
-            'title' => $this->menu->getTitle(),
-            'description' => $this->menu->getDescriptionMenu(),
-            'theme' => $this->menu->getThemeMenu(),
-            'diet' => $this->menu->getDietMenu(),
-            'min_people' => $this->menu->getMinPeople(),
-            'price' => $this->menu->getPrice(),
-        ];
-    }
-
-    #[Groups(['menu_dish:detail'])]
-    public function getDishDetails(): ?array
-    {
-        if (!$this->dish) {
-            return null;
-        }
-
-        return [
-            'id' => $this->dish->getId(),
-            'name' => $this->dish->getName(),
-            'description' => $this->dish->getDescription(),
-            'category' => $this->dish->getCategory(),
-            'price' => $this->dish->getPrice()
-        ];
-    }
-
-    public function getMenuDishList(): ?string
-    {
-        if (!$this->menu || !$this->dish) {
-            return null;
-        }
-        return 'Menu: ' . $this->menu->getTitle();
     }
 }

@@ -38,4 +38,24 @@ enum AllergenType: string
             self::MOLLUSQUES->value => 'Mollusques',
         ];
     }
+    public static function getIcon(string $allergen): string
+    {
+        return match ($allergen) {
+            self::GLUTEN->value => '🌾',
+            self::LACTOSE->value => '🥛',
+            self::ARACHIDES->value => '🥜',
+            self::FRUITS_A_COQUE->value => '🌰',
+            self::POISSON->value => '🐟',
+            self::CRUSTACES->value => '🦐',
+            self::OEUF->value => '🍳',
+            self::SOJA->value => '🌱',
+            self::MOUTARDE->value => '🌭',
+            self::SESAME->value => '🍔',
+            self::SULFITES->value => '🍷',
+            self::CELERI->value => '🥬',
+            self::LUPIN->value => '🌿',
+            self::MOLLUSQUES->value => '🦪',
+            default => '',
+        };
+    }
 }

@@ -20,14 +20,15 @@ class DishAllergen
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
+    #[Groups(['dish_allergen:read', 'dish:list', 'dish:detail'])]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[Groups(['dish:detail'])]
+    #[Groups(['dish_allergen:detail', 'dish_allergen:read', 'dish:list', 'dish:detail'])]
     #[ORM\ManyToOne(inversedBy: 'dishAllergens')]
     private ?Dishes $dish = null;
 
-    #[Groups(['dish_allergen:read'])]
+    #[Groups(['dish:list', 'dish:detail'])]
     #[ORM\ManyToOne(inversedBy: 'dishAllergens')]
     private ?Allergens $allergen = null;
 

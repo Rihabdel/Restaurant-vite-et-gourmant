@@ -2,6 +2,9 @@ services:
   frontend:
     build: ./FRONTEND
     container_name: vite_gourmand_front
+    volumes:
+      - ./FRONTEND:/usr/local/apache2/htdocs/
+
     ports:
       - "8080:80"
 
@@ -12,6 +15,8 @@ services:
       - "8000:80"
     volumes:
       - ./BACKEND:/var/www/html
+      - symfony_var:/var/www/html/var   # ← ajout
+      - symfony_vendor:/var/www/html/vendor   # ← ajout
     depends_on:
       - database
 
@@ -37,4 +42,6 @@ services:
       PMA_HOST: database
 
 volumes:
+  symfony_var:
+  symfony_vendor:
   db_data:

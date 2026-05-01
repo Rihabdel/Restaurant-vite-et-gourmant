@@ -12,7 +12,7 @@ enum CategoryDishes: string
     {
         return match ($this) {
             self::entree => 'Entrée',
-            self::plat => 'Plat',
+            self::plat => 'Plat principal',
             self::dessert => 'Dessert',
         };
     }

@@ -5,12 +5,12 @@ namespace App\Enum;
 enum Status: string
 {
     case en_attente = 'en attente';
-    case accepte = 'accepté';
-    case en_preparation = 'en préparation';
+    case accepté = 'accepté';
+    case en_préparation = 'en préparation';
     case livrée = 'livrée';
     case en_attente_de_retour = 'en attente de retour';
-    case termine = 'terminé';
-    case annule = 'annulé';
+    case terminée = 'terminée';
+    case annulé = 'annulé';
 
     public static function getValues(): array
     {
@@ -20,24 +20,24 @@ enum Status: string
     {
         return match ($this) {
             self::en_attente => 'En attente',
-            self::accepte => 'Accepté',
-            self::en_preparation => 'En préparation',
+            self::accepté => 'Accepté',
+            self::en_préparation => 'En préparation',
             self::livrée => 'Livrée',
             self::en_attente_de_retour => 'En attente de retour',
-            self::termine => 'Terminé',
-            self::annule => 'Annulé',
+            self::terminée => 'Terminée',
+            self::annulé => 'Annulé',
         };
     }
     public static function fromLabel(string $label): ?self
     {
         return match ($label) {
             'En attente' => self::en_attente,
-            'Accepté' => self::accepte,
-            'En préparation' => self::en_preparation,
+            'Accepté' => self::accepté,
+            'En préparation' => self::en_préparation,
             'Livrée' => self::livrée,
             'En attente de retour' => self::en_attente_de_retour,
-            'Terminé' => self::termine,
-            'Annulé' => self::annule,
+            'Terminée' => self::terminée,
+            'Annulé' => self::annulé,
             default => null,
         };
     }
@@ -45,12 +45,12 @@ enum Status: string
     {
         return match ($this) {
             self::en_attente => 'gray',
-            self::accepte => 'blue',
-            self::en_preparation => 'orange',
+            self::accepté => 'blue',
+            self::en_préparation => 'orange',
             self::livrée => 'purple',
             self::en_attente_de_retour => 'teal',
-            self::termine => 'green',
-            self::annule => 'red',
+            self::terminée => 'green',
+            self::annulé => 'red',
         };
     }
 }

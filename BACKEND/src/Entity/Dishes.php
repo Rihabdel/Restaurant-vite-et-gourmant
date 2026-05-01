@@ -23,35 +23,37 @@ class Dishes
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['dish:read', 'dish:detail', 'menu:detail', 'menu_dish:read', 'dish:list'])]
+    #[Groups(['dish:read', 'dish:write', 'dish:detail', 'dish:list'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
-    #[Groups(['menu_dish:read', 'dish:read', 'dish:list', 'dish:detail', 'dish:write', 'menu:detail'])]
+    #[Groups(['dish:read', 'dish:list', 'dish:detail', 'dish:write'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['dish:list', 'dish:detail', 'dish:write', 'menu:detail', 'menu_dish:list'])]
+    #[Groups(['dish:list', 'dish:detail', 'dish:write'])]
     private ?string $description = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    #[Groups(['menu_dish:read', 'dish:list', 'dish:detail', 'dish:write', 'menu:detail'])]
+    #[Groups(['menu_dish:read', 'dish:detail', 'dish:write', 'dish:list'])]
     private ?string $price = null;
 
-    #[Groups(['menu_dish:read', 'menu_dish:list', 'dish:list', 'dish:detail', 'menu:detail', 'dish:read'])]
+    #[Groups(['dish:write', 'dish:list', 'dish:detail', 'dish:read', 'dish:list'])]
     #[ORM\Column(enumType: CategoryDishes::class, nullable: false)]
     private ?CategoryDishes $category = null;
 
-    #[Groups(['dish:detail'])]
     #[ORM\Column]
+    #[Groups(['dish:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['dish:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     /**
      * @var Collection<int, MenusDishes>
      */
+
     #[ORM\OneToMany(targetEntity: MenusDishes::class, mappedBy: 'dish', cascade: ['persist', 'remove'])]
     private Collection $menusDishes;
 
@@ -173,7 +175,6 @@ class Dishes
     /**
      * @return Collection<int, DishAllergen>
      */
-
     public function getDishAllergens(): Collection
     {
         return $this->dishAllergens;
@@ -218,13 +219,16 @@ class Dishes
     {
         return $this->menusDishes->count();
     }
-    #[Groups(['dish:detail'])]
-    public function getListOfAllergensFromDishes(): array
+    #[Groups(['dish:list', 'dish:detail'])]
+    public function getAllergenName(): array
     {
-        $allergens = [];
+        $allergenName = [];
         foreach ($this->dishAllergens as $dishAllergen) {
-            $allergens[] = $dishAllergen->getAllergen()->getName();
+            $allergen = $dishAllergen->getAllergen();
+            if ($allergen) {
+                $allergenName[] = $allergen->getName();
+            }
         }
-        return $allergens;
+        return $allergenName;
     }
 }

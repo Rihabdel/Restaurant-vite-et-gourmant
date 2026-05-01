@@ -52,14 +52,12 @@ class MenusDishesController extends AbstractController
                 content: new OA\JsonContent(
                     example: [
                         'message' => 'Plat ajouté au menu avec succès',
-                        'menu' => 'Nouveau Menu',
-                        'dish' => 'plat ajouté',
-                        'allergen_id' => [
-                            ['id' => 1, 'name' => ' allergene si il y en a'],
-                            ['id' => 2, 'name' => 'allergene si il y en a']
+                        'dish' => [
+                            'id' => 1,
+                            'name' => 'nom du plat'
                         ]
                     ]
-                )
+                ),
             ),
             new OA\Response(
                 response: 400,
@@ -92,89 +90,49 @@ class MenusDishesController extends AbstractController
     )]
     public function addDishToMenu(int $id, Request $request): JsonResponse
     {
-        try {
-            $menu = $this->entityManager->getRepository(Menus::class)->find($id);
-            if (!$menu) {
-                return new JsonResponse(
-                    ['error' => 'Menu non trouvé'],
-                    Response::HTTP_NOT_FOUND
-                );
-            }
-            //
-            $data = json_decode($request->getContent(), true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                return new JsonResponse(
-                    ['error' => 'JSON invalide: ' . json_last_error_msg()],
-                    Response::HTTP_BAD_REQUEST
-                );
-            }
-            if (!isset($data['dish_id'])) {
-                return new JsonResponse(
-                    ['error' => 'le champ "dish_id" est obligatoire '],
-                    Response::HTTP_BAD_REQUEST
-                );
-            }
-            $dishId = $data['dish_id'];
-            $dish = $this->entityManager->getRepository(Dishes::class)->find($dishId);
-            if (!$dish) {
-                return new JsonResponse(
-                    ['error' => 'Plat avec ID ' . $dishId . ' non trouvé'],
-                    Response::HTTP_NOT_FOUND
-                );
-            }
-            //verifier si le plat est déjà dans le menu
-            $existingMenuDish = $this->entityManager->getRepository(MenusDishes::class)->findOneBy([
-                'menu' => $menu,
-                'dish' => $dish
-            ]);
-            if ($existingMenuDish) {
-                return new JsonResponse(
-                    ['message' => 'Le plat est déjà dans le menu'],
-                    Response::HTTP_OK
-                );
-            } else {
-                $menuDish = new MenusDishes();
-                $menuDish->setMenu($menu);
-                $menuDish->setDish($dish);
-                $menuDish->setDisplayOrder(count($menu->getMenusDishes()) + 1);
-            }
-            // valider le menuDish
-            $errors = $this->validator->validate($menuDish);
-            if (count($errors) > 0) {
-                $errorMessages = [];
-                foreach ($errors as $error) {
-                    $errorMessages[] = $error->getPropertyPath() . ': ' . $error->getMessage();
-                }
+        $menu = $this->entityManager->getRepository(Menus::class)->find($id);
 
-                return new JsonResponse(
-                    ['errors' => $errorMessages],
-                    Response::HTTP_UNPROCESSABLE_ENTITY
-                );
-            }
-            // persist et flush
-            $this->entityManager->persist($menuDish);
-            $this->entityManager->flush();
-            return new JsonResponse(
-                [
-                    'message' => 'Plat ajouté au menu avec succès',
-                    'menu' => $menu->getTitle(),
-                    'dish' => $dish->getName(),
-                    'allergen_id' => $dish->getDishAllergens()->map(function ($allergen) {
-                        return [
-                            'id' => $allergen->getAllergen()->getId(),
-                            'name' => $allergen->getAllergen()->getName()
-
-                        ];
-                    })->toArray(),
-                ],
-                Response::HTTP_CREATED
-            );
-        } catch (\Exception $e) {
-            return new JsonResponse(
-                ['error' => 'Erreur serveur: ' . $e->getMessage()],
-                Response::HTTP_INTERNAL_SERVER_ERROR
-            );
+        if (!$menu) {
+            return $this->json(['error' => 'Menu non trouvé'], 404);
         }
+
+        $data = json_decode($request->getContent(), true);
+
+        if (!isset($data['dish_id'])) {
+            return $this->json(['error' => 'dish_id requis'], 400);
+        }
+
+        $dish = $this->entityManager->getRepository(Dishes::class)->find($data['dish_id']);
+
+        if (!$dish) {
+            return $this->json(['error' => 'Plat non trouvé'], 404);
+        }
+
+        $existing = $this->entityManager->getRepository(MenusDishes::class)
+            ->findOneBy(['menu' => $menu, 'dish' => $dish]);
+
+        if ($existing) {
+            return $this->json(['message' => 'Déjà présent'], 200);
+        }
+
+        $maxOrder = $this->entityManager->getRepository(MenusDishes::class)
+            ->findMaxDisplayOrder($menu);
+
+        $menuDish = new MenusDishes();
+        $menuDish->setMenu($menu);
+        $menuDish->setDish($dish);
+        $menuDish->setDisplayOrder($maxOrder + 1);
+
+        $this->entityManager->persist($menuDish);
+        $this->entityManager->flush();
+
+        return $this->json([
+            'message' => 'plat ajouté au menu avec succès',
+            'dish' => [
+                'id' => $dish->getId(),
+                'name' => $dish->getName()
+            ]
+        ], 201);
     }
 
 
@@ -183,35 +141,26 @@ class MenusDishesController extends AbstractController
     #[OA\Get(
         tags: ['MenuDish'],
         summary: 'Récupérer la liste des plats d\'un menu',
-        description: 'Récupérer la liste des plats d\'un menu avec leurs allergènes, triés par ordre d\'affichage',
+        description: 'Récupérer la liste des plats d\'un menu avec leurs détails',
         responses: [
             new OA\Response(
                 response: 200,
-                description: 'Liste des plats du menu récupérée avec succès',
+                description: 'Liste des plats récupérée avec succès',
                 content: new OA\JsonContent(
                     example: [
                         [
                             'id' => 1,
-                            'name' => 'nom du menu',
-                            'dishes' => [
-                                [
-                                    'id' => 1,
-                                    'name' => 'nom du plat',
-                                    'description' => 'description du plat.',
-                                    'price' => '12.99',
-                                    'category' => 'entree',
-                                    'allergens' => [
-                                        ['id' => 1, 'nom allergene si il y en a']
-                                    ]
-                                ],
-                                [
-                                    'id' => 2,
-                                    'name' => 'nom du plat',
-                                    'description' => 'description du plat.',
-                                    'price' => '9.99',
-                                    'category' => 'plat',
-                                ]
-                            ]
+                            'name' => 'nom du plat',
+                            'description' => ' description du plat.',
+                            'price' => 12.99,
+                            'category' => 'entree'
+                        ],
+                        [
+                            'id' => 2,
+                            'name' => 'nom du plat',
+                            'description' => ' description du plat.',
+                            'price' => 9.99,
+                            'category' => 'plat'
                         ]
                     ]
                 )
@@ -238,21 +187,15 @@ class MenusDishesController extends AbstractController
     )]
     public function getMenuWithDishes(int $id, EntityManagerInterface $em): JsonResponse
     {
-        $menu = $this->entityManager->getRepository(Menus::class)->find($id);
+        $menu = $em->getRepository(Menus::class)->find($id);
         if (!$menu) {
-            return new JsonResponse(
-                ['message' => 'Menu non trouvé'],
-                Response::HTTP_NOT_FOUND
-            );
+            return new JsonResponse(['error' => 'Menu non trouvé'], Response::HTTP_NOT_FOUND);
         }
-        $menusDishes = $this->entityManager->getRepository(MenusDishes::class)->findBy(
-            ['menu' => $menu],
-            ['displayOrder' => 'ASC']
-        );
+        $menusDishes = $em->getRepository(MenusDishes::class)->findDishesByMenu($menu->getId());
         $responseData = $this->serializer->serialize(
             $menusDishes,
             'json',
-            ['groups' => ['dish:read', 'menu_dish:list']]
+            ['groups' => ['menu:read', 'dish:detail']]
         );
         return new JsonResponse($responseData, Response::HTTP_OK, [], true);
     }
@@ -328,7 +271,7 @@ class MenusDishesController extends AbstractController
         $responseData = $this->serializer->serialize(
             $menusDishes,
             'json',
-            ['groups' => ['dish:read', 'menu_dish:detail', 'dish_allergen:read']]
+            ['groups' => ['menu:detail', 'dish:detail']]
         );
         return new JsonResponse($responseData, Response::HTTP_OK, [], true);
     }

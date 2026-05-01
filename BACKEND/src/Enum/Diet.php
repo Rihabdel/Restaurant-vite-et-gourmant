@@ -15,6 +15,7 @@ enum Diet: string
         return match ($this) {
             self::classique => 'Classique',
             self::vegetarien => 'Végétarien',
+            self::vegan => 'Vegan',
             self::sans_gluten => 'Sans Gluten',
             self::autres => 'Autres',
         };
@@ -25,6 +26,7 @@ enum Diet: string
         return match ($this) {
             self::classique => '🍽️',
             self::vegetarien => '🥗',
+            self::vegan => '🌱',
             self::sans_gluten => '🚫🌾',
             self::autres => '🍴',
         };
@@ -35,6 +37,7 @@ enum Diet: string
         return match ($this) {
             self::classique => 'Menu traditionnel avec une variété d\'options.',
             self::vegetarien => 'Menu sans viande, riche en légumes et protéines végétales.',
+            self::vegan => 'Menu végan, riche en légumes et protéines végétales.',
             self::sans_gluten => 'Menu adapté aux personnes intolérantes au gluten.',
             self::autres => 'Menu avec des options spéciales selon les besoins.',
         };
@@ -59,6 +62,10 @@ enum Diet: string
     public function est_sans_gluten(): bool
     {
         return $this === self::sans_gluten;
+    }
+    public function est_vegan(): bool
+    {
+        return $this === self::vegan;
     }
     public function est_autres(): bool
     {

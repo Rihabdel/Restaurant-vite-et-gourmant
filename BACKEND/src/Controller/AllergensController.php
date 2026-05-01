@@ -144,6 +144,7 @@ final class AllergensController extends AbstractController
                 'id' => $allergen->getId(),
                 'name' => $allergen->getName(),
                 'description' => $allergen->getDescription(),
+                'icon' => $allergen->getIcon(),
                 'createdAt' => $allergen->getCreatedAt()->format('Y-m-d\TH:i:s\Z'),
             ],
             Response::HTTP_OK
@@ -300,5 +301,39 @@ final class AllergensController extends AbstractController
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
+    }
+    #[Route('/', methods: ['GET'], name: 'list')]
+    #[OA\Get(
+        tags: ['Allergens'],
+        summary: 'Récupérer la liste de tous les allergènes',
+        description: 'Cette endpoint permet de récupérer la liste complète de tous les allergènes disponibles.',
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Liste des allergènes récupérée avec succès',
+                content: new OA\JsonContent(
+                    type: 'array',
+                    items: new OA\Items(
+                        type: 'object',
+                        properties: [
+                            new OA\Property(property: 'id', type: 'integer', example: 1),
+                            new OA\Property(property: 'name', type: 'string', example: 'Gluten'),
+                            new OA\Property(property: 'description', type: 'string', example: 'Protéine présente dans le blé, l\'orge et le seigle.'),
+                            new OA\Property(property: 'createdAt', type: 'string', format: 'date-time', example: '2024-06-01T12:00:00Z'),
+                        ]
+                    )
+                )
+            ),
+            new OA\Response(
+                response: 500,
+                description: 'Erreur interne du serveur'
+            ),
+        ]
+    )]
+    public function getAllergens(AllergensRepository $allergensRepository): JsonResponse
+    {
+        $allergens = $allergensRepository->findAll();
+        $responseData = $this->serializer->serialize($allergens, 'json', ['groups' => ['allergen:read', 'dish_allergen:read', 'dish_allergen:detail']]);
+        return new JsonResponse($responseData, Response::HTTP_OK, [], true);
     }
 }

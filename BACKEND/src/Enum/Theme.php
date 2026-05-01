@@ -9,10 +9,10 @@ enum Theme: string
     case classique = 'classique';
     case anniversaire = 'anniversaire';
     case mariage = 'mariage';
+    case bapteme = 'bapteme';
     case entreprise = 'entreprise';
-    case fete_des_meres = 'fete_des_meres';
+    case familiale = 'familiale';
     case noel = 'noel';
-    case saint_valentin = 'saint_valentin';
     case halloween = 'halloween';
     case paques = 'paques';
     case autres = 'autres';
@@ -23,10 +23,10 @@ enum Theme: string
             self::classique => 'Classique',
             self::anniversaire => 'Anniversaire',
             self::mariage => 'Mariage',
+            self::bapteme => 'Baptême',
             self::entreprise => 'Entreprise',
-            self::fete_des_meres => 'Fête des Mères',
+            self::familiale => 'Familiale',
             self::noel => 'Noël',
-            self::saint_valentin => 'Saint-Valentin',
             self::halloween => 'Halloween',
             self::paques => 'Pâques',
             self::autres => 'Autres',
@@ -56,17 +56,17 @@ enum Theme: string
     {
         return $this === self::entreprise;
     }
-    public function est_fete_des_meres(): bool
+    public function est_familiale(): bool
     {
-        return $this === self::fete_des_meres;
+        return $this === self::familiale;
     }
     public function est_noel(): bool
     {
         return $this === self::noel;
     }
-    public function est_saint_valentin(): bool
+    public function est_bapteme(): bool
     {
-        return $this === self::saint_valentin;
+        return $this === self::bapteme;
     }
     public function est_halloween(): bool
     {

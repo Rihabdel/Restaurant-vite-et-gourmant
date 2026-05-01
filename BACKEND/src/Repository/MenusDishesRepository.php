@@ -26,9 +26,6 @@ class MenusDishesRepository extends ServiceEntityRepository
     }
 
 
-    /**
-     * Trouver les plats d'un menu ordonnés
-     */
     public function findByMenu(Menus $menu): array
     {
         return $this->createQueryBuilder('md')
@@ -40,76 +37,36 @@ class MenusDishesRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
-
-    /**
-     * Trouver si un plat est dans un menu
-     */
     public function isDishInMenu(Menus $menu, Dishes $dish): bool
     {
-        $result = $this->createQueryBuilder('md')
-            ->select('COUNT(md.id)')
+        return (bool) $this->createQueryBuilder('md')
+            ->select('1')
             ->where('md.menu = :menu')
             ->andWhere('md.dish = :dish')
             ->setParameter('menu', $menu)
             ->setParameter('dish', $dish)
+            ->setMaxResults(1)
             ->getQuery()
-            ->getSingleScalarResult();
+            ->getOneOrNullResult();
+    }
 
-        return $result > 0;
-    }
-    public function addDishToMenu(Menus $menu, Dishes $dish, int $displayOrder): void
-    {
-        $registry = $this->getEntityManager();
-        $menusDishes = new MenusDishes();
-        $menusDishes->setMenu($menu);
-        $menusDishes->setDish($dish);
-        $menusDishes->setDisplayOrder($displayOrder);
-        $registry->persist($menusDishes);
-        $registry->flush();
-        $result = $this->createQueryBuilder('md')
-            ->select('COUNT(md.id)')
-            ->where('md.menu = :menu')
-            ->andWhere('md.dish = :dish')
-            ->setParameter('menu', $menu)
-            ->setParameter('dish', $dish)
-            ->getQuery()
-            ->getSingleScalarResult();
-    }
-    /**
-     * Trouver le dernier ordre d'affichage d'un menu
-     */
-    public function removeDishFromMenu(Menus $menu, Dishes $dish): void
-    {
-        $registry = $this->getEntityManager();
-        $menusDishes = $this->findOneBy([
-            'menu' => $menu,
-            'dish' => $dish
-        ]);
-        if ($menusDishes) {
-            $registry->remove($menusDishes);
-            $registry->flush();
-        }
-    }
     public function findMaxDisplayOrder(Menus $menu): int
     {
-        $result = $this->createQueryBuilder('md')
-            ->select('MAX(md.display_order)')
+        return (int) $this->createQueryBuilder('md')
+            ->select('MAX(md.displayOrder)')
             ->where('md.menu = :menu')
             ->setParameter('menu', $menu)
             ->getQuery()
             ->getSingleScalarResult();
-
-        return $result ?: 0;
     }
-    public function findDishesByMenu(Menus $menu): array
+    public function findDishesByMenu(int $menuId): array
     {
         return $this->createQueryBuilder('md')
+            ->select('d.id, d.name, d.category')
             ->join('md.dish', 'd')
-            ->addSelect('d')
-            ->where('md.menu = :menu')
-            ->setParameter('menu', $menu)
-            ->orderBy('md.display_order', 'ASC')
+            ->where('md.menu = :menuId')
+            ->setParameter('menuId', $menuId)
             ->getQuery()
-            ->getResult();
+            ->getArrayResult();
     }
 }
