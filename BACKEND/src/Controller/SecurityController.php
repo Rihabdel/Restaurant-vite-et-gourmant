@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Repository\UserRepository;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,17 +27,17 @@ class SecurityController extends AbstractController
     #[Route('/registration', name: 'registration', methods: 'POST')]
     #[OA\Post(
         tags: ['Authentication'],
-        description: 'User registration endpoint',
+        description: 'Registration endpoint',
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
                 properties: [
-                    new OA\Property(property: 'email', type: 'string', example: 'user@mail.com'),
-                    new OA\Property(property: 'password', type: 'string', example: 'password123'),
-                    new OA\Property(property: 'firstName', type: 'string', example: 'John'),
-                    new OA\Property(property: 'lastName', type: 'string', example: 'Doe'),
-                    new OA\Property(property: 'adress', type: 'string', example: '123 Main Street'),
-                    new OA\Property(property: 'phone', type: 'integer', example: 1234567890),
+                    new OA\Property(property: 'email', type: 'string'),
+                    new OA\Property(property: 'password', type: 'string'),
+                    new OA\Property(property: 'firstName', type: 'string'),
+                    new OA\Property(property: 'lastName', type: 'string'),
+                    new OA\Property(property: 'phone', type: 'int'),
+                    new OA\Property(property: 'address', type: 'string'),
                 ]
             )
         ),
@@ -46,29 +47,57 @@ class SecurityController extends AbstractController
                 description: 'User registered successfully',
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: 'user', type: 'string'),
-                        new OA\Property(property: 'apiToken', type: 'string'),
-                        new OA\Property(property: 'roles', type: 'array', items: new OA\Items(type: 'string')),
-
+                        new OA\Property(property: 'email', type: 'string', example: 'user@example.com'),
+                        new OA\Property(property: 'firstName', type: 'string', example: 'John'),
+                        new OA\Property(property: 'lastName', type: 'string', example: 'Doe'),
+                        new OA\Property(property: 'phone', type: 'int', example: 1234567890),
+                        new OA\Property(property: 'address', type: 'string', example: '123 Main St'),
                     ]
                 )
             ),
             new OA\Response(response: 400, description: 'Bad request - invalid data provided')
         ]
     )]
+
     public function register(Request $request, UserPasswordHasherInterface $passwordHasher): JsonResponse
     {
+        $data = json_decode($request->getContent(), true);
 
-        $user = $this->serializer->deserialize($request->getContent(), User::class, 'json');
-        $user->setPassword($passwordHasher->hashPassword($user, $user->getPassword()));
+        if (!$data) {
+            return new JsonResponse(['error' => 'JSON invalide'], 400);
+        }
+
+        if (empty($data['email']) || empty($data['password'])) {
+            return new JsonResponse(['error' => 'Champs obligatoires manquants'], 400);
+        }
+
+        $user = new User();
+        $user->setEmail($data['email']);
+        $user->setPhone($data['phone'] ?? null);
+        $user->setAddress($data['address'] ?? null);
+        $user->setLastName($data['lastName'] ?? null);
+        $user->setFirstName($data['firstName'] ?? null);
+        $user->setPassword(
+            $passwordHasher->hashPassword($user, $data['password'])
+        );
+        // gerer les roles
+        if (isset($data['roles']) && is_array($data['roles'])) {
+            $user->setRoles($data['roles']);
+        } else {
+            $user->setRoles(['ROLE_USER']);
+        }
         $user->setCreatedAt(new DateTimeImmutable());
-
         $this->manager->persist($user);
         $this->manager->flush();
-        return new JsonResponse(
-            ['user'  => $user->getUserIdentifier(), 'apiToken' => $user->getApiToken(), 'roles' => $user->getRoles()],
-            Response::HTTP_CREATED
-        );
+
+        return new JsonResponse([
+            'user' => $user->getUserIdentifier(),
+            'firstName' => $user->getFirstName(),
+            'lastName' => $user->getLastName(),
+            'phone' => $user->getPhone(),
+            'address' => $user->getAddress(),
+            'roles' => $user->getRoles()
+        ], Response::HTTP_CREATED);
     }
 
     #[Route('/login', name: 'login', methods: ['POST'])]
@@ -123,8 +152,7 @@ class SecurityController extends AbstractController
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(property: 'email', type: 'string', example: 'user@example.com'),
-                        new OA\Property(property: 'token', type: 'string', example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c')
-
+                        new OA\Property(property: 'roles', type: 'array', items: new OA\Items(type: 'string'), example: ['ROLE_USER']),
                     ]
 
                 )
@@ -140,18 +168,19 @@ class SecurityController extends AbstractController
         }
 
         return new JsonResponse([
+            'id' => $user->getId(),
             'email' => $user->getUserIdentifier(),
             'roles' => $user->getRoles(),
             'token' => $user->getApiToken(),
             'firstName' => $user->getFirstName(),
             'lastName' => $user->getLastName(),
-            'adress' => $user->getAdress(),
+            'address' => $user->getAddress(),
             'phone' => $user->getPhone(),
             'createdAt' => $user->getCreatedAt(),
 
         ]);
     }
-    #[Route('/api/logout', name: 'logout', methods: ['POST'])]
+    #[Route('/logout', name: 'logout', methods: ['POST'])]
     #[OA\Post(
         tags: ['Authentication'],
         summary: 'Logout endpoint',
@@ -187,7 +216,6 @@ class SecurityController extends AbstractController
                     new OA\Property(property: 'lastName', type: 'string', example: 'Doe'),
                     new OA\Property(property: 'phone', type: 'int', example: 1234567890),
                     new OA\Property(property: 'address', type: 'string', example: '123 Main St'),
-                    new OA\Property(property: 'postalCode', type: 'string', example: '12345'),
                 ]
             )
         ),
@@ -224,6 +252,34 @@ class SecurityController extends AbstractController
         $this->manager->persist($user);
         $this->manager->flush();
 
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+        return $this->json($user, Response::HTTP_OK, [], ['groups' => ['user:read']]);
+    }
+
+    #[Route('/admin/employees', name: 'admin_users', methods: ['GET'])]
+    public function getUsers(UserRepository $userRepository): JsonResponse
+    {
+        try {
+
+            $users = $userRepository->findEmployees();
+            return $this->json($users, 200, [], ['groups' => ['user:read']]);
+        } catch (\Exception $e) {
+            return new JsonResponse(['message' => $e->getMessage()], Response::HTTP_FORBIDDEN);
+        }
+    }
+    //suupprimer un utilisateur
+    #[Route('/admin/employees/{id}', name: 'delete_user', methods: ['DELETE'])]
+    public function deleteUser(int $id, UserRepository $userRepository): JsonResponse
+    {
+        try {
+            $user = $userRepository->find($id);
+            if (!$user) {
+                return new JsonResponse(['message' => 'Utilisateur non trouvé'], Response::HTTP_NOT_FOUND);
+            }
+            $this->manager->remove($user);
+            $this->manager->flush();
+            return new JsonResponse(['message' => 'Utilisateur supprimé avec succès'], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return new JsonResponse(['message' => $e->getMessage()], Response::HTTP_FORBIDDEN);
+        }
     }
 }

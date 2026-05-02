@@ -80,7 +80,15 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->getQuery()
             ->getOneOrNullResult();
     }
-
+    //**
+    //     * @return User[] Returns an array of User objects
+    //     */
+    public function findEmployees(): array
+    {
+        return array_values(array_filter($this->findAll(), function ($user) {
+            return in_array('ROLE_EMPLOYEE', $user->getRoles());
+        }));
+    }
     //    /**
     //     * @return User[] Returns an array of User objects
     //     */

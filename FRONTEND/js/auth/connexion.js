@@ -1,6 +1,6 @@
 
 import { setToken, setCookie, showAndHideElementsForRoles, roleCookieName } from "../script.js";
-const API_BASE = 'http://127.0.0.1:8000/api';
+import { API_BASE } from "../api.js";
 const emailInput = document.getElementById("EmailInput");
 const passwordInput = document.getElementById("PasswordInput");
 const btnConnexion = document.getElementById("BtnLogin");

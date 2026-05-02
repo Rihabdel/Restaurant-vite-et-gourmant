@@ -69,17 +69,17 @@ class Orders
     #[ORM\ManyToOne(inversedBy: 'orders')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
-
+    #[Groups(['orders:read'])]
     #[ORM\ManyToOne(inversedBy: 'orders')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Menus $menu = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?Reviews $review = null;
-
+    #[Groups(['orders:read'])]
     #[ORM\Column(length: 50)]
     private ?string $deliveryCity = null;
-
+    #[Groups(['orders:read'])]
     #[ORM\Column]
     private ?int $deliveryPostalCode = null;
 
@@ -99,15 +99,14 @@ class Orders
     public function setNumberOfPeople(int $numberOfPeople): static
     {
         $this->numberOfPeople = $numberOfPeople;
-
         return $this;
     }
-
+    #[Groups(['orders:read'])]
     public function getTotalPrice(): ?float
     {
         return $this->totalPrice;
     }
-
+    #[Groups(['orders:read'])]
     public function setTotalPrice(float $totalPrice): static
     {
         $this->totalPrice = $totalPrice;
@@ -295,5 +294,27 @@ class Orders
     {
         $cancellableStatuses = ['en attente'];
         return in_array($this->status, $cancellableStatuses);
+    }
+    public function isDeliverable(): bool
+    {
+        $deliverableStatuses = ['en attente', 'confirmée'];
+        return in_array($this->status, $deliverableStatuses);
+    }
+    public function isReviewable(): bool
+    {
+        $reviewableStatuses = ['livrée'];
+        return in_array($this->status, $reviewableStatuses);
+    }
+    public function canBeCancelledByUser(User $user): bool
+    {
+        return $this->isCancellable() && $this->getUser() === $user;
+    }
+    public function canBeCancelledByAdmin(): bool
+    {
+        return $this->isCancellable();
+    }
+    public function canBeDelivered(): bool
+    {
+        return $this->isDeliverable();
     }
 }

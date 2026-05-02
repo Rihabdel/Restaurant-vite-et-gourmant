@@ -1,195 +1,251 @@
-import { createOrder, getUserInfo, getMenus} from './api.js';
-import { showAndHideElementsForRoles, isConnected, getToken} from './script.js';
-import { fillMenuSelect } from './menu.js';
-const API_BASE = 'https://127.0.0.1:8000/api';
+import { createOrder, getOrders, getMenus,getOrderById, updateOrder, cancelOrder} from './api.js';
+import { getUserInfo, showAndHideElementsForRoles } from './script.js';
+
+
 export default async function initOrder() {
     console.log("Initialisation page commandes");
-    attachEventListeners();
-    await fillMenuSelect();
-    await loadOrders(); // charge les commandes existantes
-    // Attacher les écouteurs pour les boutons Modifier et Annuler (délégués)
-    document.addEventListener('click', async (e) => {
-        if (e.target.classList.contains('edit-order-btn')) {
-            const orderId = e.target.dataset.id;
-            await fillEditModal(orderId); 
-            const modal = new bootstrap.Modal(document.getElementById('editCommandeModal'));
-            modal.show();
-        }
-
-        if (e.target.classList.contains('cancel-order-btn')) {
-            const orderId = e.target.dataset.id;
-            document.getElementById('cancel-order-id').value = orderId;
-            const modal = new bootstrap.Modal(document.getElementById('cancelCommandeModal'));
-            modal.show();
-        }
-    });
+    initButtons();
+    initForm();
 }
-function attachEventListeners() {
-    // Écouteurs pour les boutons de la modale de création de commande
-    document.getElementById('new-order-btn')?.addEventListener('click', async () => {
-        console.log("Bouton nouvelle commande cliqué");
-        await fillNewOrderModal();
-        console.log("Données utilisateur chargées dans la modale");
-        const modal = new bootstrap.Modal(document.getElementById('OrderModal'));
-        console.log("Affichage de la modale de nouvelle commande");
-        loadOrders(); 
-        if (modal) modal.show();
-    });
-        
-    document.getElementById('confirm-order-btn')?.addEventListener('click', async (event) => {
-        event.preventDefault();
-        const orderData = getCurrentOrderData();
-        const user = await getUserInfo();
-        fillNewOrderDetailsModal(orderData, user);
-        const modal = new bootstrap.Modal(document.getElementById('OrderModal'));//
-        if (modal) modal.hide();
-        const detailsModal = new bootstrap.Modal(document.getElementById('OrderDetailsModal'));
-        detailsModal.show();
-    });
-     document.getElementById('pay-order-btn')?.addEventListener('click', async (event) => {
-        event.preventDefault();
-        await handleCreateOrder(event);
-        const detailsModal = new bootstrap.Modal(document.getElementById('OrderDetailsModal'));
-        if (detailsModal) detailsModal.hide();
-    });
+
+function initButtons() {
+    const newOrderBtn = document.getElementById('new-order-btn');
+    if (newOrderBtn) {
+        newOrderBtn.addEventListener('click', async () => { 
+            await fillMenuSelect();
+            await fillNewOrderModal();
+        });
+    }
+    // Event delegation pour les boutons de modification des commandes
+    const ordersTable = document.getElementById('historyOrdersTable');
+    if (ordersTable) {
+        ordersTable.addEventListener('click', async (event) => {    
+            if (event.target.classList.contains('edit-order-btn')) {
+                const orderId = event.target.getAttribute('data-id');
+                fillEditOrderModal(orderId);
+            }
+            if (event.target.classList.contains('cancel-order-btn')) {
+                const orderId = event.target.getAttribute('data-id');
+                const modalEL = document.getElementById('deleteOrderModal');
+                const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEL);
+                modalInstance.show();
+                const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+                confirmCancelBtn.onclick = async () => {
+                    try {
+                        await cancelOrder(orderId);
+                        alert("Votre commande a été annulée avec succès !");
+                        await loadOrders();
+                        const cancelModalEL = document.getElementById('deleteOrderModal');
+                        const cancelModalInstance = bootstrap.Modal.getInstance(cancelModalEL);
+                        if (cancelModalInstance) cancelModalInstance.hide();
+                    }
+                    catch (error) {
+                        console.error("Erreur lors de l'annulation de la commande :", error);
+                        alert("Une erreur est survenue lors de l'annulation de votre commande. Veuillez réessayer.");
+                    }
+                };
+            }
+        });
+    }
+}
+
+function initForm() {   
+    const orderForm = document.getElementById('OrderForm');
+    if (orderForm) {
+        orderForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const orderData = getCurrentOrderData();
+            try {
+                await createOrder(orderData);
+                alert("Votre commande a été créée avec succès !");
+                const modalEL = document.getElementById('OrderModal');
+                const modalInstance = bootstrap.Modal.getInstance(modalEL);
+                if (modalInstance) modalInstance.hide();
+                await displayOrders();
+            } catch (error) {
+                console.error("Erreur lors de la création de la commande :", error);
+                alert("Une erreur est survenue lors de la création de votre commande. Veuillez réessayer.");
+            }
+        });
+    }
+    const editOrderForm = document.getElementById('edit-order-Form');
+    if (editOrderForm) {
+        editOrderForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const orderId = document.getElementById('edit-order-id').value;
+            const orderData = getCurrentOrderData();
+            try {
+                await updateOrder(orderId, orderData);
+                alert("Votre commande a été mise à jour avec succès !");
+                const modalEL = document.getElementById('editOrderModal');
+                const modalInstance = bootstrap.Modal.getInstance(modalEL);
+                if (modalInstance) modalInstance.hide();
+                await displayOrders();
+            } catch (error) {
+                console.error("Erreur lors de la mise à jour de la commande :", error);
+                alert("Une erreur est survenue lors de la mise à jour de votre commande. Veuillez réessayer.");
+            }
+            });
+}
 }
 //recupere les infos de l'utilisateur pour préremplir la modale de création de commande
 export async function fillNewOrderModal() {
-    const user = await getUserInfo();
-    if (user){
-        document.getElementById('customerName').value = user.lastName || '';
-        document.getElementById('customerPrenom').value = user.firstName || '';
+    try {
+        const user = await getUserInfo();
+        document.getElementById('customerName').value = user.firstName || '';
+        document.getElementById('customerPrenom').value = user.lastName || '';
         document.getElementById('customerEmail').value = user.email || '';
         document.getElementById('customerPhone').value = user.phone || '';
-        document.getElementById('customerAddress').value = user.address || '';
-    }
-}
-
-export function fillNewOrderDetailsModal(orderData , user) {
-    document.getElementById('detailsName').textContent = user.lastName || '';
-    document.getElementById('detailsPrenom').textContent = user.firstName || '';
-    document.getElementById('detailsEmail').textContent = user.email || '';
-    document.getElementById('detailsPhone').textContent = user.phone || '';
-    document.getElementById('detailsMenu').textContent = orderData.menuTitle || '';
-    document.getElementById('detailsQuantity').textContent = orderData.minOfPeople || '';
-    document.getElementById('detailsDeliveryDate').textContent = orderData.deliveryDate || '';
-    document.getElementById('detailsDeliveryTime').textContent = orderData.deliveryTime || '';
-    document.getElementById('detailsAddress').textContent = orderData.deliveryAddress || '';
-    document.getElementById('detailsTotalPrice').textContent = orderData.totalPrice ? `${orderData.totalPrice.toFixed(2)} €` : '';
-}
-//creer une nouvelle  avec double confirmation (d'abord affichage d'une modale de récapitulatif, puis création effective à la validation)
-
-export async function handleCreateOrder(event) {
-    event.preventDefault(); // Empêche tout comportement par défaut
-
-    if (!isConnected()) {
-        alert('Vous devez être connecté.');
-        window.location.href = '/connexion';
-        return;
-    }
-
-    const orderform = document.getElementById('OrderForm');
-    if (!orderform) return;
-
-    const formData = new FormData(orderform);
-    const orderData = {
-        //select menu
-        menuId: parseInt(formData.get('menuId'), 10), 
-        numberOfPeople: Number.parseInt(formData.get('numberOfPeople'), 10),
-        deliveryAddress: formData.get('deliveryAddress'),
-        deliveryCity: formData.get('deliveryCity'),
-        deliveryDate: formData.get('deliveryDate'),
-        deliveryTime: formData.get('deliveryTime'),
-        deliveryPostalCode: formData.get('deliveryPostalCode'),
-        billingAddress: formData.get('address') || formData.get('deliveryAddress'), 
-        billingCity: formData.get('city') || formData.get('deliveryCity'),
-        billingPostalCode: formData.get('postalCode') || formData.get('deliveryPostalCode'),
-    };
-
-    try {
-        const createdOrder = await createOrder(orderData);
-        alert('Commande créée avec succès !');
-        const detailsModal = new bootstrap.Modal(document.getElementById('OrderDetailsModal'));
-        if (detailsModal) detailsModal.hide();
-        await loadOrders(); 
+        document.getElementById('factAddress').value = user.address || '';
+        const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('OrderModal')); 
+modal.show();
 
     } catch (error) {
-        console.error('erreur création commande', error);
-        alert('Erreur lors de la création de la commande.');
+        console.error("Erreur lors du chargement des informations utilisateur :", error);
+    }
+}
+//recupere les infos de la commande pour préremplir la modale de confirmation de commande
+export function fillNewOrderDetailsModal(orderData, user) {
+    try {
+        
+    document.getElementById('detailsName').textContent = orderData.user || user.firstName || 'N/A';
+    document.getElementById('detailsEmail').textContent = orderData.userEmail || user.email || 'N/A';
+    document.getElementById('detailsPhone').textContent = orderData.userPhone || user.phone || 'N/A';
+    document.getElementById('detailsAddress').textContent = orderData.userAddress || user.address || 'N/A';
+    document.getElementById('detailsNumberOfPeople').textContent = orderData.numberOfPeople || 'N/A';
+    document.getElementById('detailsDeliveryCity').textContent = orderData.deliveryCity || 'N/A';
+    document.getElementById('detailsDeliveryPostalCode').textContent = orderData.deliveryPostalCode || 'N/A';
+    document.getElementById('detailsMenu').textContent = orderData.menu || 'N/A';
+    document.getElementById('detailsDeliveryDate').textContent = orderData.deliveryDate ? new Date(orderData.deliveryDate).toLocaleDateString() : 'N/A';
+    document.getElementById('detailsDeliveryTime').textContent = orderData.deliveryTime || 'N/A';
+    
+    const modal = new bootstrap.Modal.getOrCreateInstance(document.getElementById('OrderDetailsModal'));
+    modal.show();
+    } catch (error) {
+        console.error("Erreur lors du remplissage de la modale de détails de commande :", error);
+    }
+}
+// recuperer les donnes de la commande pour préremplir la modale de modification de commande
+export function getCurrentOrderData() {
+    return {
+        
+        menuId: menuSelect ? menuSelect.value : null,
+        numberOfPeople: document.getElementById('numberOfPeople').value,
+        deliveryCity: document.getElementById('deliveryCity').value,
+        deliveryPostalCode: document.getElementById('deliveryPostalCode').value,
+        deliveryDate: document.getElementById('deliveryDate').value,
+        deliveryTime: document.getElementById('deliveryTime').value,
+        user: document.getElementById('customerName').value,
+        userEmail: document.getElementById('customerEmail').value,
+        userPhone: document.getElementById('customerPhone').value,
+        userAddress: document.getElementById('factAddress').value
+    };
+}
+//fonction pour remplir la liste des menus dans le select de la modale de création de commande
+export async function fillMenuSelect() {
+    try {
+        const menus = await getMenus();
+        const menuSelect = document.getElementById('menuSelect');
+        
+        if (menuSelect) {
+            menuSelect.innerHTML = '<option value="" disabled selected>Choisissez un menu</option>';
+            
+            menus.forEach(menu => {
+                // Defensive check: ensure the menu has an ID
+                if (menu && menu.id) {
+                    const option = document.createElement('option');
+                    option.value = menu.id;
+                    option.textContent = menu.title || "Sans titre";
+                    menuSelect.appendChild(option);
+                }
+            });
+        }
+    } catch (error) {
+        console.error("Erreur lors du chargement des menus :", error);
+    }
+}
+export async function displayOrders() {
+    try {
+        const orders = await getOrders();
+        const ordersTable = document.getElementById('historyOrdersTable');
+        if (ordersTable) {
+            if (orders.length === 0) {
+                ordersTable.innerHTML = '<p>Vous n\'avez pas encore passé de commandes.</p>';
+            } else {
+                ordersTable.innerHTML = `
+                    <thead>
+                        <tr>
+                            <th scope="col">N°</th>
+                            <th scope="col">Commande</th>
+                            <th scope="col">Date et heure de la commande</th>
+                            <th scope="col">Modification</th>
+                            <th scope="col">Annulation</th>
+                            <th scope="col">Statut</th>
+                    </tr>
+                    </thead>
+                    <tbody id="orders-tbody">
+                        ${orders.map(order => `
+                            <tr>
+                                <th scope="row">${order.id}</th>
+                                <td>${order.menu.title}</td>
+                                <td>${new Date(order.createdAt).toLocaleString()}</td>
+                                <td><button class="btn btn-sm btn-primary edit-order-btn" data-id="${order.id}">Modifier</button></td>
+                                <td><button class="btn btn-sm btn-danger cancel-order-btn" data-id="${order.id}">Annuler</button></td>
+                                <td>${order.status}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>         
+                `;
+            }
+        }
+    } catch (error) {
+        console.error("Erreur lors du chargement des commandes :", error);
+        alert("Impossible de charger vos commandes. Veuillez réessayer plus tard.");
     }
     showAndHideElementsForRoles();
+
 }
+//fonction pour remplir la modale de modification de commande avec les infos de la commande sélectionnée
+export async function fillEditOrderModal(orderId) {
+    try{
+        const order = await getOrderById(orderId);
+        if (!order) {
+            alert("Commande introuvable. Veuillez réessayer.");
+            return;
+        }
+        const user = await getUserInfo();
+        document.getElementById('customerName').value = order.user.firstName || '';
+        document.getElementById('customerPrenom').value = order.user.lastName || '';
+        document.getElementById('customerEmail').value = order.user.email || '';
+        document.getElementById('customerPhone').value = order.user.phone || '';
+        document.getElementById('factAddress').value = order.user.address || '';
+        document.getElementById('deliveryCity').value = order.deliveryCity || '';
+        document.getElementById('deliveryPostalCode').value = order.deliveryPostalCode || '';
+        document.getElementById('deliveryDate').value = order.deliveryDate ? new Date(order.deliveryDate).toISOString().split('T')[0] : '';
+        document.getElementById('deliveryTime').value = order.deliveryTime || '';
+        const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editOrderModal')); 
+   
+        const editMenuSection = document.getElementById('edit-menu-section');
+if (editMenuSection && order.menu) {
+    // 1. On sécurise les données numériques
+    const priceValue = parseFloat(order.menu.price || 0);
+    const formattedPrice = !isNaN(priceValue) ? priceValue.toFixed(2) + ' €' : 'N/A';
 
-//rempli le select des menus dans la modale de création de commande
-
-function calculateTotalPrice(menuPrice, quantity, deliveryCity) {
-    let total = menuPrice * quantity;
-    // Frais de livraison : si ville != "bordeaux" (insensible à la casse)
-    if (deliveryCity.toLowerCase() !== 'bordeaux') {
-        total += 5 + 0.59 * 10; // exemple avec 10km (à améliorer)
-    }
-    // Réduction de 10% si quantity >= minPersons + 5
-    // Pour cela, il faudrait connaître le minPersons du menu. On peut le stocker aussi dans dataset.
-    // Simplifions pour l'instant : pas de réduction.
-    return total;
+    // 2. On injecte le HTML
+    editMenuSection.innerHTML = `
+        <label class="form-label fw-bold">Votre menu commandé :</label>
+        <div class="p-3 border rounded bg-light">
+            <p class="mb-1"><strong>Menu :</strong> ${order.menu.title || 'N/A'}</p>
+            <p class="mb-1 text-muted small">${order.menu.descriptionMenu || 'Pas de description'}</p>
+            <p class="mb-1"><strong>Prix :</strong> ${formattedPrice}</p>
+            <p class="mb-1"><strong>Nombre de convives :</strong> ${order.numberOfPeople || 'N/A'}</p>
+            <p class="mb-0 text-info"><em>Minimum requis : ${order.menu.minPeople || 'N/A'}</em></p>
+        </div>
+    `;
 }
-
-// Fonction pour récupérer les données actuelles de la commande à partir du formulaire
-function getCurrentOrderData() {
-    const menuSelect = document.getElementById('menuSelect');
-    const selectedOption = menuSelect?.options[menuSelect.selectedIndex];
-    const menuTitle = selectedOption ? selectedOption.textContent : '';
-    const menuPrice = selectedOption ? parseFloat(selectedOption.dataset.price) : 0;
-    const numberOfPeople = parseInt(document.getElementById('menuQuantity')?.value, 10) || 0;
-    const deliveryAddress = document.getElementById('deliveryAddress')?.value || '';
-    const deliveryCity = document.getElementById('deliveryCity')?.value || '';
-    const deliveryDate = document.getElementById('deliveryDate')?.value || '';
-    const deliveryTime = document.getElementById('deliveryTime')?.value || '';
-    const totalPrice = calculateTotalPrice(menuPrice, numberOfPeople, deliveryCity);
-
-    return {
-        menuTitle,
-        numberOfPeople,
-        deliveryAddress,
-        deliveryCity,
-        deliveryDate,
-        deliveryTime,
-        totalPrice
-    };
-}
-async function loadOrders() {
-    try {
-        const token = getToken();
-        const response = await fetch(`${API_BASE}/orders`, {
-            headers: { 'X-AUTH-TOKEN': token }
-        });
-        if (!response.ok) throw new Error('Erreur chargement');
-        const orders = await response.json();
-        displayOrders(orders);
+modal.show();
     } catch (error) {
-        console.error(error);
+        console.error("Erreur lors du chargement des informations de la commande :", error);
+        alert("Impossible de charger les détails de la commande. Veuillez réessayer plus tard.");
     }
-}
-
-function displayOrders(orders) {
-    const tbody = document.getElementById('orders-tbody');
-    if (!tbody) return;
-    if (!Array.isArray(orders) || orders.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6">Aucune commande</td></tr>';
-        return;
-    }
-    tbody.innerHTML = orders.map(order => `
-        <tr>
-            <th scope="row">${order.id}</th>
-            <td>Commande #${order.id}</td>
-            <td>${order.createdAt ? new Date(order.createdAt).toLocaleDateString() : ''}</td>
-            <td>
-                <button class="btn btn-warning btn-sm edit-order-btn" data-id="${order.id}">Modifier</button>
-            </td>
-            <td>
-                <button class="btn btn-danger btn-sm delete-order-btn" data-id="${order.id}">Annuler</button>
-            </td>
-            <td>${order.status || 'En attente'}</td>
-        </tr>
-    `).join('');
 }

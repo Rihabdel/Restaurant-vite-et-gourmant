@@ -22,9 +22,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
+    #[Groups(['user:read'])]
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Groups(['user:read'])]
     #[ORM\Column(length: 180)]
     private ?string $email = null;
 
@@ -32,7 +34,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var list<string> The user roles
      */
     const ROLE_USER = 'ROLE_USER';
-    const ROLE_EMPLOYE = 'ROLE_EMPLOYE';
+    const ROLE_EMPLOYEE = 'ROLE_EMPLOYEE';
     const ROLE_ADMIN = 'ROLE_ADMIN';
     #[ORM\Column]
     #[OA\Property(type: 'array', items: ['type' => 'string'])]
@@ -41,18 +43,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var string The hashed password
      */
+    #[Groups(['user:write'])]
     #[ORM\Column]
     private ?string $password = null;
-
+    #[Groups(['user:read', 'user:write'])]
     #[ORM\Column(length: 100)]
     private ?string $firstName = null;
-
+    #[Groups(['user:read', 'user:write'])]
     #[ORM\Column(length: 100)]
     private ?string $lastName = null;
 
+    #[Groups(['user:read', 'user:write'])]
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $adress = null;
+    private ?string $address = null;
 
+    #[Groups(['user:read', 'user:write'])]
     #[ORM\Column(nullable: true)]
     private ?int $phone = null;
 
@@ -193,14 +198,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getAdress(): ?string
+    public function getAddress(): ?string
     {
-        return $this->adress;
+        return $this->address;
     }
 
-    public function setAdress(?string $adress): static
+    public function setAddress(?string $address): static
     {
-        $this->adress = $adress;
+        $this->address = $address;
 
         return $this;
     }

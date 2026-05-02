@@ -2,6 +2,79 @@ import { getToken} from './script.js';
 export const API_BASE = "http://localhost:8000/api";
 
 
+// --- Fonctions API pour les plats ---
+export async function getDishes() {
+    const response = await fetch(`${API_BASE}/dishes/list`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }); 
+    if (!response.ok) {
+        throw new Error('Erreur de chargement des plats');
+    }
+    return await response.json();
+}
+export async function createDish(dishData) {
+    const response = await fetch(`${API_BASE}/dishes/new`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-AUTH-TOKEN': getToken()
+        },
+        body: JSON.stringify(dishData) 
+    });
+    if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Détails serveur :", errorData);
+        throw new Error('Erreur de création du plat');
+    }
+    return await response.json();
+}
+export async function getDishById(id) {
+    const response = await fetch(`${API_BASE}/dishes/${id}`,{
+        method: 'GET',
+        headers: {
+            'content-Type': 'application/json'
+        },
+    });
+    if (!response.ok) {
+        throw new Error('Erreur d\'affichage du plat');
+    }
+    return await response.json();
+}
+
+export async function updateDish(id, dishData) {
+    const response = await fetch(`${API_BASE}/dishes/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-AUTH-TOKEN': getToken()
+        },
+        body: JSON.stringify(dishData) 
+    });
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erreur de mise à jour du plat');
+    }
+    return await response.json();
+}
+export async function deleteDish(id) {
+    const response = await fetch(`${API_BASE}/dishes/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-AUTH-TOKEN': getToken()
+        },
+    });
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erreur de suppression du plat');
+    }
+    return await response.json();
+}
+
+// --- Fonctions API pour les menus ---
 export async function getMenus(filters = {}) {
     const params = new URLSearchParams(filters);
     const response = await fetch(`${API_BASE}/menu/list?${params.toString()}`, {
@@ -15,18 +88,7 @@ export async function getMenus(filters = {}) {
     }
     return await response.json();
 }
-export async function getMenuById(id) {
-    const response = await fetch(`${API_BASE}/menu/${id}`,{
-        method: 'GET',
-        headers: {
-            'content-Type': 'application/json'
-        },
-    });
-    if (!response.ok) {
-        throw new Error('Erreur d\'affichage de menu');
-    }
-    return await response.json();
-}
+
 export async function enregistrerMenu(menuData) {
     
     const response = await fetch(`${API_BASE}/menu/new`, {
@@ -40,6 +102,18 @@ export async function enregistrerMenu(menuData) {
 
     if (!response.ok) {
         throw new Error('Erreur d\'ajout du menu');
+    }
+    return await response.json();
+}
+export async function getMenuById(id) {
+    const response = await fetch(`${API_BASE}/menu/${id}`,{
+        method: 'GET',
+        headers: {
+            'content-Type': 'application/json'
+        },
+    });
+    if (!response.ok) {
+        throw new Error('Erreur d\'affichage de menu');
     }
     return await response.json();
 }
@@ -71,7 +145,7 @@ export async function deleteMenu(id) {
     return await response.json();
 }
 
-// --- Fonction pour charger les plats d'un menu et les afficher dans la section dédiée ---
+// --- Fonction API pour menuDishes ---
 export async function getMenuDishes(id) {
     const response = await fetch(`${API_BASE}/menus-dishes/${id}/list`,{
         method: 'GET',
@@ -100,22 +174,6 @@ export async function addDishToMenu(menuId, dishId) {
     }
     return await response.json();
 }
-
-
-export async function getDishById(id) {
-    const response = await fetch(`${API_BASE}/dishes/${id}`,{
-        method: 'GET',
-        headers: {
-            'content-Type': 'application/json'
-        },
-    });
-    if (!response.ok) {
-        throw new Error('Erreur d\'affichage du plat');
-    }
-    return await response.json();
-}
-
-  
 export async function getListDesDishesByMenuId(id) {
     const response = await fetch(`${API_BASE}/menus-dishes/${id}/list`,{
         method: 'GET',
@@ -140,67 +198,77 @@ export async function getListDesDishesByMenuId(id) {
     return response;
 }
 
+// --- Fonction API pour les allergènes ---
 
-
-export async function getDishes() {
-    const response = await fetch(`${API_BASE}/dishes/list`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }); 
-    if (!response.ok) {
-        throw new Error('Erreur de chargement des plats');
-    }
-    return await response.json();
-}
-export async function createDish(dishData) {
-    const response = await fetch(`${API_BASE}/dishes/new`, {
+export async function addAllergen(allergenName) {
+    const response = await fetch(`${API_BASE}/allergens/new`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'X-AUTH-TOKEN': getToken()
         },
-        body: JSON.stringify(dishData) 
+        body: JSON.stringify({ name: allergenName }) 
     });
     if (!response.ok) {
         const errorData = await response.json();
-        console.error("Détails serveur :", errorData);
-        throw new Error('Erreur de création du plat');
+        throw new Error(errorData.message || 'Erreur d\'ajout de l\'allergène');
     }
     return await response.json();
 }
-export async function updateDish(id, dishData) {
-    const response = await fetch(`${API_BASE}/dishes/${id}`, {
-        method: 'PUT',
+export async function getDishAllergens(dishId) {
+   
+    const response = await fetch(`${API_BASE}/dish_allergen/${dishId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erreur de mise à jour de la commande');
+    }
+    return await response.json();
+}
+export async function getAllergens() {
+    const response = await fetch(`${API_BASE}/allergens`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+    if (!response.ok) throw new Error('Erreur chargement allergènes');
+    return await response.json();
+}
+// --- Fonction API pour dishAllegen ---
+export async function getDishAllergenes(id) {
+    const response = await fetch(`${API_BASE}/dish_allergen/${id}`,{
+        method: 'GET',  
+        headers: {
+            'content-Type': 'application/json'
+        },
+    });
+    if (!response.ok) {
+        throw new Error('Erreur d\'affichage des allergènes du plat');
+    }
+    return await response.json();
+}
+export async function addDishAllergens(dishId, allergenIds) {
+    const response = await fetch(`${API_BASE}/dish_allergen/${dishId}`, {
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'X-AUTH-TOKEN': getToken()
         },
-        body: JSON.stringify(dishData) 
+        body: JSON.stringify({ allergen_id: allergenIds }) 
     });
     if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Erreur de mise à jour du plat');
-    }
-    return await response.json();
-}
-export async function deleteDish(id) {
-    const response = await fetch(`${API_BASE}/dishes/${id}`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-AUTH-TOKEN': getToken()
-        },
-    });
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erreur de suppression du plat');
+        throw new Error(errorData.message || 'Erreur d\'ajout des allergènes au plat');
     }
     return await response.json();
 }
 
-
+// --- Fonctions API pour les commandes ---
 export async function createOrder(orderData) {
     console.log("Données de la commande envoyées à l'API :", orderData);
     const response = await fetch(`${API_BASE}/orders/new`, {
@@ -267,6 +335,7 @@ export async function cancelOrder(id) {
     }
     return await response.json();
 }
+// --- Fonction API pour récupérer les informations de l'utilisateur connecté ---
 export async function getUserInfo() {
      let myHeaders = new Headers();
     myHeaders.append("X-AUTH-TOKEN", getToken());
@@ -294,74 +363,3 @@ export async function getUserInfo() {
     return response;
 }
 
-
-// --- Fonction pour charger les allergènes d'un plat et les afficher dans le select ---
-
-export async function addAllergen(allergenName) {
-    const response = await fetch(`${API_BASE}/allergens/new`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-AUTH-TOKEN': getToken()
-        },
-        body: JSON.stringify({ name: allergenName }) 
-    });
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erreur d\'ajout de l\'allergène');
-    }
-    return await response.json();
-}
-export async function getDishAllergens(dishId) {
-   
-    const response = await fetch(`${API_BASE}/dish_allergen/${dishId}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    });
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erreur de mise à jour de la commande');
-    }
-    return await response.json();
-}
-export async function getAllergens() {
-    const response = await fetch(`${API_BASE}/allergens`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    });
-    if (!response.ok) throw new Error('Erreur chargement allergènes');
-    return await response.json();
-}
-export async function getDishAllergenes(id) {
-    const response = await fetch(`${API_BASE}/dish_allergen/${id}`,{
-        method: 'GET',  
-        headers: {
-            'content-Type': 'application/json'
-        },
-    });
-    if (!response.ok) {
-        throw new Error('Erreur d\'affichage des allergènes du plat');
-    }
-    return await response.json();
-}
-
-
-export async function addDishAllergens(dishId, allergenIds) {
-    const response = await fetch(`${API_BASE}/dish_allergen/${dishId}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-AUTH-TOKEN': getToken()
-        },
-        body: JSON.stringify({ allergen_id: allergenIds }) 
-    });
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erreur d\'ajout des allergènes au plat');
-    }
-    return await response.json();
-}

@@ -32,7 +32,7 @@ final class UserController extends AbstractController
 
     ) {}
 
-    #[Route('/{id}', name: 'edit', methods: ['PUT'])]
+
     public function edit(Request $request, User $user): Response
     {
         $user = $this->userRepository->findOneById($user->getId());

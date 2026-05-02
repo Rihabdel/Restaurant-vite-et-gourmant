@@ -21,7 +21,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
-#[Route('api/orders', name: 'app_api_orders_')]
+#[Route('api', name: 'app_api_orders_')]
 final class OrdersController extends AbstractController
 {
     public function __construct(
@@ -30,7 +30,7 @@ final class OrdersController extends AbstractController
         private ValidatorInterface $validator
     ) {}
 
-    #[Route('/new', methods: ['POST'], name: 'new')]
+    #[Route('/orders/new', methods: ['POST'], name: 'new')]
     #[IsGranted('ROLE_USER')]
     #[OA\Post(
         tags: ["Orders"],
@@ -163,33 +163,20 @@ final class OrdersController extends AbstractController
             $this->entityManager->persist($order);
             $this->entityManager->flush();
 
-            $location = $this->generateUrl('app_api_orders_list', ['id' => $order->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+            $location = $this->generateUrl('app_api_orders_show', ['id' => $order->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
 
-            return $this->json([
-                'id' => $order->getId(),
-                'menu' => $menu->getTitle(),
-                'number_of_people' => $order->getNumberOfPeople(),
-                'delivery_info' => [
-                    'address' => $order->getDeliveryAddress(),
-                    'city' => $order->getDeliveryCity(),
-                    'postal_code' => $order->getDeliveryPostalCode(),
-                    'date' => $order->getDeliveryDate()->format('Y-m-d'),
-                    'time' => $order->getDeliveryTime()->format('H:i')
-                ],
-                'prices' => [
-                    'menu_price' => $menu->getPrice(),
-                    'delivery_cost' => $deliveryCost,
-                    'total_price' => $order->getTotalPrice()
-                ],
-                'status' => $order->getStatus(),
-                'created_at' => $order->getCreatedAt()->format('Y-m-d H:i:s')
-            ], Response::HTTP_CREATED, ['Location' => $location]);
+            return $this->json(
+                $order,
+                Response::HTTP_CREATED,
+                ['Location' => $location],
+                ['groups' => ['orders:read', 'menu:read']]
+            );
         } catch (\Exception $e) {
             return $this->json(['error' => 'Erreur lors de la création de la commande: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
-    #[Route('{id}', methods: ['GET'], name: 'show')]
+    #[Route('/orders/{id}', methods: ['GET'], name: 'show')]
     #[IsGranted('ROLE_USER')]
     #[OA\Get(
         tags: ["Orders"],
@@ -197,7 +184,7 @@ final class OrdersController extends AbstractController
         parameters: [
             new OA\Parameter(
                 name: "id",
-                in: "query",
+                in: "path",
                 description: "ID de la commande à afficher",
                 required: true,
                 schema: new OA\Schema(type: "integer")
@@ -206,28 +193,7 @@ final class OrdersController extends AbstractController
         responses: [
             new OA\Response(
                 response: 200,
-                description: "Détails de la commande récupérés avec succès",
-                content: new OA\JsonContent(
-                    example: [
-                        "id" => 1,
-                        "menu" => "Menu Dégustation",
-                        "number_of_people" => 15,
-                        "delivery_info" => [
-                            "address" => "123 Rue Exemple",
-                            "city" => "Bordeaux",
-                            "postal_code" => "33000",
-                            "date" => "2026-03-31",
-                            "time" => "19:00"
-                        ],
-                        "prices" => [
-                            "menu_price" => 100.0,
-                            "delivery_cost" => 0.0,
-                            "total_price" => 100.0
-                        ],
-                        "status" => "en_attente",
-                        "created_at" => "2024-11-01 12:00:00"
-                    ]
-                )
+                description: "Détails de la commande récupérés avec succès"
             ),
             new OA\Response(
                 response: 403,
@@ -249,10 +215,10 @@ final class OrdersController extends AbstractController
         if (!$this->canAccessOrder($order)) {
             return $this->json(['error' => 'Accès non autorisé à cette commande'], Response::HTTP_FORBIDDEN);
         }
-        $data = $this->serializer->serialize($order, 'json', ['groups' => ['orders:read', 'menu:read']]);
-        return new JsonResponse($data, Response::HTTP_OK, [], true);
+        return $this->json($order, Response::HTTP_OK, [], ['groups' => ['orders:read', 'menu:read']]);
     }
-    #[Route('', methods: ['GET'], name: 'index')]
+
+    #[Route('/orders', methods: ['GET'], name: 'index')]
     #[IsGranted('ROLE_USER')]
     #[OA\Get(
         tags: ["Orders"],
@@ -275,7 +241,7 @@ final class OrdersController extends AbstractController
         return $this->json($orders, Response::HTTP_OK, [], ['groups' => ['orders:read', 'menu:read']]);
     }
 
-    #[Route('/list', methods: ['GET'], name: 'list')]
+    #[Route('/orders/list', methods: ['GET'], name: 'list')]
     #[IsGranted('ROLE_USER')]
     #[OA\Get(
         tags: ["Orders"],
@@ -373,9 +339,9 @@ final class OrdersController extends AbstractController
     }
 
     // Méthodes auxiliaires
-    #[Route('/{id}/cancel', methods: ['POST'], name: 'cancel')]
+    #[Route('/orders/{id}/cancel', methods: ['PUT'], name: 'cancel')]
     #[IsGranted('ROLE_USER')]
-    #[OA\Post(
+    #[OA\Put(
         tags: ["Orders"],
         summary: "Annuler une commande",
         parameters: [
@@ -416,12 +382,12 @@ final class OrdersController extends AbstractController
             return $this->json(['error' => 'La commande ne peut être annulée à ce stade'], Response::HTTP_BAD_REQUEST);
         }
 
-        $order->setStatus(Status::annule->value);
+        $order->setStatus(Status::annulé->value);
         $this->entityManager->flush();
 
         return $this->json(['message' => 'Commande annulée avec succès'], Response::HTTP_OK);
     }
-    #[Route('/{id}/edit', methods: ['PUT'], name: 'edit')]
+    #[Route('/orders/{id}/edit', methods: ['PUT'], name: 'edit')]
     #[IsGranted('ROLE_USER')]
     #[OA\Put(
         tags: ["Orders"],
@@ -496,6 +462,14 @@ final class OrdersController extends AbstractController
             if (isset($data['deliveryTime'])) {
                 $order->setDeliveryTime(new \DateTime($data['deliveryTime']));
             }
+            //si admininistrateur ou employé, possibilité de modifier le statut de la commande
+            if (isset($data['status']) && (in_array('ROLE_ADMIN', $this->getUser()->getRoles()) || in_array('ROLE_EMPLOYE', $this->getUser()->getRoles()))) {
+                $statusEnum = Status::tryFrom($data['status']);
+                if (!$statusEnum) {
+                    return $this->json(['error' => 'Statut invalide'], Response::HTTP_BAD_REQUEST);
+                }
+                $order->setStatus($statusEnum->value);
+            }
             $this->entityManager->persist($order);
             $this->entityManager->flush();
 
@@ -529,5 +503,170 @@ final class OrdersController extends AbstractController
         return $numberOfPeople > $orders->getMenu()->getMinPeople() + 5
             ? 0.1 * $orders->getMenu()->getPrice() * $numberOfPeople
             : 0.0;
+    }
+    //delete menu admin ou employee
+    #[Route('/admin/orders/{id}', methods: ['DELETE'], name: 'delete')]
+    #[IsGranted('ROLE_ADMIN')]
+    #[OA\Delete(
+        tags: ["Orders"],
+        summary: "Supprimer une commande",
+        parameters: [
+            new OA\Parameter(
+                name: "id",
+                in: "path",
+                description: "ID de la commande à supprimer",
+                required: true,
+                schema: new OA\Schema(type: "integer")
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 204,
+                description: "Commande supprimée avec succès"
+            ),
+            new OA\Response(
+                response: 403,
+                description: "Accès non autorisé"
+            ),
+            new OA\Response(
+                response: 404,
+                description: "Commande non trouvée"
+            )
+        ]
+    )]
+    public function delete(Orders $order): JsonResponse
+    {
+        if (!$this->canAccessOrder($order)) {
+            return $this->json(['error' => 'Accès non autorisé'], Response::HTTP_FORBIDDEN);
+        }
+        $this->entityManager->remove($order);
+        $this->entityManager->flush();
+
+        return $this->json(null, Response::HTTP_NO_CONTENT);
+    }
+
+    // afficher toutes les commandes pour les employés et les admins
+    #[Route('/admin/orders', methods: ['GET'], name: 'admin_index')]
+    #[IsGranted('ROLE_ADMIN')]
+
+    #[OA\Get(
+        tags: ["Orders"],
+        summary: "Lister toutes les commandes (admin/employee)",
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Liste des commandes récupérée avec succès"
+            ),
+            new OA\Response(
+                response: 403,
+                description: "Accès non autorisé"
+            )
+        ]
+    )]
+    public function adminIndex(OrdersRepository $ordersRepository, SerializerInterface $serializer, Request $request): JsonResponse
+    {
+
+        $orders = $ordersRepository->findAll();
+        $data = $serializer->serialize($orders, 'json', ['groups' => ['orders:read']]);
+        return new JsonResponse($data, Response::HTTP_OK, [], true);
+    }
+    #[Route('/admin/orders/{id}/edit', methods: ['PUT'], name: 'admin_edit')]
+    #[IsGranted('ROLE_ADMIN')]
+
+    public function editOrderByAdmin(Orders $order, Request $request): JsonResponse
+    {
+        if (!in_array($order->getStatus(), [Status::en_attente->value, Status::en_préparation->value])) {
+            return $this->json(['error' => 'La commande ne peut être annulée à ce stade'], Response::HTTP_BAD_REQUEST);
+        }
+        $data = json_decode($request->getContent(), true);
+        if (isset($data['numberOfPeople'])) {
+            $order->setNumberOfPeople($data['numberOfPeople']);
+        }
+        if (isset($data['deliveryAddress'])) {
+            $order->setDeliveryAddress($data['deliveryAddress']);
+        }
+        if (isset($data['deliveryCity'])) {
+            $order->setDeliveryCity($data['deliveryCity']);
+        }
+        if (isset($data['deliveryPostalCode'])) {
+            $order->setDeliveryPostalCode($data['deliveryPostalCode']);
+        }
+        if (isset($data['deliveryDate'])) {
+            $order->setDeliveryDate(new \DateTime($data['deliveryDate']));
+        }
+        if (isset($data['deliveryTime'])) {
+            $order->setDeliveryTime(new \DateTime($data['deliveryTime']));
+        }
+        if (isset($data['status'])) {
+            $statusEnum = Status::tryFrom($data['status']);
+            if (!$statusEnum) {
+                return $this->json(['error' => 'Statut invalide'], Response::HTTP_BAD_REQUEST);
+            }
+            $order->setStatus($statusEnum->value);
+        }
+
+        $this->entityManager->persist($order);
+        $this->entityManager->flush();
+        return $this->json(['message' => 'Commande modifiée avec succès'], Response::HTTP_OK);
+    }
+
+    #[Route('/admin/orders/{id}/status', methods: ['PUT'], name: 'admin_update_status')]
+    #[IsGranted('ROLE_ADMIN')]
+    #[OA\Put(
+        tags: ["Orders"],
+        summary: "Mettre à jour le statut d'une commande (admin)",
+        parameters: [
+            new OA\Parameter(
+                name: "id",
+                in: "path",
+                description: "ID de la commande à mettre à jour",
+                required: true,
+                schema: new OA\Schema(type: "integer")
+            )
+        ],
+        requestBody: new OA\RequestBody(
+            description: "Nouveau statut de la commande",
+            required: true,
+            content: new OA\JsonContent(
+                example: [
+                    "status" => "en_preparation"
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Statut de la commande mis à jour avec succès"
+            ),
+            new OA\Response(
+                response: 400,
+                description: "Statut invalide ou mise à jour non autorisée à ce stade"
+            ),
+            new OA\Response(
+                response: 403,
+                description: "Accès non autorisé"
+            ),
+            new OA\Response(
+                response: 404,
+                description: "Commande non trouvée"
+            )
+        ]
+    )]
+    public function updateOrderStatus(Orders $order, Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        if (!isset($data['status'])) {
+            return $this->json(['error' => 'Statut manquant'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $statusEnum = Status::tryFrom($data['status']);
+        if (!$statusEnum) {
+            return $this->json(['error' => 'Statut invalide'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $order->setStatus($statusEnum->value);
+        $this->entityManager->flush();
+
+        return $this->json(['message' => 'Statut de la commande mis à jour avec succès'], Response::HTTP_OK);
     }
 }

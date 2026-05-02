@@ -19,7 +19,7 @@ security:
         main:
             lazy: true
             provider: app_user_provider
-            stateless: false
+            stateless: true
             custom_authenticator: App\Security\ApiTokenAuthenticator
             json_login:
                 check_path: app_api_login
@@ -41,9 +41,9 @@ security:
 
     access_control:
         - { path: ^/api/doc, roles: PUBLIC_ACCESS }
-        - { path: ^/api/login, roles: PUBLIC_ACCESS }
-        - { path: ^/api/registration, roles: PUBLIC_ACCESS }
-        - { path: ^/api/menu, roles: PUBLIC_ACCESS }
+        - { path: ^/api/login }
+        - { path: ^/api/registration }
+        - { path: ^/api, roles: PUBLIC_ACCESS }
         - { path: ^/admin, roles: ROLE_ADMIN }
 
 when@test:

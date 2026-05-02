@@ -1,22 +1,13 @@
-<section class="profile-section mt-5">
-  <div class="container text-center">
-    <h2 class="mb-4">Bienvenue sur votre profil, [Nom d'utilisateur] !</h2>
 <section class="info-section mt-5">
   <div class="container" id="profileInfo">
-    <h2 class="text-center mb-4">Informations Personnelles</h2>
-    <div id="welcomeMessage" class="text-center mb-4"></div>
-    <h4 class="mb-3">Détails du Profil</h4>
-    <p class="mb-2"><strong>Nom :</strong> <span id="profileName">[Nom]</span></p>
-    <p class="mb-2"><strong>Prénom :</strong> <span id="profileFirstName">[Prénom]</span></p>
-    <p class="mb-2"><strong>Email :</strong> <span id="profileEmail">[Email]</span></p>
-    <p class="mb-2"><strong>Numéro de téléphone :</strong> <span id="profilePhone">[Numéro de téléphone]</span></p>
-    <p class="mb-2"><strong>Adresse postale :</strong> <span id="profileAddress">[Adresse postale]</span></p>
+      <!-- Les informations de l'utilisateur seront affichées ici -->
   </div>
+  <div class="text-center">
+    <button class="btn btn-primary" id="editProfileBtn" aria-expanded="false" aria-controls="editProfileForm">
+      Modifier les informations
+    </button>
   </div>
-
-<button class="btn btn-primary mt-4" data-bs-toggle="collapse" data-bs-target="#editProfileForm" aria-expanded="false" aria-controls="editProfileForm">
-  Modifier les informations
-</button>
+</div>
 <div class="collapse mt-4" id="editProfileForm">
     <form id="profileForm">
         <div class="row row-cols-2">
@@ -34,28 +25,22 @@
           <input type="text" class="form-control" id="gsmInput" placeholder="Votre numéro de téléphone" name="NumeroTelephone"> 
         </div>
         </div>
-        <div class="row row-cols-2">
-        <div class="mb-3 col-8">
+        <div class="col-8 mb-3">
           <label for="AdressePostaleInput" class="form-label">Adresse postale</label>
           <input type="text" class="form-control" id="AdressePostaleInput" placeholder="Votre adresse postale" name="AdressePostale"> 
         </div>
-        <div class="mb-3 col-4">
-          <label for="EmailInput" class="form-label" >Email</label>
-          <input type="email" class="form-control" id="EmailInput" placeholder="test@mail.fr" name="Email" readonly> 
-        </div>
-        </div>
         <div class="text-center">
-            <button type="submit" class="btn btn-primary" >Mettre à jour les informations</button>
+            <button type="submit" id="updateProfileButton" class="btn btn-primary">Mettre à jour les informations</button>
         </div>
     </form>
 </div>
-</div>  
 </section>  
 <section class="settings-section mt-5 mb-5">
   <div class="container text-center">
     <h2 class="text-center mb-4">Paramètres du Compte</h2>
-    <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#changePasswordModal">Changer le mot de passe</button>
-    <button class="btn btn-danger ms-3" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">Supprimer le compte</button>
+    <button class="btn btn-secondary" id="editPasswordBtn">Changer le mot de passe</button>
+    <button class="btn btn-outline-secondary ms-3" id="signoutBtn">Se déconnecter</button>
+    <button class="btn btn-danger ms-3" id="deleteAccountBtn">Supprimer le compte</button>
   </div>
 </section>
 <!-- modal changement de mot de passe -->
@@ -80,7 +65,7 @@
             <label for="confirmNewPassword" class="form-label">Confirmer le nouveau mot de passe</label>
             <input type="password" class="form-control" id="confirmNewPassword" required name="confirmNewPassword">
           </div>
-          <button type="submit" class="btn btn-primary">Mettre à jour le mot de passe</button>
+          <button type="submit" id="updatePasswordButton" class="btn btn-primary">Mettre à jour le mot de passe</button>
         </form>
       </div>
     </div>
@@ -96,7 +81,7 @@
         </div>
         <div class="modal-body">
           <p>Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.</p>
-          <button type="button" class="btn btn-danger">Supprimer le compte</button>
+          <button type="button"  class="btn btn-danger" id="confirmDeleteAccount">Supprimer le compte</button>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
         </div>
       </div>

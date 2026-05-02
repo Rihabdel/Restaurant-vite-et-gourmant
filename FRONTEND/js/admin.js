@@ -1,5 +1,5 @@
-import { API_BASE, getMenus,getMenuById, updateMenu,addDishToMenu, 
-    getOrderById,getDishes, createDish, getDishById,updateDish,deleteDish,addDishAllergens,getAllergens} from "./api.js";
+import { API_BASE,getDishes, createDish, getDishById,updateDish,deleteDish,addDishAllergens,getAllergen
+    ,getMenus,getMenuById, updateMenu,addDishToMenu, deleteMenu,getOrderById} from "./api.js";
 import { getToken} from "./script.js";
 import {fillEditMenuModal} from "./menu.js";
 import { validateEmail,validatePassword,validateConfirmPassword,validateRequired } from "./auth/inscription.js";
@@ -32,6 +32,342 @@ export default async function initAdmin() {
     }
 }
 
+// afficher les plats
+async function loadDishes() {
+    try {
+        const dishes = await getDishes();
+        displayDishes(dishes);
+    } catch (error) {
+        console.error("Erreur lors du chargement des plats :", error);
+    }
+}
+// afficher les plats dans le tableau
+async function displayDishes(dishes) {
+    
+    dishList.innerHTML = "";
+    if (!dishes || dishes.length === 0) {
+        dishList.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center">Aucun plat</td>
+            </tr>`;
+        return;
+    }
+    const allergens = await getAllergens();
+    dishes.forEach(dish => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${dish.id}</td>
+            <td>${dish.category || 'Aucune'}</td>
+            <td>${dish.name}</td>
+            <td>${dish.description || ''}</td>
+            <td>${Number(dish.price).toFixed(2)} €</td>
+            
+            <td class="badge-allergenes">
+                ${dish.allergenName?.join(', ') || 'Aucun'}
+            </td>
+            <td>
+            <select id="allergenSelect" class="form-select form-select-sm allergen-select" data-id="${dish.id}">
+                ${allergens.map(allergen => `
+                    <option value="${allergen.id}" ${dish.allergenIds?.includes(allergen.id) ? 'selected' : ''}>
+                        ${allergen.name}
+                    </option>
+                `).join('')}
+            </select>
+            <button class="btn btn-sm btn-primary mt-2 add-allergen-dish-btn" data-id="${dish.id}">Ajouter</button>
+            </td>
+            <td>
+                <button class="btn btn-dm edit-dish-btn" data-id="${dish.id}">
+                    <i class="bi bi-pencil-square"></i>
+                </button>
+                <button class="btn btn-dm-danger delete-dish-btn" data-id="${dish.id}">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </td>
+        `;
+        dishList.appendChild(row);
+    });
+}
+// --- Initialiser les listeners pour ajouter ,modifier et supprimer les plats et ajout d'allergène à un plat ---
+function initDishListeners() {
+     const confirmBtn = document.getElementById('confirmDeleteDishBtn')
+     const modalDelete = new bootstrap.Modal(document.getElementById('deleteDishModal'));
+        dishList.addEventListener("click", async (e) => {
+        const editDish = e.target.closest('.edit-dish-btn');
+        if (editDish) {
+            const dishId = editDish.dataset.id;
+            if (!dishId) return;
+
+            try {
+                const dish = await getDishById(dishId);
+                fillEditDishModal(dish);
+                const modal = new bootstrap.Modal(document.getElementById('addDishModal'));
+                modal.show();
+                
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        const deleteDish = e.target.closest('.delete-dish-btn');
+        if (deleteDish) {
+            const dishId = deleteDish.dataset.id;
+            if (!dishId) return;
+            
+           ;
+            if (confirmBtn) {
+                confirmBtn.dataset.id = dishId;
+                modalDelete.show();
+            }
+        }
+        const addAllergenBtn = e.target.closest('.add-allergen-dish-btn');
+        if (addAllergenBtn) {
+            const dishId = addAllergenBtn.dataset.id;
+            if (!dishId) return;
+            const select = document.querySelector(`select.allergen-select[data-id="${dishId}"]`);
+            if (!select) {
+                console.error("Sélecteur d'allergènes introuvable pour le plat ID :", dishId);
+                alert("Erreur technique");
+                return;
+            }
+            const selectedOptions = Array.from(select.selectedOptions);
+            const allergenId = selectedOptions.map(option =>option.value);
+            try {
+                await addDishAllergens(dishId, allergenId[0]);
+                alert("Allergènes mis à jour !");
+                loadDishes();
+            } catch (error) {
+                console.error("Erreur lors de la mise à jour des allergènes :", error);
+                alert("Une erreur est survenue lors de la mise à jour des allergènes.");
+            }
+        }
+    });
+
+        confirmBtn.addEventListener('click', async () => {
+            const dishId = confirmBtn.dataset.id;
+            if (!dishId) return;
+            try {
+                await deleteDish(dishId);
+                const modalEl = document.getElementById('deleteDishModal');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+                alert("Plat supprimé avec succès !");
+                loadDishes();
+            } catch (error) {
+                console.error("Erreur lors de la suppression du plat :", error);
+                alert("Une erreur est survenue lors de la suppression du plat.");
+            }
+
+        });
+        
+        const addDishButton = document.getElementById('addDishButton');
+        if (addDishButton) {
+            addDishButton.addEventListener('click', () => {
+                const modal = new bootstrap.Modal(document.getElementById('addDishModal'));
+                modal.show();
+            });
+        }
+        
+}
+// remplir la modale de modification d'un plat
+function fillEditDishModal(dish) {
+    document.getElementById('dishName').value = dish.name;
+    document.getElementById('dishDescription').value = dish.description;
+    document.getElementById('dishPrice').value = dish.price;
+    document.getElementById('dishCategory').value = dish.category;
+
+    const select = document.getElementById('dishAllergens');
+
+    Array.from(select.options).forEach(option => {
+        option.selected = dish.allergenName?.includes(option.value);
+    });
+
+    document.getElementById('addDishForm').dataset.id = dish.id;
+}
+// --- Gérer le formulaire d'ajout ou de modification d'un plat ---
+const addDishForm = document.getElementById('addDishForm');
+
+if (addDishForm) {
+    addDishForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(addDishForm);
+
+        const dishData = {
+            name: formData.get('dishName'),
+            description: formData.get('dishDescription'),
+            price: formData.get('dishPrice'),
+            category: formData.get('dishCategory'),
+            allergenName: formData.getAll('dishAllergens')
+        };
+
+        try {
+            if (addDishForm.dataset.id) {
+                await updateDish(addDishForm.dataset.id, dishData);
+                alert("Plat mis à jour !");
+            } else {
+                await createDish(dishData);
+                alert("Plat créé !");
+            }
+
+            const modalEl = document.getElementById('addDishModal');
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) modal.hide();
+
+            loadDishes();
+        } catch (error) {
+            console.error(error);
+        }
+    });
+}
+
+
+
+// --- Afficher les menus ---
+async function loadMenus() {
+    try {
+        const menus = await getMenus();
+        displayMenus(menus);
+    } catch (error) {
+        console.error("Erreur lors du chargement des menus :", error);
+    }
+}
+// --- Afficher les menus dans le tableau ---
+async function displayMenus(menus) {
+  
+    const menuList = document.getElementById("menuList");
+    if (!menus || menus.length === 0) {
+        menuList.innerHTML = `<tr><td colspan="10" class="text-center">Aucun menu</td></tr>`;
+        return;
+    }
+    const dishes = await getDishes();
+ 
+    const rows = menus.map(menu => `
+<tr>
+    <td><strong>${menu.title}</strong></td>
+    <td>${menu.descriptionMenu || ''}</td>
+    <td>${menu.minPeople}</td>
+    <td>${menu.stock}</td>
+    <td>${menu.listOfDishesFromMenu?.map(d => d.name).join('- ') || 'Aucun'}</td>
+    <td>
+    <select id="dishSelect" class="form-select form-select-sm dish-select" data-id="${menu.id}">
+        ${dishes.map(dish => `
+            <option value="${dish.id}" ${menu.listOfDishesFromMenu?.some(d => d.id === dish.id) ? 'selected' : ''}>
+                ${dish.name}
+        </option>
+        `).join('')}
+        
+    </select>
+    <button class="btn btn-sm btn-primary mt-2 add-dish-menu-btn" data-id="${menu.id}">Ajouter</button>
+    </td>
+    <td>
+        <button class="available-btn ${menu.isAvailable ? 'available-yes' : 'availables-no'}"
+            data-id="${menu.id}">
+            ${menu.isAvailable ? "Disponible" : "Indisponible"}
+        </button>
+    </td>
+
+    <td>
+        ${menu.allAllergenes?.join(', ') || '-'}
+    </td>
+
+    <td>
+        <button class="action-btn btn-edit edit-menu-btn" data-id="${menu.id}">
+            <i class="bi bi-pencil"></i>
+        </button>
+
+        <button class="action-btn btn-delete delete-menu-btn" data-id="${menu.id}">
+            <i class="bi bi-trash"></i>
+        </button>
+    </td>
+</tr>
+`).join('');
+    menuList.innerHTML = rows;
+}
+// --- Initialiser les listeners pour les actions de modification et de suppression d'un menu et ajout d'un plat à un menu ---
+function initMenuEvents() { 
+    document.addEventListener("click", async (e) => {
+            const btn = e.target.closest(".available-btn");
+            if (!btn) return;
+
+            const id = btn.dataset.id;
+            // Vérifier l'état actuel à partir du dataset   
+            const current = btn.dataset.isAvailable === "1" || btn.dataset.isAvailable === "true";
+            if (btn) {
+            try {
+                await updateMenu(id, { isAvailable: !current });
+                btn.dataset.isAvailable = (!current).toString();
+                btn.classList.toggle("btn-success", !current);
+                btn.classList.toggle("btn-secondary", current);
+                btn.textContent = !current ? "Disponible" : "Indisponible";
+            } catch (error) {
+                console.error("Erreur lors de la mise à jour de la disponibilité :", error);
+                alert("Une erreur est survenue lors de la mise à jour de la disponibilité.");
+            }
+             }
+    }    );
+    menuList.addEventListener("click", async (e) => {
+        const editBtn = e.target.closest('.edit-menu-btn');
+        if (editBtn){
+            const id = editBtn.dataset.id;
+            const form = document.getElementById('editMenuForm');
+            if (form) {
+                form.setAttribute('data-id', id);
+            }
+            if (id) {
+                fillEditMenuModal(id);
+            } else {
+                console.error('ID de menu non trouvé pour le bouton de modification cliqué.');
+            }
+        }
+        const deleteBtn = e.target.closest('.delete-menu-btn');
+        if (deleteBtn) {
+        const menuId = deleteBtn.dataset.id;
+        if (!menuId) return;
+        if (!confirm("Êtes-vous sûr de vouloir supprimer ce menu ?")) {
+            return;
+        }
+        try {
+            await deleteMenu(menuId);
+            alert("Menu supprimé avec succès !");
+            loadMenus(); // recharger la liste après suppression
+        } catch (error) {
+            console.error("Erreur lors de la suppression du menu :", error);
+            alert("Une erreur est survenue lors de la suppression du menu.");
+        }
+    }
+
+        // selection un plat s'ajoute au menu
+        const addDishMenu= e.target.closest('.add-dish-menu-btn');
+        if (addDishMenu) {
+            const menuId = addDishMenu.dataset.id;
+            if (!menuId) {
+                console.error("ID de menu manquant");
+                alert("Erreur technique");
+                return;
+            }
+                const select = document.querySelector(`select.dish-select[data-id="${menuId}"]`);
+                    if (!select) {
+                        console.error("Sélecteur de plats introuvable pour le menu ID :", menuId);
+                        alert("Erreur technique");
+                        return;
+                    }
+            const selectedOptions = Array.from(select.selectedOptions);
+            const dishId = selectedOptions.map(option =>option.value);
+            try {
+                await addDishToMenu(menuId, dishId[0]);
+                alert("Plats mis à jour avec succès !");
+                loadMenus(); // Recharger la liste pour refléter les changements
+            } catch (error) {
+                console.error("Erreur lors de la mise à jour des plats du menu :", error);
+                alert("Une erreur est survenue lors de la mise à jour des plats du menu.");
+            }
+        }
+    });
+}
+
+
+
+
+//--initilaiser les listeners d'un ajout d'un employee
 function initEmployeeListeners() {
     
     const formEmployee= document.getElementById('newEmployeeForm');
@@ -172,8 +508,17 @@ function displayEmployees(employees) {
         employeeList.appendChild(row);
     });
 }
-//---supprimer un employé---
-
+//---supprimer le compte d'un employé---
+function deleteEmployee(employeeId) {
+    return fetch(`${API_BASE}/admin/employees/${employeeId}`, {
+        method: "DELETE",
+        headers: { "X-AUTH-TOKEN": getToken() }
+    }).then(response => {
+        if (!response.ok) {
+            throw new Error(`Erreur ${response.status} lors de la suppression de l'employé`);
+        }
+    });
+}
 
 
 
@@ -237,7 +582,7 @@ async function loadOrders() {
         }
     }
 }
-    // --- Initialiser les listeners pour les actions sur les commandes ---
+    // --- Initialiser les listeners pour les actions modifier , supprimer des commandes et changer le statut ---
 function initOrdersListeners() {
         const ordersTable = document.getElementById("historyOrdersTableAdmin");
         ordersTable.addEventListener("click", async (e) => {
@@ -323,7 +668,7 @@ async function getOrdersAdmin() {
     }
     return await response.json();
 }
-// --- mettre à jour une commande ---
+// --- mettre à jour l'administrateur d'une commande ---
 async function updateOrder(orderId, orderData) {
     const response = await fetch(`${API_BASE}/admin/orders/${orderId}/edit`, {
         method: 'PUT', 
@@ -356,7 +701,7 @@ export async function updateOrderStatus(id, status) {
     }
     return response.json();
 }
-//supprimer une commande
+//supprimer un administrateur d'une commande
 export async function deleteAdminOrders(id) {
     const response = await fetch(`${API_BASE}/admin/orders/${id}`, {
         method: 'DELETE',
@@ -372,7 +717,7 @@ export async function deleteAdminOrders(id) {
     }
     console.log("Commande supprimée");
 } 
-
+// remplir la modale de modification d'une commande
 function fillEditOrderModal(order) {
     
     const menuSelect = document.getElementById('menuSelectEdit');
@@ -417,8 +762,7 @@ function fillEditOrderModal(order) {
 }
 );
 }
-//modifier une commande
-
+// --- Gérer le formulaire de modification d'une commande ---
 const editOrderForm = document.getElementById("editOrderForm");
 if (editOrderForm) {
     editOrderForm.addEventListener("submit", async (e) => {
@@ -474,366 +818,5 @@ if (editOrderModal) {
     editOrderModal.addEventListener('hidden.bs.modal', () => {
         editOrderForm.reset();
         delete editOrderForm.dataset.id;
-    });
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-// afficher les plats
-async function loadDishes() {
-    try {
-        const dishes = await getDishes();
-        displayDishes(dishes);
-    } catch (error) {
-        console.error("Erreur lors du chargement des plats :", error);
-    }
-}
-async function displayDishes(dishes) {
-    
-    dishList.innerHTML = "";
-    if (!dishes || dishes.length === 0) {
-        dishList.innerHTML = `
-            <tr>
-                <td colspan="6" class="text-center">Aucun plat</td>
-            </tr>`;
-        return;
-    }
-    const allergens = await getAllergens();
-    dishes.forEach(dish => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td>${dish.id}</td>
-            <td>${dish.category || 'Aucune'}</td>
-            <td>${dish.name}</td>
-            <td>${dish.description || ''}</td>
-            <td>${Number(dish.price).toFixed(2)} €</td>
-            
-            <td class="badge-plats">
-                ${dish.allergenName?.join(', ') || 'Aucun'}
-            </td>
-            <td>
-            <select id="allergenSelect" class="form-select form-select-sm allergen-select" data-id="${dish.id}">
-                ${allergens.map(allergen => `
-                    <option value="${allergen.id}" ${dish.allergenIds?.includes(allergen.id) ? 'selected' : ''}>
-                        ${allergen.name}
-                    </option>
-                `).join('')}
-            </select>
-            <button class="btn btn-sm btn-primary mt-2 add-allergen-dish-btn" data-id="${dish.id}">Ajouter</button>
-            </td>
-            <td>
-                <button class="btn btn-dm edit-dish-btn" data-id="${dish.id}">
-                    <i class="bi bi-pencil-square"></i>
-                </button>
-                <button class="btn btn-dm-danger delete-dish-btn" data-id="${dish.id}">
-                    <i class="bi bi-trash"></i>
-                </button>
-            </td>
-        `;
-        dishList.appendChild(row);
-    });
-}
-// --- Initialiser les listeners pour modifier et supprimer les plats ---
-function initDishListeners() {
-     const confirmBtn = document.getElementById('confirmDeleteDishBtn')
-     const modalDelete = new bootstrap.Modal(document.getElementById('deleteDishModal'));
-        dishList.addEventListener("click", async (e) => {
-        const editDish = e.target.closest('.edit-dish-btn');
-        if (editDish) {
-            const dishId = editDish.dataset.id;
-            if (!dishId) return;
-
-            try {
-                const dish = await getDishById(dishId);
-                fillEditDishModal(dish);
-                const modal = new bootstrap.Modal(document.getElementById('addDishModal'));
-                modal.show();
-                
-            } catch (error) {
-                console.error(error);
-            }
-        }
-        const deleteDish = e.target.closest('.delete-dish-btn');
-        if (deleteDish) {
-            const dishId = deleteDish.dataset.id;
-            if (!dishId) return;
-            
-           ;
-            if (confirmBtn) {
-                confirmBtn.dataset.id = dishId;
-                modalDelete.show();
-            }
-        }
-        const addAllergenBtn = e.target.closest('.add-allergen-dish-btn');
-        if (addAllergenBtn) {
-            const dishId = addAllergenBtn.dataset.id;
-            if (!dishId) return;
-            const select = document.querySelector(`select.allergen-select[data-id="${dishId}"]`);
-            if (!select) {
-                console.error("Sélecteur d'allergènes introuvable pour le plat ID :", dishId);
-                alert("Erreur technique");
-                return;
-            }
-            const selectedOptions = Array.from(select.selectedOptions);
-            const allergenId = selectedOptions.map(option =>option.value);
-            try {
-                await addDishAllergens(dishId, allergenId[0]);
-                alert("Allergènes mis à jour !");
-                loadDishes();
-            } catch (error) {
-                console.error("Erreur lors de la mise à jour des allergènes :", error);
-                alert("Une erreur est survenue lors de la mise à jour des allergènes.");
-            }
-        }
-    });
-
-        confirmBtn.addEventListener('click', async () => {
-            const dishId = confirmBtn.dataset.id;
-            if (!dishId) return;
-            try {
-                await deleteDish(dishId);
-                const modalEl = document.getElementById('deleteDishModal');
-                const modal = bootstrap.Modal.getInstance(modalEl);
-                if (modal) modal.hide();
-                alert("Plat supprimé avec succès !");
-                loadDishes();
-            } catch (error) {
-                console.error("Erreur lors de la suppression du plat :", error);
-                alert("Une erreur est survenue lors de la suppression du plat.");
-            }
-
-        });
-        
-        const addDishButton = document.getElementById('addDishButton');
-        if (addDishButton) {
-            addDishButton.addEventListener('click', () => {
-                const modal = new bootstrap.Modal(document.getElementById('addDishModal'));
-                modal.show();
-            });
-        }
-        
-}
-// remplir la modale de modification d'un plat
-function fillEditDishModal(dish) {
-    document.getElementById('dishName').value = dish.name;
-    document.getElementById('dishDescription').value = dish.description;
-    document.getElementById('dishPrice').value = dish.price;
-    document.getElementById('dishCategory').value = dish.category;
-
-    const select = document.getElementById('dishAllergens');
-
-    Array.from(select.options).forEach(option => {
-        option.selected = dish.allergenName?.includes(option.value);
-    });
-
-    document.getElementById('addDishForm').dataset.id = dish.id;
-}
-// --- FORMULAIREAjouter ou modifier un plat ---
-const addDishForm = document.getElementById('addDishForm');
-
-if (addDishForm) {
-    addDishForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const formData = new FormData(addDishForm);
-
-        const dishData = {
-            name: formData.get('dishName'),
-            description: formData.get('dishDescription'),
-            price: formData.get('dishPrice'),
-            category: formData.get('dishCategory'),
-            allergenName: formData.getAll('dishAllergens')
-        };
-
-        try {
-            if (addDishForm.dataset.id) {
-                await updateDish(addDishForm.dataset.id, dishData);
-                alert("Plat mis à jour !");
-            } else {
-                await createDish(dishData);
-                alert("Plat créé !");
-            }
-
-            const modalEl = document.getElementById('addDishModal');
-            const modal = bootstrap.Modal.getInstance(modalEl);
-            if (modal) modal.hide();
-
-            loadDishes();
-        } catch (error) {
-            console.error(error);
-        }
-    });
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// --- Afficher les menus ---
-async function loadMenus() {
-    try {
-        const menus = await getMenus();
-        displayMenus(menus);
-    } catch (error) {
-        console.error("Erreur lors du chargement des menus :", error);
-    }
-}
-async function displayMenus(menus) {
-  
-    const menuList = document.getElementById("menuList");
-    if (!menus || menus.length === 0) {
-        menuList.innerHTML = `<tr><td colspan="10" class="text-center">Aucun menu</td></tr>`;
-        return;
-    }
-    const dishes = await getDishes();
- 
-    const rows = menus.map(menu => `
-<tr>
-    <td><strong>${menu.title}</strong></td>
-    <td>${menu.descriptionMenu || ''}</td>
-    <td>${menu.minPeople}</td>
-    <td>${menu.stock}</td>
-    <td>${menu.listOfDishesFromMenu?.map(d => d.name).join('- ') || 'Aucun'}</td>
-    <td>
-    <select id="dishSelect" class="form-select form-select-sm dish-select" data-id="${menu.id}">
-        ${dishes.map(dish => `
-            <option value="${dish.id}" ${menu.listOfDishesFromMenu?.some(d => d.id === dish.id) ? 'selected' : ''}>
-                ${dish.name}
-        </option>
-        `).join('')}
-        
-    </select>
-    <button class="btn btn-sm btn-primary mt-2 add-dish-menu-btn" data-id="${menu.id}">Ajouter</button>
-    </td>
-    <td>
-        <button class="available-btn ${menu.isAvailable ? 'available-yes' : 'availables-no'}"
-            data-id="${menu.id}">
-            ${menu.isAvailable ? "Disponible" : "Indisponible"}
-        </button>
-    </td>
-
-    <td>
-        ${menu.allAllergenes?.join(', ') || '-'}
-    </td>
-
-    <td>
-        <button class="action-btn btn-edit edit-menu-btn" data-id="${menu.id}">
-            <i class="bi bi-pencil"></i>
-        </button>
-
-        <button class="action-btn btn-delete delete-menu-btn" data-id="${menu.id}">
-            <i class="bi bi-trash"></i>
-        </button>
-    </td>
-</tr>
-`).join('');
-    menuList.innerHTML = rows;
-}
-// --- Initialiser les listeners pour les actions sur les menus ---
-function initMenuEvents() { 
-    document.addEventListener("click", async (e) => {
-            const btn = e.target.closest(".available-btn");
-            if (!btn) return;
-
-            const id = btn.dataset.id;
-            // Vérifier l'état actuel à partir du dataset   
-            const current = btn.dataset.isAvailable === "1" || btn.dataset.isAvailable === "true";
-            if (btn) {
-            try {
-                await updateMenu(id, { isAvailable: !current });
-                btn.dataset.isAvailable = (!current).toString();
-                btn.classList.toggle("btn-success", !current);
-                btn.classList.toggle("btn-secondary", current);
-                btn.textContent = !current ? "Disponible" : "Indisponible";
-            } catch (error) {
-                console.error("Erreur lors de la mise à jour de la disponibilité :", error);
-                alert("Une erreur est survenue lors de la mise à jour de la disponibilité.");
-            }
-             }
-    }    );
-    menuList.addEventListener("click", async (e) => {
-        const editBtn = e.target.closest('.edit-menu-btn');
-        if (editBtn){
-            const id = editBtn.dataset.id;
-            const form = document.getElementById('editMenuForm');
-            if (form) {
-                form.setAttribute('data-id', id);
-            }
-            if (id) {
-                fillEditMenuModal(id);
-            } else {
-                console.error('ID de menu non trouvé pour le bouton de modification cliqué.');
-            }
-        }
-        const deleteBtn = e.target.closest('.delete-menu-btn');
-        if (deleteBtn) {
-        const menuId = deleteBtn.dataset.id;
-        if (!menuId) return;
-        if (!confirm("Êtes-vous sûr de vouloir supprimer ce menu ?")) {
-            return;
-        }
-        try {
-            await fetch(`${API_BASE}/menu/${menuId}`, {
-                method: "DELETE",
-                headers: { "X-AUTH-TOKEN": getToken() }
-            });
-            alert("Menu supprimé avec succès !");
-            loadMenus(); // recharger la liste après suppression
-        } catch (error) {
-            console.error("Erreur lors de la suppression du menu :", error);
-            alert("Une erreur est survenue lors de la suppression du menu.");
-        }
-    }
-
-        // selection un plat s'ajoute au menu
-        const addDishMenu= e.target.closest('.add-dish-menu-btn');
-        if (addDishMenu) {
-            const menuId = addDishMenu.dataset.id;
-            if (!menuId) {
-                console.error("ID de menu manquant");
-                alert("Erreur technique");
-                return;
-            }
-                const select = document.querySelector(`select.dish-select[data-id="${menuId}"]`);
-                    if (!select) {
-                        console.error("Sélecteur de plats introuvable pour le menu ID :", menuId);
-                        alert("Erreur technique");
-                        return;
-                    }
-            const selectedOptions = Array.from(select.selectedOptions);
-            const dishId = selectedOptions.map(option =>option.value);
-            try {
-                await addDishToMenu(menuId, dishId[0]);
-                alert("Plats mis à jour avec succès !");
-                loadMenus(); // Recharger la liste pour refléter les changements
-            } catch (error) {
-                console.error("Erreur lors de la mise à jour des plats du menu :", error);
-                alert("Une erreur est survenue lors de la mise à jour des plats du menu.");
-            }
-        }
     });
 }

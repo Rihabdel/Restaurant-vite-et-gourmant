@@ -1,6 +1,6 @@
 <div class="form-container mt-5 mb-5" >
     <h2 class="text-center mb-4">Inscription</h2>
-    <form id="InscriptionForm">
+    <form id="InscriptionForm" method="POST"class="mx-auto" style="max-width: 400px;">
         <div class="mb-3">
             <label for="NomInput" class="form-label">Nom</label>
             <input type="text" class="form-control" id="NomInput" placeholder="Votre nom" name="lastName"> 
@@ -14,8 +14,8 @@
           <input type="text" class="form-control" id="gsmInput" placeholder="Votre numéro de téléphone" name="phone"> 
         </div>
         <div class="mb-3">
-          <label for="AdressePostaleInput" class="form-label">Adresse postale</label>
-          <input type="text" class="form-control" id="AdressePostaleInput" placeholder="Votre adresse postale" name="Adress"> 
+          <label for="AddressePostaleInput" class="form-label">Adresse postale</label>
+          <input type="text" class="form-control" id="AddressePostaleInput" placeholder="Votre adresse postale" name="address"> 
         </div>
         <div class="mb-3">
           <label for="EmailInput" class="form-label">Email</label>
@@ -30,9 +30,12 @@
             <input type="password" class="form-control" id="ValidatePasswordInput" name="passwordConfirm">
           </div>
         <div class="text-center">
-            <button type="button" class="btn btn-primary" id="btnSubmitInscription">Inscription</button>
+            <button type="submit" class="btn btn-primary" id="btnSubmitInscription">Inscription</button>
         </div>
     </form>
     <div class="text-center pt-3">
         <a href="/connexion">Vous avez déjà un compte ? Connectez-vous ici !</a>
     </div>
+
+</div>    
+<script type="module" src="../../js/auth/inscription.js"></script>
