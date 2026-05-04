@@ -277,7 +277,7 @@ export async function createOrder(orderData) {
             'Content-Type': 'application/json',
             'X-AUTH-TOKEN': getToken()
         },
-        body: JSON.stringify(orderData) 
+        body: JSON.stringify(orderData)
     });
     if (!response.ok) {
         const errorData = await response.json();

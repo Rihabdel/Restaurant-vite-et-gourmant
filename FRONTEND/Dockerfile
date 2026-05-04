@@ -1,8 +1,7 @@
-# On utilise Apache, le serveur web que tu connais
-FROM httpd:2.4-alpine
 
-# On copie tous tes fichiers (index.html, ton dossier css, js, images)
-# vers le dossier que Apache utilise pour afficher les sites
+FROM httpd:2.4-alpine
+RUN sed -i 's/#LoadModule rewrite_module/LoadModule rewrite_module/' /usr/local/apache2/conf/httpd.conf \
+    && sed -i 's/AllowOverride None/AllowOverride All/' /usr/local/apache2/conf/httpd.conf
 COPY . /usr/local/apache2/htdocs/
 
 EXPOSE 80
