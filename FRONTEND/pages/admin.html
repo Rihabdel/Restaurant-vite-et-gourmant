@@ -271,6 +271,47 @@
                             </div>  
                     </div>  
                     <div class="tab-pane fade" id="v-pills-commandes" role="tabpanel" aria-labelledby="v-pills-commandes-tab" tabindex="0">
+                        <!-- Filtres -->
+                            <div class="filters-section">
+                                <div class="section-subtitle mb-3">
+                                    <button class="btn btn-filtres" data-bs-toggle="collapse" href="#filtresCollapse" onclick="" aria-expanded="false" aria-controls="filtresCollapse" onkeypress="onmouseover"><i class="bi bi-funnel"></i> Filtrer la liste des commandes</button>
+                                </div>
+                                <div class="collapse" id="filtresCollapse"> 
+                                    <div class="container filter">
+                                            <div class="">
+                                                <label for="userFilter" class="form-label">utilisateur</label>
+                                                <input type="text" class="form-control" id="userFilter" placeholder="le nom de l'utilisateur">
+                                            </div>
+                                            <div class="">
+                                                <label for="statusFilter" class="form-label">Status de la commande</label>
+                                                <select aria-label="Status" class="form-select" id="statusFilter" name="status de la commande">
+                                                    <option value="all">Tous</option>
+                                                    <option value="en attente">En attente</option>
+                                                    <option value="accepté">Acceptée</option>
+                                                    <option value="En préparation">En préparation</option>
+                                                    <option value="livrée">Livrée</option>
+                                                    <option value="En attente de retour">En attente de retour</option>
+                                                    <option value="annulée">Annulée</option>
+                                                </select>
+                                            </div>
+                                            <div class="">
+                                                <label for="menuSelectFilter" class="form-label">Menu</label>
+                                                <select aria-label="Menu" class="form-select" id="menuSelectFilter" name="menu">
+                                                    <option value="all">Tous les menus</option>
+                                                </select>
+                                            </div>
+                                            <div class="">
+                                                <label for="deliveryDateFilter" class="form-label">Date de livraison</label>
+                                                <input type="date" class="form-control" id="deliveryDateFilter" placeholder="Sélectionnez une date de livraison">
+                                            </div>
+                                            <div class="d-flex align-items-end">
+                                                <button class="btn btn-outline-primary w-100" id="resetFilters">
+                                                <i class="bi bi-arrow-counterclockwise"></i> Réinitialiser
+                                                </button>
+                                            </div>
+                                    </div>
+                                </div>
+                            </div>
                         <!--liste des commandes -->
                             <div class="admin-gestion mb-3">
                                     <h2 class="mb-4">Gestion des Commandes</h2>  
@@ -297,6 +338,23 @@
                                         </table>
                                     </div>
                             </div>
+                            <!--annuler une commande-->
+                    <div class="modal fade" id="deleteOrderModal" aria-hidden="true" aria-labelledby="deleteCommandeModalLabel" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered delete-commande-modal*">
+                        <div class="modal-content">
+                        <div class="modal-body">
+                            <h5>Êtes-vous sûr de vouloir annuler cette commande ?</h5>
+                            <p>Cette action est irréversible.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="button" class="btn btn-danger" id="confirmCancelBtn">Confirmer l'annulation</button>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+                    </div>
+                    <!-- Modal pour modifier une commande -->
                     <div class="modal fade" id="editOrderModal" tabindex="-1" aria-labelledby="editOrderModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">

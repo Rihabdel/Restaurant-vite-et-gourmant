@@ -11,6 +11,7 @@ enum Status: string
     case en_attente_de_retour = 'en attente de retour';
     case terminée = 'terminée';
     case annulé = 'annulé';
+    case all = 'all';
 
     public static function getValues(): array
     {
@@ -26,6 +27,7 @@ enum Status: string
             self::en_attente_de_retour => 'En attente de retour',
             self::terminée => 'Terminée',
             self::annulé => 'Annulé',
+            self::all => 'Tous',
         };
     }
     public static function fromLabel(string $label): ?self
@@ -38,6 +40,7 @@ enum Status: string
             'En attente de retour' => self::en_attente_de_retour,
             'Terminée' => self::terminée,
             'Annulé' => self::annulé,
+            'Tous' => self::all,
             default => null,
         };
     }
@@ -51,6 +54,7 @@ enum Status: string
             self::en_attente_de_retour => 'teal',
             self::terminée => 'green',
             self::annulé => 'red',
+            self::all => 'black',
         };
     }
 }

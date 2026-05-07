@@ -1,5 +1,5 @@
-import { API_BASE,getDishes, createDish, getDishById,updateDish,deleteDish,addDishAllergens,getAllergen
-    ,getMenus,getMenuById, updateMenu,addDishToMenu, deleteMenu,getOrderById} from "./api.js";
+import { API_BASE,getDishes, createDish, getDishById,updateDish,deleteDish,addDishAllergens,getAllergens
+    ,getMenus,getMenuById, updateMenu,addDishToMenu, deleteMenu,getOrderById,deleteDishFromMenu} from "./api.js";
 import { getToken} from "./script.js";
 import {fillEditMenuModal} from "./menu.js";
 import { validateEmail,validatePassword,validateConfirmPassword,validateRequired } from "./auth/inscription.js";
@@ -239,24 +239,29 @@ async function displayMenus(menus) {
         return;
     }
     const dishes = await getDishes();
- 
+    
     const rows = menus.map(menu => `
 <tr>
     <td><strong>${menu.title}</strong></td>
     <td>${menu.descriptionMenu || ''}</td>
     <td>${menu.minPeople}</td>
     <td>${menu.stock}</td>
-    <td>${menu.listOfDishesFromMenu?.map(d => d.name).join('- ') || 'Aucun'}</td>
+    <td>${menu.listOfDishesFromMenu?.map(d => d.category ? `${d.name}--(${d.category})` : d.name).join('- ') || 'Aucun'}</td>
     <td>
     <select id="dishSelect" class="form-select form-select-sm dish-select" data-id="${menu.id}">
         ${dishes.map(dish => `
             <option value="${dish.id}" ${menu.listOfDishesFromMenu?.some(d => d.id === dish.id) ? 'selected' : ''}>
-                ${dish.name}
+                ${dish.name}--(${dish.category})
         </option>
         `).join('')}
         
     </select>
-    <button class="btn btn-sm btn-primary mt-2 add-dish-menu-btn" data-id="${menu.id}">Ajouter</button>
+    <button class="btn btn-sm btn-primary mt-2 add-dish-menu-btn" data-id="${menu.id}">
+        <i class="bi bi-plus"></i>
+    </button>
+    <button class="btn btn-sm btn-secondary delete-dish-menu-btn" data-id="${menu.id}">
+        <i class="bi bi-trash"></i>
+    </button>
     </td>
     <td>
         <button class="available-btn ${menu.isAvailable ? 'available-yes' : 'availables-no'}"
@@ -334,7 +339,32 @@ function initMenuEvents() {
             alert("Une erreur est survenue lors de la suppression du menu.");
         }
     }
-
+        const deleteDishMenuBtn = e.target.closest('.delete-dish-menu-btn');
+        if (deleteDishMenuBtn) {
+            const menuId = deleteDishMenuBtn.dataset.id;
+            if (!menuId) {
+                console.error("ID de menu manquant pour suppression de plat");
+                alert("Erreur technique");
+                return;
+            }
+            const select = document.querySelector(`select.dish-select[data-id="${menuId}"]`);
+            if (!select) {
+                console.error("Sélecteur de plats introuvable pour le menu ID :", menuId);
+                alert("Erreur technique");
+                return;
+            }
+            const selectedOptions = Array.from(select.selectedOptions);
+            const dishId = selectedOptions.map(option =>option.value);
+            try {      
+                await deleteDishFromMenu(menuId, dishId[0]);       
+                alert("Plat supprimé du menu avec succès !");
+                loadMenus(); // Recharger la liste pour refléter les changements
+            } catch (error) {
+                console.error("Erreur lors de la suppression du plat du menu :", error);
+                alert("Une erreur est survenue lors de la suppression du plat du menu.");
+            }
+        }  
+    
         // selection un plat s'ajoute au menu
         const addDishMenu= e.target.closest('.add-dish-menu-btn');
         if (addDishMenu) {
@@ -362,6 +392,7 @@ function initMenuEvents() {
             }
         }
     });
+
 }
 
 
@@ -583,7 +614,7 @@ async function loadOrders() {
     }
 }
     // --- Initialiser les listeners pour les actions modifier , supprimer des commandes et changer le statut ---
-function initOrdersListeners() {
+export function initOrdersListeners() {
         const ordersTable = document.getElementById("historyOrdersTableAdmin");
         ordersTable.addEventListener("click", async (e) => {
             const editBtn = e.target.closest('.edit-order-btn');
@@ -610,26 +641,27 @@ function initOrdersListeners() {
                 }
             }
             const deleteBtn = e.target.closest('.delete-order-btn');
-            if (deleteBtn) {
-                const id = deleteBtn.dataset.id;
-                if (!id) {
-                    console.error("ID de commande manquant");
-                    alert("Erreur technique");
-                    return;
+
+                if (deleteBtn) {
+                    const orderId = deleteBtn.dataset.id;
+                    if (!orderId) return;
+
+                    const isConfirmed = confirm("Êtes-vous sûr de vouloir supprimer cette commande ?");
+
+                    if (!isConfirmed) return; // 🔥 STOP si annulation
+
+                    try {
+                        await deleteAdminOrders(orderId);
+
+                        alert("Commande supprimée avec succès !");
+                        loadOrders();
+
+                    } catch (error) {
+                        console.error("Erreur :", error);
+                        alert("Une erreur est survenue");
+                    }
                 }
-                if (!confirm("Êtes-vous sûr de vouloir supprimer cette commande ?")) {
-                    return;
-                }
-                try {
-                    await cancelAdminOrders(id);
-                    alert("Commande supprimée avec succès !");
-                    loadOrders(); // recharger la liste après annulation
-                } catch (error) {
-                    console.error("Erreur lors de l'annulation de la commande :", error);
-                    alert("Une erreur est survenue lors de l'annulation de la commande.");
-                }
-            
-            }
+       
         });
 
         const statusSelects = ordersTable.querySelectorAll('.status-order-btn');   
@@ -655,19 +687,21 @@ function initOrdersListeners() {
 
     }
 // --- Afficher les commandes à l'administrateur ---
-async function getOrdersAdmin() {
-    const response = await fetch(`${API_BASE}/admin/orders`, {
+async function getOrdersAdmin(filtres = {}) {
+    const params = new URLSearchParams(filtres);
+    const response = await fetch(`${API_BASE}/admin/orders?${params.toString()}`, {
         method: 'GET',
         headers: {
-            'Content-Type': 'application/json',
             'X-AUTH-TOKEN': getToken()
         }
     });
     if (!response.ok) {
-        throw new Error('Erreur de récupération des commandes');
+        const error = await response.json();
+        throw new Error(error.message || 'Erreur lors du chargement des commandes');
     }
     return await response.json();
 }
+
 // --- mettre à jour l'administrateur d'une commande ---
 async function updateOrder(orderId, orderData) {
     const response = await fetch(`${API_BASE}/admin/orders/${orderId}/edit`, {
@@ -718,7 +752,7 @@ export async function deleteAdminOrders(id) {
     console.log("Commande supprimée");
 } 
 // remplir la modale de modification d'une commande
-function fillEditOrderModal(order) {
+export function fillEditOrderModal(order) {
     
     const menuSelect = document.getElementById('menuSelectEdit');
     const numberOfPeople = document.getElementById('numberOfPeople');
@@ -820,3 +854,69 @@ if (editOrderModal) {
         delete editOrderForm.dataset.id;
     });
 }
+// --- filter la liste des commandes ---
+function buildFilters() {
+    const statusFilter = document.getElementById('statusFilter').value;
+    const userFilter = document.getElementById('userFilter').value;
+    const deliveryDateFilter = document.getElementById('deliveryDateFilter').value;
+    const menuSelectFilter = document.getElementById('menuSelectFilter').value;
+    const filters = {};
+    if (statusFilter !== 'all') {
+        filters.status = statusFilter;
+    }
+    if (userFilter !== '') {
+        filters.user = userFilter;
+    }
+    if (deliveryDateFilter) filters.deliveryDate = deliveryDateFilter;
+    if (menuSelectFilter !== 'all') {
+        filters.menu = menuSelectFilter;
+    }
+    return filters;
+}
+function applyFilters() {
+    try{
+        const filters = buildFilters();
+        const filteredOrders = getOrdersAdmin(filters);
+        filteredOrders.then(orders => {
+            console.log("Commandes filtrées :", orders);
+            displayAdminOrders(orders);
+        }).catch(error => {
+            console.error("Aucune commande trouvée :", error);
+            alert("Aucune commande trouvée avec les critères de filtre sélectionnés.");
+            
+        });
+    } catch (error) {
+        console.error("Erreur lors de la construction des filtres :", error);
+        alert("Une erreur est survenue lors de la construction des filtres.");
+    }
+}
+    
+    const user = document.getElementById('userFilter');
+    const deliveryDate = document.getElementById('deliveryDateFilter');
+    const status = document.getElementById('statusFilter');
+    const menu = document.getElementById('menuSelectFilter');
+    if (menu) {
+        getMenus().then(menus => {
+            menu.innerHTML = `<option value="all">Tous les menus</option>` +
+                menus.map(menu => `<option value="${menu.title}">${menu.title}</option>`).join('');
+        }).catch(error => {
+            console.error("Erreur lors du chargement des menus pour le filtre :", error);
+            alert("Une erreur est survenue lors du chargement des menus pour le filtre.");
+        }
+        );
+    }
+    const resetFiltersBtn = document.getElementById("resetFilters");
+if (resetFiltersBtn) {
+    resetFiltersBtn.addEventListener("click", () => {
+        if (user) user.value = '';
+        if (deliveryDate) deliveryDate.value = '';
+        if (status) status.value = '';
+        if (menu) menu.value = 'all';
+        applyFilters();
+    }
+);
+}
+if (user) user.addEventListener("change", applyFilters);
+if (deliveryDate) deliveryDate.addEventListener("change", applyFilters);
+if (status) status.addEventListener("change", applyFilters);
+if (menu) menu.addEventListener("change", applyFilters);

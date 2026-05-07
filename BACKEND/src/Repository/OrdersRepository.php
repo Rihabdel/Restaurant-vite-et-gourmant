@@ -17,7 +17,7 @@ class OrdersRepository extends ServiceEntityRepository
     }
 
     // trouver les commandes d'un client
-    public function findWithFilters(array $filters): array
+    public function findByFilters(array $filters): array
     {
         $qb = $this->createQueryBuilder('o')
             ->leftJoin('o.user', 'u')
@@ -25,9 +25,9 @@ class OrdersRepository extends ServiceEntityRepository
             ->leftJoin('o.menu', 'm')
             ->addSelect('m');
 
-        if (isset($filters['userId'])) {
+        if (isset($filters['user'])) {
             $qb->andWhere('o.user = :userId')
-                ->setParameter('userId', $filters['userId']);
+                ->setParameter('userId', $filters['user']);
         }
 
         if (isset($filters['status'])) {
@@ -35,15 +35,20 @@ class OrdersRepository extends ServiceEntityRepository
                 ->setParameter('status', $filters['status']);
         }
 
-        if (isset($filters['delivery_date'])) {
-            $qb->andWhere('o.deliveryDate = :deliveryDate')
-                ->setParameter('deliveryDate', new \DateTime($filters['delivery_date']));
+        if (isset($filters['date_range'])) {
+            $qb->andWhere('o.deliveryDate BETWEEN :startDate AND :endDate')
+                ->setParameter('startDate', new \DateTime($filters['date_range']['start']))
+                ->setParameter('endDate', new \DateTime($filters['date_range']['end']));
+        }
+        if (isset($filters['menu'])) {
+            $qb->andWhere('o.menu = :menu')
+                ->setParameter('menu', $filters['menu']);
         }
 
         return $qb->getQuery()->getResult();
     }
 
-    public function findByClientId($userId)
+    public function findByClientId(int $userId)
     {
         return $this->createQueryBuilder('o')
             ->andWhere('o.user = :userId')
@@ -57,7 +62,7 @@ class OrdersRepository extends ServiceEntityRepository
             ->getResult();
     }
     // trouver les commandes par status (pour employee)
-    public function findByStatus($status)
+    public function findByStatus(string $status)
     {
         return $this->createQueryBuilder('o')
             ->leftJoin('o.user', 'u')
@@ -84,6 +89,7 @@ class OrdersRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
     // statistiques des commandes pour l'addministration par plat
     public function getOrderStatisticsByDish(\DateTime $startDate, \DateTime $endDate)
     {

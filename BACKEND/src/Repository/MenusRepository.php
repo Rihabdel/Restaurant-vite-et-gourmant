@@ -59,9 +59,8 @@ class MenusRepository extends ServiceEntityRepository
                 ->setParameter('isAvailable', $filters['isAvailable']);
         }
         return $qb->getQuery()->getResult();
-
-        // src/Repository/MenusRepository.php
     }
+
     public function findWithDishesAndAllergens(int $id): ?Menus
     {
         return $this->createQueryBuilder('m')
@@ -98,5 +97,13 @@ class MenusRepository extends ServiceEntityRepository
             ->setParameter('dishId', $dishId)
             ->getQuery()
             ->execute();
+    }
+    public function findByTitle(string $title): ?Menus
+    {
+        return $this->createQueryBuilder('m')
+            ->where('m.title = :title')
+            ->setParameter('title', $title)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }
