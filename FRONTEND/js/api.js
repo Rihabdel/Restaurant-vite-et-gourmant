@@ -110,7 +110,7 @@ export async function getMenuById(id) {
         method: 'GET',
         headers: {
             'content-Type': 'application/json'
-        },
+        }
     });
     if (!response.ok) {
         throw new Error('Erreur d\'affichage de menu');
@@ -175,7 +175,7 @@ export async function addDishToMenu(menuId, dishId) {
     return await response.json();
 }
 export async function getListDesDishesByMenuId(id) {
-    const response = await fetch(`${API_BASE}/menus-dishes/${id}/list`,{
+    const response = await fetch(`${API_BASE}/menus-dishes/${id}/detail`,{
         method: 'GET',
         headers: {
             'content-Type': 'application/json'
@@ -235,7 +235,9 @@ export async function getAllergens() {
         headers: {
             'Content-Type': 'application/json'
         }
+    
     });
+    
     if (!response.ok) throw new Error('Erreur chargement allergènes');
     return await response.json();
 }
@@ -270,18 +272,18 @@ export async function addDishAllergens(dishId, allergenIds) {
 
 // --- Fonctions API pour les commandes ---
 export async function createOrder(orderData) {
-    console.log("Données de la commande envoyées à l'API :", orderData);
     const response = await fetch(`${API_BASE}/orders/new`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'X-AUTH-TOKEN': getToken()
         },
-        body: JSON.stringify(orderData)
-    });
+        body: JSON.stringify(orderData) 
+    }); 
     if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Erreur de création de la commande');
+        console.error("Détails serveur :", errorData);
+        throw new Error('Erreur de création de la commande');
     }
     return await response.json();
 }
@@ -307,6 +309,17 @@ export async function getOrderById(id) {
     if (!response.ok) throw new Error('Erreur chargement commande');
     return await response.json();
 }
+export async function getOrdersByUserId() {
+    const response = await fetch(`${API_BASE}/orders`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-AUTH-TOKEN': getToken()
+        }
+    });
+    if (!response.ok) throw new Error('Erreur chargement commandes de l\'utilisateur');
+    return await response.json();
+}   
 export async function updateOrder(id, orderData) {
     const response = await fetch(`${API_BASE}/orders/${id}/edit`, {
         method: 'PUT',
@@ -363,3 +376,18 @@ export async function getUserInfo() {
     return response;
 }
 
+export async function deleteDishFromMenu(menuId, dishId) {
+    const response = await fetch(`${API_BASE}/menus-dishes/${menuId}/remove-dish/${dishId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-AUTH-TOKEN': getToken()
+        },
+        body: JSON.stringify({ dish_id: dishId }) 
+    });
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erreur de suppression du plat du menu');
+    }
+    return await response.json();
+}

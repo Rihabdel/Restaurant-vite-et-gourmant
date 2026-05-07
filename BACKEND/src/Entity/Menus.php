@@ -270,7 +270,7 @@ class Menus
     }
 
     #[Groups(['menu:detail', 'order:read', 'menu:list'])]
-    public function getTotalPriceEstimate(int $numberOfPeople): float
+    public function getPriceEstimate(int $numberOfPeople): float
     {
         $basePrice = $this->getPrice() * $numberOfPeople;
 

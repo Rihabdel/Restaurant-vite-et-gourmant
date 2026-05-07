@@ -28,12 +28,12 @@ class MenusDishes
     #[ORM\Column]
     private ?int $id = null;
 
-    #[Groups(['menu_dish:read'])]
+    #[Groups(['menu_dish:read, menu:read'])]
     #[ORM\ManyToOne(inversedBy: 'menusDishes')]
     #[ORM\JoinColumn(onDelete: "CASCADE")]
     private ?Menus $menu = null;
 
-    #[Groups(['menu_dish:read'])]
+    #[Groups(['menu_dish:read', 'dish:detail', 'allergen:read'])]
     #[ORM\ManyToOne(targetEntity: Dishes::class, inversedBy: 'menusDishes')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Dishes $dish = null;

@@ -89,7 +89,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->apiToken = bin2hex(random_bytes(30));
         $this->orders = new ArrayCollection();
     }
-
+    #[Groups(['user:read'])]
     public function getId(): ?int
     {
         return $this->id;
@@ -318,6 +318,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setApiToken(string $apiToken): static
     {
         $this->apiToken = $apiToken;
+
+        return $this;
+    }
+    public function setPasswordHash(string $hashedPassword): static
+    {
+        $this->password = $hashedPassword;
 
         return $this;
     }

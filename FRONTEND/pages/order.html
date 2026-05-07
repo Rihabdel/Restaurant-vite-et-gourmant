@@ -1,124 +1,104 @@
     <section class="orders-section mt-5">
-          <h2 class="text-center mb-4">Mes Commandes</h2>
-          <div class="container">
-              <div class="text-center mb-4">
+        <h2 class="text-center mb-4">Mes Commandes</h2>
+        <div class="container">
+            <div class="text-center mb-4">
                 <button type="button" class="btn btn-primary" id="new-order-btn">
-                  <i class="bi bi-plus"></i> Passer une nouvelle commande
+                <i class="bi bi-plus"></i> Passer une nouvelle commande
                 </button>
-              </div> 
-              <div class="container" id="ordesContainer">
-                    <div class="table-valided-orders mt-5" id="valided-orders">
-                        <h3 class="mb-4">Historique de vos commandes :</h3>
-                        <p>Vous pouvez suivre l'état de vos commandes passées ci-dessous :</p>
-                    </div>  
-                        <table id="historyOrdersTable" class="table-responsive table table-striped">
-                        <thead>
-                          <tr>
-                            <th scope="col">N°</th>
-                            <th scope="col">commande</th>
-                            <th scope="col">Date et heure de la commande</th>
-                            <th scope="col">Modification</th>
-                            <th scope="col">Annulation</th>
-                            <th scope="col">Statut</th>
-                          </tr>
-                        </thead>
-                        <tbody >
-                          
-                        </tbody>
-                        </table>
-              </div>
-          </div>
+            </div> 
+            <div class="orders-gestion mb-3">
+                <h2 class="mb-4 text-center">Gestion de vos Commandes</h2>  
+                <div class="table-responsive" id="order-cards-container">
+                                        <table class="table table-striped admin-table table-hover align-middle" id="historyOrdersTable">
+                                            <thead >
+                                                <tr>
+                                                <th class="d-none d-md-table-cell" scope="col">N°</th>
+                                                <th scope="col">commande</th>
+                                                <th scope="col">Date de livraison</th>
+                                                <th scope="col">Heure de livraison</th>
+                                                <th scope="col">Nombre de personnes</th>
+                                                <th scope="col">frais de livraison</th>
+                                                <th scope="col">Prix total</th>
+                                                <th scope="col">Adresse de livraison</th>
+                                                <th scope="col">Ville de livraison</th>
+                                                <th scope="col">Modification</th>
+                                                <th scope="col">Annulation</th>
+                                                <th scope="col">Statut de la commande</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="ordersList">
+                                                <tr></tr>
+                                            </tbody>
+                                        </table>
+                </div>
+            </div>
     </section>
-<!---modal edition de la commande de menu-->
-<div class="modal fade" id="editOrderModal" aria-hidden="true" aria-labelledby="editCommandeModalLabel" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered edit-commande-modal*">
-    <div class="modal-content">
-        <form id="edit-order-Form">
-          <input type="hidden" id="edit-order-id" name="orderId">
-          <div class="container-fluid">
-            <div class="modal-body">
-          <div class="row">Modifier votre commande :</div>
-          <div class="row">
-            <div class="col mb-3">
-                <label for="edit-customerName" class="form-label">Nom du client</label>
-                <input type="text" class="form-control" id="edit-customerName" placeholder="Entrez votre nom">
-            </div>
-            <div class="col mb-3">
-                <label for="edit-customerPrenom" class="form-label">Prénom du client</label>
-                <input type="text" class="form-control" id="edit-customerPrenom" placeholder="Entrez votre prénom">
-            </div>
-          </div>
-          <div class="row">
-            <div class="col mb-3">
-                <label for="edit-customerEmail" class="form-label">Email du client</label>
-                <input type="email" class="form-control" id="edit-customerEmail" placeholder="Entrez votre email">
-            </div>
-            <div class="col mb-3">
-                <label for="edit-customerPhone" class="form-label">Numéro de téléphone</label>
-                <input type="tel" class="form-control" id="edit-customerPhone" placeholder="Entrez votre numéro de téléphone">
-            </div>
-          </div>
-          <div class="row facture">
-            <div class="col mb-3">
-                <label for="edit-customerAddress" class="form-label">Adresse de facturation</label>
-                <input type="text" class="form-control" id="edit-customerAddress" placeholder="Entrez votre adresse">
-            </div>
-            <div class="col mb-3">
-                <label for="edit-factDate" class="form-label">Date de facturation</label>
-                <input type="text" class="form-control" id="edit-factDate" placeholder="Entrez votre adresse">
-            </div>
-            </div>
-            <div class="delivery row">
-            <div class="mb-3">
-                <label for="edit-deliveryAddress" class="form-label">Adresse de livraison</label>
-                <input type="text" class="form-control" id="edit-deliveryAddress" placeholder="Entrez votre adresse">
-                <small class="form-text">5 euros de livraison majoré de 59 centimes par kilomètre parcourus</small>
-            </div>
-            <div class="col mb-3">
-                <label for="edit-deliveryDate" class="form-label">Date de livraison</label>
-                <input type="date" class="form-control" id="edit-deliveryDate">
-            </div>
-            <div class="col mb-3">
-                <label for="edit-deliveryTime" class="form-label">Heure de livraison</label>
-                <input type="time" class="form-control" id="edit-deliveryTime">
-            </div>
-            </div>
-            <div class="row" id="edit-menu-section">
-            <div class="col mb-3" >
-                <label for="menuSelect" class="form-label">Votre menu commandé :</label>
-                <p aria-readonly="true">Menu: </p>
-                <p>Description du menu: </p>
-            </div>
-            <div class="col mb-3">
-                <label for="edit-menuQuantity" class="form-label"placeholder="minimum">Nombre de personnes :</label>
-                <input type="number" class="form-control" id="edit-menuQuantity" placeholder="Entrez le nombre de personnes">
-                <small class="form-text">Minimum de [20-50] personnes</small></br>
-            </div>
-          </div>
-            </div>  
-            <div class="modal-footer">
-              <button type="button" class="btn btn-primary"  data-bs-target="#detailsCommandeModal" data-bs-toggle="modal">Confirmer votre commande</button>
-            </div>
-          </div> 
-        </form>
-      </div>
-  </div>
-</div>
-<!--annuler une commande-->
-<div class="modal fade" id="deleteOrderModal" aria-hidden="true" aria-labelledby="deleteCommandeModalLabel" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered delete-commande-modal*">
-    <div class="modal-content">
-      <div class="modal-body">
-        <h5>Êtes-vous sûr de vouloir annuler cette commande ?</h5>
-        <p>Cette action est irréversible.</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-        <button type="button" class="btn btn-danger" id="confirmCancelBtn">Confirmer l'annulation</button>
-      </div>
-    </div>
-  </div>
-</div>
+<!-- Modal pour modifier une commande -->
+                    <div class="modal fade" id="editOrderModal" tabindex="-1" aria-labelledby="editOrderModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editOrderModalLabel">Modifier votre commande</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="editOrderForm">
+                                    <div class="mb-3">
+                                      <label for="menuSelected" class="form-label">Titre du menu</label>
+                                      <input type="text" class="form-control" id="menuSelected" name="menuSelected" disabled>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="numberOfPeople" class="form-label">Nombre de personnes</label>
+                                        <input type="number" class="form-control" id="numberOfPeople" name="numberOfPeople" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="deliveryCity" class="form-label">Ville de livraison</label>
+                                        <input type="text" class="form-control" id="deliveryCity" name="deliveryCity" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="deliveryAddress" class="form-label">Adresse de livraison</label>
+                                        <input type="text" class="form-control" id="deliveryAddress" name="deliveryAddress" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="deliveryDate" class="form-label">Date de livraison</label>
+                                        <input type="date" class="form-control" id="deliveryDate" name="deliveryDate" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="deliveryPostalCode" class="form-label">Code postal de livraison</label>
+                                        <input type="text" class="form-control" id="deliveryPostalCode" name="deliveryPostalCode" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="deliveryTime" class="form-label">Heure de livraison</label>
+                                        <input type="time" class="form-control" id="deliveryTime" name="deliveryTime" required>
+                                    </div>
+
+                                    <div class="text-center">
+                                        <button type="submit" class="btn btn-primary">
+                                            Enregistrer les modifications
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+
+                        </div>
+                    </div>
+                    </div>
+         <!--annuler une commande-->
+                    <div class="modal fade" id="deleteOrderModal" aria-hidden="true" aria-labelledby="deleteCommandeModalLabel" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered delete-commande-modal*">
+                        <div class="modal-content">
+                        <div class="modal-body">
+                            <h5>Êtes-vous sûr de vouloir annuler cette commande ?</h5>
+                            <p>Cette action est irréversible.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="button" class="btn btn-danger" id="confirmCancelBtn">Confirmer l'annulation</button>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
 <!-- ajout ORDER MODAL -->
 <div class="modal fade" id="OrderModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered order-modal">
@@ -199,7 +179,7 @@
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#detailsOrderModal">Retour</button>
-                  <button type="submit" class="btn btn-primary" id="confirm-order-btn">Confirmer vos informations</button>
+                  <button type="button" class="btn btn-primary" id="confirm-order-btn">Confirmer vos informations</button>
                 </div>  
             </div>
         </form>
@@ -210,12 +190,14 @@
 <div class="modal fade" id="OrderDetailsModal" aria-hidden="true" aria-labelledby="detailsCommandeModalLabel" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered details-commande-modal*">
     <div class="modal-content">
-        <div class="modal-body" id="OrderDetailsModalBody">
+        <div class="modal-body" id="orderDetails">
+          <h3 class="text-center mb-4">Récapitulatif de votre commande</h3>
+
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Retour</button>
           <button type="button" class="btn btn-primary" id="pay-order-btn" data-bs-dismiss="modal">payer</button>
-        </div>
+          </div>
     </div>
   </div>  
 </div>

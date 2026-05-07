@@ -35,9 +35,9 @@ class Orders
     #[Groups(['orders:read'])]
     private ?float $totalPrice = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 0, nullable: true)]
+    #[ORM\Column(type: Types::FLOAT, precision: 10, scale: 2, nullable: true)]
     #[Groups(['orders:read', 'orders:write'])]
-    private ?string $deliveryCost = null;
+    private ?float $deliveryCost = null;
 
     #[ORM\Column(length: 255)]
     #[Groups(['orders:read', 'orders:write'])]
@@ -106,23 +106,22 @@ class Orders
     {
         return $this->totalPrice;
     }
-    #[Groups(['orders:read'])]
+    #[Groups(['orders:write'])]
     public function setTotalPrice(float $totalPrice): static
     {
         $this->totalPrice = $totalPrice;
 
         return $this;
     }
-
-    public function getDeliveryCost(): ?string
+    #[Groups(['orders:read'])]
+    public function getDeliveryCost(): ?float
     {
         return $this->deliveryCost;
     }
 
-    public function setDeliveryCost(?string $deliveryCost): static
+    public function setDeliveryCost(?float $deliveryCost): static
     {
         $this->deliveryCost = $deliveryCost;
-
         return $this;
     }
 
@@ -265,10 +264,11 @@ class Orders
 
     public function setDeliveryPostalCode(int $deliveryPostalCode): static
     {
-        $this->deliveryPostalCode = $deliveryPostalCode;
-        if (!preg_match('/^\d{5}$/', (string)$deliveryPostalCode)) {
+        if (!preg_match('/^\d{5}$/', $deliveryPostalCode)) {
             throw new \InvalidArgumentException('Le code postal doit être un nombre à 5 chiffres');
         }
+
+        $this->deliveryPostalCode = $deliveryPostalCode;
 
         return $this;
     }

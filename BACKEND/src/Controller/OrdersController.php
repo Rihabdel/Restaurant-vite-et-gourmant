@@ -135,7 +135,16 @@ final class OrdersController extends AbstractController
                 return $this->json(['error' => "La date de livraison doit respecter le délai de préparation ({$menu->getOrderBefore()} heures)"], Response::HTTP_BAD_REQUEST);
             }
 
-            $deliveryCost = $this->calculateDeliveryCost($data['deliveryCity'], $data['deliveryPostalCode']);
+            $distanceKm = 0;
+            $deliveryCost = $this->calculateDeliveryCost(
+                $data['deliveryCity'],
+                $data['deliveryPostalCode'],
+                $distanceKm
+            );
+
+            $totalPrice =
+                $menu->getPriceEstimate($data['numberOfPeople'])
+                + $deliveryCost;
 
             $order = new Orders();
             $order->setMenu($menu)
@@ -148,35 +157,22 @@ final class OrdersController extends AbstractController
                 ->setDeliveryTime(new \DateTime($data['deliveryTime']))
                 ->setCreatedAt(new \DateTimeImmutable())
                 ->setDeliveryCost($deliveryCost)
-                ->setTotalPrice($menu->calculate_total_price($data['numberOfPeople']) + $deliveryCost)
+                ->setTotalPrice($totalPrice)
                 ->setStatus(Status::en_attente->value);
-
-            $errors = $this->validator->validate($order);
-            if (count($errors) > 0) {
-                $messages = array_map(fn($e) => $e->getMessage(), iterator_to_array($errors));
-                return $this->json(['errors' => $messages], Response::HTTP_BAD_REQUEST);
-            }
-
-            // Mettre à jour le stock
-            $menu->setStock($menu->getStock() - $data['numberOfPeople']);
-
             $this->entityManager->persist($order);
             $this->entityManager->flush();
-
-            $location = $this->generateUrl('app_api_orders_show', ['id' => $order->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
-
-            return $this->json(
-                $order,
-                Response::HTTP_CREATED,
-                ['Location' => $location],
-                ['groups' => ['orders:read', 'menu:read']]
-            );
+            return $this->json($order, Response::HTTP_CREATED, [], ['groups' => ['orders:read', 'menu:read']]);
         } catch (\Exception $e) {
             return $this->json(['error' => 'Erreur lors de la création de la commande: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
-    #[Route('/orders/{id}', methods: ['GET'], name: 'show')]
+    #[Route(
+        '/orders/{id}',
+        name: 'orders_show',
+        methods: ['GET'],
+        requirements: ['id' => '\d+']
+    )]
     #[IsGranted('ROLE_USER')]
     #[OA\Get(
         tags: ["Orders"],
@@ -205,10 +201,10 @@ final class OrdersController extends AbstractController
             )
         ]
     )]
+    // Afficher les détails d'une commande (accessible uniquement par le propriétaire de la commande, les admins et les employés)
     public function show(int $id, OrdersRepository $ordersRepository): JsonResponse
     {
         $order = $ordersRepository->find($id);
-
         if (!$order) {
             return $this->json(['error' => 'Commande non trouvée'], Response::HTTP_NOT_FOUND);
         }
@@ -218,124 +214,42 @@ final class OrdersController extends AbstractController
         return $this->json($order, Response::HTTP_OK, [], ['groups' => ['orders:read', 'menu:read']]);
     }
 
-    #[Route('/orders', methods: ['GET'], name: 'index')]
+    // Lister les commandes d'un utilisateur
+    #[Route('/orders', methods: ['GET'], name: 'listOrdersByUser')]
     #[IsGranted('ROLE_USER')]
     #[OA\Get(
         tags: ["Orders"],
-        summary: "Lister toutes les commandes",
+        summary: "Lister les commandes de l'utilisateur connecté",
         responses: [
             new OA\Response(
                 response: 200,
                 description: "Liste des commandes récupérée avec succès"
             ),
             new OA\Response(
-                response: 403,
-                description: "Accès non autorisé"
-            )
-        ]
-    )]
-    public function index(OrdersRepository $ordersRepository): JsonResponse
-    {
-        $orders = $ordersRepository->findAll();
-
-        return $this->json($orders, Response::HTTP_OK, [], ['groups' => ['orders:read', 'menu:read']]);
-    }
-
-    #[Route('/orders/list', methods: ['GET'], name: 'list')]
-    #[IsGranted('ROLE_USER')]
-    #[OA\Get(
-        tags: ["Orders"],
-        summary: "Lister les commandes de l'utilisateur connecté",
-        parameters: [
-            new OA\Parameter(
-                name: "status",
-                in: "query",
-                description: "Filtrer par statut (ex: en_attente, en_preparation, livre, annule)",
-                required: false,
-                schema: new OA\Schema(type: "string")
-            ),
-            new OA\Parameter(
-                name: "createdAt",
-                in: "query",
-                description: "Filtrer par date de création (format YYYY-MM-DD)",
-                required: false,
-                schema: new OA\Schema(type: "string", format: "date")
-            ),
-            new OA\Parameter(
-                name: "menu",
-                in: "query",
-                description: "Filtrer par ID de menu",
-                required: false,
-                schema: new OA\Schema(type: "integer")
-            )
-        ],
-        responses: [
-            new OA\Response(
-                response: 200,
-                description: "Liste des commandes récupérée avec succès",
-                content: new OA\JsonContent(
-                    example: [
-                        [
-                            "id" => 1,
-                            "menu" => "Menu Dégustation",
-                            "number_of_people" => 15,
-                            "delivery_info" => [
-                                "address" => "123 Rue Exemple",
-                                "city" => "Bordeaux",
-                                "postal_code" => "33000",
-                                "date" => "2026-03-31",
-                                "time" => "19:00"
-                            ],
-                            "prices" => [
-                                "menu_price" => 100.0,
-                                "delivery_cost" => 0.0,
-                                "total_price" => 100.0
-                            ],
-                            "status" => "en_attente",
-                            "created_at" => "2024-11-01 12:00:00"
-                        ]
-                    ]
-                )
-            ),
-            new OA\Response(
-                response: 400,
-                description: "Requête invalide (ex: filtre non valide)"
+                response: 401,
+                description: "Utilisateur non authentifié"
             ),
             new OA\Response(
                 response: 404,
-                description: "Aucune commande trouvée pour l'utilisateur"
+                description: "Aucune commande trouvée pour cet utilisateur"
             )
         ]
     )]
-    public function list(OrdersRepository $ordersRepository, Request $request): JsonResponse
+    public function listByUser(OrdersRepository $ordersRepository): JsonResponse
+
     {
         $user = $this->getUser();
-        $filters = [
-            'status' => $request->query->get('status'),
-            'user' => $user->getUserIdentifier(),
-            'date' => $request->query->get('createdAt'),
-            'menu' => $request->query->get('menu'),
-        ];
-
-        if ($filters['status']) {
-            $statusEnum = Status::tryFrom($filters['status']);
-            if (!$statusEnum) {
-                return $this->json(['error' => 'Statut invalide'], Response::HTTP_BAD_REQUEST);
-            }
-            $filters['status'] = $statusEnum->value;
+        if (!$user) {
+            return $this->json(['error' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
         }
-
-        $orders = empty(array_filter($filters))
-            ? $ordersRepository->findBy(['user' => $user])
-            : $ordersRepository->findByFilters($filters);
-
-
+        $orders = $ordersRepository->findByClientId($user->getId());
+        if ($orders === []) {
+            return $this->json(['message' => 'Aucune commande trouvée pour cet utilisateur'], Response::HTTP_NOT_FOUND);
+        }
         if (!$orders) {
-            return $this->json(['message' => 'Aucune commande trouvée'], Response::HTTP_NOT_FOUND);
+            return $this->json(['message' => 'Aucune commande trouvée pour cet utilisateur'], Response::HTTP_NOT_FOUND);
         }
-
-        $data = $this->serializer->serialize($orders, 'json', ['groups' => ['orders:read', 'menu:read']]);
-        return new JsonResponse($data, Response::HTTP_OK, [], true);
+        return $this->json($orders, Response::HTTP_OK, [], ['groups' => ['orders:read', 'menu:read', 'user:read']]);
     }
 
     // Méthodes auxiliaires
@@ -489,14 +403,19 @@ final class OrdersController extends AbstractController
     }
 
 
-    private function calculateDeliveryCost(string $deliveryCity, string $deliveryPostalCode): float
+    private function calculateDeliveryCost(string $deliveryCity, string $deliveryPostalCode, float $distance): float
     {
-        $bordeauxPostalCodes = ['33000', '33100', '33200', '33300', '33400', '33500', '33800'];
-        return in_array($deliveryPostalCode, $bordeauxPostalCodes) && stripos($deliveryCity, 'Bordeaux') !== false
-            ? 0.0
-            : 5.0;
-    }
 
+        $bordeauxPostalCodes = ['33000', '33100', '33200', '33300', '33400', '33500', '33800'];
+        $isBordeaux =
+            in_array($deliveryPostalCode, $bordeauxPostalCodes) &&
+            stripos($deliveryCity, 'bordeaux') !== false;
+
+        if ($isBordeaux) {
+            return 5.0;
+        }
+        return 5.0 + ($distance * 0.59);
+    }
     private function discount(Orders $orders): float
     {
         $numberOfPeople = $orders->getNumberOfPeople();
@@ -545,7 +464,7 @@ final class OrdersController extends AbstractController
         return $this->json(null, Response::HTTP_NO_CONTENT);
     }
 
-    // afficher toutes les commandes pour les employés et les admins
+    // afficher toutes les commandes pour les employés et les admins et les filtrer par statut, date de livraison ou menu
     #[Route('/admin/orders', methods: ['GET'], name: 'admin_index')]
     #[IsGranted('ROLE_ADMIN')]
 
@@ -565,11 +484,55 @@ final class OrdersController extends AbstractController
     )]
     public function adminIndex(OrdersRepository $ordersRepository, SerializerInterface $serializer, Request $request): JsonResponse
     {
+        $filters = [
+            'status' => $request->query->get('status'),
+            'user' => $request->query->get('user'),
+            'delivery_date' => $request->query->get('delivery_date'),
+            'menu' => $request->query->get('menu'),
+        ];
 
-        $orders = $ordersRepository->findAll();
-        $data = $serializer->serialize($orders, 'json', ['groups' => ['orders:read']]);
+        if ($filters['status']) {
+            $statusEnum = Status::tryFrom($filters['status']);
+            if (!$statusEnum) {
+                return $this->json(['error' => 'Statut invalide'], Response::HTTP_BAD_REQUEST);
+            }
+            $filters['status'] = $statusEnum->value;
+        }
+        if ($filters['user']) {
+            $user = $this->entityManager->getRepository(User::class)->findOneBy(['lastName' => $filters['user']]);
+            if (!$user) {
+                return $this->json(['error' => 'Utilisateur non trouvé pour le filtre'], Response::HTTP_BAD_REQUEST);
+            }
+            $filters['user'] = $user->getId();
+        }
+        if ($filters['delivery_date']) {
+            try {
+                $filters['delivery_date'] = new \DateTime($filters['delivery_date']);
+            } catch (\Exception $e) {
+                return $this->json(['error' => 'Date de livraison invalide pour le filtre'], Response::HTTP_BAD_REQUEST);
+            }
+        }
+        if ($filters['menu']) {
+            $menu = $this->entityManager->getRepository(Menus::class)->findOneBy(['title' => $filters['menu']]);
+            if (!$menu) {
+                return $this->json(['error' => 'Menu non trouvé pour le filtre'], Response::HTTP_BAD_REQUEST);
+            }
+            $filters['menu'] = $menu->getId();
+        }
+
+        $orders = empty(array_filter($filters))
+            ? $ordersRepository->findAll()
+            : $ordersRepository->findByFilters($filters);
+
+        if (!$orders) {
+            return $this->json(['message' => 'Aucune commande trouvée'], Response::HTTP_NOT_FOUND);
+        }
+
+        $data = $this->serializer->serialize($orders, 'json', ['groups' => ['orders:read', 'menu:read']]);
         return new JsonResponse($data, Response::HTTP_OK, [], true);
     }
+
+    // Modifier une commande par un admin ou un employé
     #[Route('/admin/orders/{id}/edit', methods: ['PUT'], name: 'admin_edit')]
     #[IsGranted('ROLE_ADMIN')]
 
@@ -610,6 +573,8 @@ final class OrdersController extends AbstractController
         return $this->json(['message' => 'Commande modifiée avec succès'], Response::HTTP_OK);
     }
 
+
+    // Mettre à jour le statut d'une commande par un admin
     #[Route('/admin/orders/{id}/status', methods: ['PUT'], name: 'admin_update_status')]
     #[IsGranted('ROLE_ADMIN')]
     #[OA\Put(

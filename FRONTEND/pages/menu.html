@@ -30,7 +30,7 @@
                         <span class="form-text">Minimum de 1 personne</span>
                         </div>
                       <div class="">
-                          <label for="Theme" class="form-label">Thème</label>
+                          <label for="themeFilter" class="form-label">Thème</label>
                           <select aria-label="Thème" class="form-select" id="themeFilter">
                               <option value="all">Tous</option>
                               <option value="anniversaire">Anniversaire</option>
@@ -160,62 +160,26 @@
 <!-- modal details de la carte de menu -->
 <div class="modal fade" id="detailscarteModal" aria-hidden="true" aria-labelledby="detailscarteModalToggleLabel" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered modal-lg details">
-    <div class="modal-content">
+    <div class="modal-content" id="detailscarteModalContent">
       <div class="modal-body" id="detailsMenuContent">
           <div class="container menu-card-detail">
-                      <h2 class="Menu-title text-center " id="detailscarteModalLabel">titre du menu</h2>
-                        <div class="menu-category" id="entrees-container">
-                            <h3><i class="bi bi-egg-fried"></i> Entrées</h3>
-                            <div class="menu-item">
-                                <div class="row row-cols-2 menu-item-header">
-                                    <div class="col-lg-10 menu-item-title">Foie Gras Maison</div>
-                                    <div class="col-lg-2 menu-item-price">18€</div>
-                                </div>
-                                <p class="menu-item-description">Préparé selon la recette familiale, servi avec sa confiture d'oignons et toast brioché</p>
-                                <small ><i class="bi bi-exclamation-triangle-fill"></i> Contient de $allergene</small>
-                            </div> 
+                      <h2 class="Menu-title text-center" id="detailscarteModalLabel">titre du menu</h2>
+                        <div class="menu-category">
+                            
                         </div>    
-                        <div class="menu-category" id ="plats-container">
-                            <h3><i class="bi bi-cup-hot"></i> Plats Principaux</h3>
-                            <div class="menu-item">
-                                <div class="row row-cols-2 menu-item-header">
-                                    <div class="col-lg-10 menu-item-title">Magret de Canard aux Cèpes</div>
-                                    <div class="col-lg-2 menu-item-price">28€</div>
-                                </div>
-                                <p class="menu-item-description">Magret grillé, sauce au vin de Saint-Émilion, cèpes de Gironde et pommes de terre sautées</p>
-                                <small ><i class="bi bi-exclamation-triangle-fill"></i> Contient de $allergene</small>
-                            </div>
-                        </div>   
-                        <div class="menu-category" id="desserts-container">
-                            <h3><i class="bi bi-cake2"></i> Desserts</h3>
-                            <div class="menu-item">
-                                <div class="row row-cols-2 menu-item-header">
-                                    <div class="col-lg-10 menu-item-title">Canelés Bordelais</div>
-                                    <div class="col-lg-2 menu-item-price">9€</div>
-                                </div>
-                                <p class="menu-item-description">Spécialité bordelaise, dorés et caramélisés à l'extérieur, moelleux à l'intérieur</p>
-                                <small ><i class="bi bi-exclamation-triangle-fill"></i> Contient de $allergene</small>
-                            </div>
-                        </div>
-                          <div class="totalPrice">
-                            <h4 class="text-center mt-4">Prix total par personne : 45 Euros</h4>
-                          </div>
+
           </div>
       </div>
       <div class="modal-footer d-flex justify-content-center">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-        <button type="button" class="btn btn-primary pre-order-btn" data-id="${menu.id}">Commander ce menu</button>
-      </div>
-      <div class ="modal-footer d-flex justify-content-center"  data-role="admin,employee">
-        <button type="button" class="btn btn-success" data-id="${menu.id}" id="editCarteMenuBtn">modifier la carte </button>
-        <button type="button" class="btn btn-danger" data-id="${menu.id}" id="deleteCarteMenuBtn">supprimer la carte </button>  
+        <button type="button" class="btn btn-primary pre-order-btn">Commander ce menu</button>
       </div>
     </div>  
   </div>
       
 </div>
 
-<!---modal recap de la commande de menu-->
+<!---modal de pré-commande-->
 <div class="modal fade" id="PreOrderModal" aria-hidden="true" aria-labelledby="recapCommandeModalLabel" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered recap-commande-modal*">
     <div class="modal-content">
@@ -227,14 +191,17 @@
                   </div>
                   <div class="row">
                     <div class="col mb-3">
-                        <label for="menuTitle" class="form-label">Titre du menu :</label>
-                        <select class="form-select" id="menuSelect">
-
-                        </select>
+                      <label for="menuSelect" class="form-label">Titre du menu :</label>
+                          <select class="form-select" id="menuSelect" name="menuId">
+                          <option value="" disabled selected>Choisissez un menu</option>
+                          </select>
+                    </div>
+                    <div class="col mb-3">    
                         <label for="numberOfPeople" class="form-label"placeholder="minimum">Nombre de personnes :</label>
                         <input type="number" class="form-control" id="numberOfPeople" placeholder="Entrez le nombre de personnes">
                         <small class="form-text">Minimum de [20-50] personnes</small></br>
                     </div>
+                  <small class="form-text minPeople">Minimum de personnes</small>  
                   </div>
                   <div class="row">
                     <div class="col mb-3">
@@ -258,8 +225,8 @@
                   </div>
                   <div class="row facture">
                       <div class="col mb-3">
-                          <label for="customerAddress" class="form-label">Adresse de facturation</label>
-                          <input type="text" class="form-control" id="customerAddress" placeholder="Entrez votre adresse">
+                          <label for="factAddress" class="form-label">Adresse de facturation</label>
+                          <input type="text" class="form-control" id="factAddress" placeholder="Entrez votre adresse">
                       </div>
                       <div class="col mb-3">
                           <label for="factDate" class="form-label">Date de facturation</label>
@@ -294,7 +261,7 @@
                   </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#detailscarteModal">Retour</button>
-                  <button type="submit" class="btn btn-primary" id="confirm-order-btn">Confirmer vos informations</button>
+                  <button type="button" class="btn btn-primary" id="confirm-order-btn">Confirmer vos informations</button>
                 </div>
               </div>
           </div>
@@ -307,12 +274,14 @@
 <div class="modal fade" id="OrderDetailsModal" aria-hidden="true" aria-labelledby="detailsCommandeModalLabel" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered details-commande-modal*">
     <div class="modal-content">
-        <div class="modal-body" id="OrderDetailsModalBody">
-        </div>  
+        <div class="modal-body" id="orderDetails">
+          <h3 class="text-center mb-4">Récapitulatif de votre commande</h3>
+
+        </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Retour</button>
-          <button type="button" class="btn btn-primary" id="pay-order-btn" data-bs-dismiss="modal" id="pay-order-btn">payer</button>
-        </div>
+          <button type="button" class="btn btn-primary" id="pay-order-btn" data-bs-dismiss="modal">payer</button>
+          </div>
     </div>
   </div>  
 </div>

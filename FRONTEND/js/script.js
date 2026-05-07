@@ -1,4 +1,4 @@
-const API_BASE = 'http://127.0.0.1:8000/api'; 
+export const API_BASE = 'http://127.0.0.1:8000/api'; 
 const tokenCookieName = "accesstoken";
 export const roleCookieName = 'role';
 const signoutBtn = document.getElementById("SignoutBtn");
@@ -126,6 +126,12 @@ export async function updateUserInfo(updatedData) {
     }
     return await response.json();
 }
+
+
+
+
+
+
 
 // Initialisation au chargement
 console.log("script.js chargé - Token:", getToken(), "Rôle:", getRole());

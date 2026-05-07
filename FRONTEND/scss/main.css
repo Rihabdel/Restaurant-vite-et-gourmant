@@ -12570,6 +12570,7 @@ td button {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1px;
+  justify-content: center;
 }
 
 .highlight-text {

@@ -1,6 +1,6 @@
-import { getMenus, getMenuById, getMenuDishes, enregistrerMenu, updateMenu, deleteMenu, createOrder, getUserInfo, getDishes} from './api.js';
+import { getMenus, getMenuById, getMenuDishes, enregistrerMenu, updateMenu, deleteMenu, createOrder, getUserInfo, getDishes, getListDesDishesByMenuId} from './api.js';
 import { showAndHideElementsForRoles, getToken } from './script.js';
-
+import { getCurrentOrderData,fillNewOrderModal,fillNewOrderDetailsModal } from './orders.js';
 // Initialiser la page des menus
 export default async function initMenu() {
     console.log("Initializing menu page...");
@@ -34,7 +34,7 @@ export async function displayMenus(menus){
     container.innerHTML = visibleMenus.map(menu=> {
 
 const pictureUrl = menu.pictureUrl ? `http://127.0.0.1:8000${menu.pictureUrl}` : '/scss/images/viteGourmand.png';
-         return `
+        return `
             <div class="col-lg-3 col-md-4 mb-4 p-2">
                 <div class="card menu-card">
                     <div class="card-image">
@@ -62,7 +62,7 @@ const pictureUrl = menu.pictureUrl ? `http://127.0.0.1:8000${menu.pictureUrl}` :
                         <div class="menu-price">
                             <i class="bi bi-currency-euro"></i> ${parseFloat(menu.price).toFixed(2)} € / pers
                         </div>
-                        <small><i class="bi bi-exclamation-triangle-fill"></i> Allergènes : ${menu.allAllergens || 'Aucune allergènes'}</small>
+                        <small><i class="bi bi-exclamation-triangle-fill"></i> Allergènes : ${menu.allAllergenes || 'Aucune allergènes'}</small>
                         <div class="d-flex justify-content-center py-2">
                         <button class="btn btn-primary view-detail-btn" data-id="${menu.id}">
                             Détails du menu
@@ -85,112 +85,162 @@ const pictureUrl = menu.pictureUrl ? `http://127.0.0.1:8000${menu.pictureUrl}` :
 // Initialiser les listeners pour les boutons d'action sur les menus (détails, édition, suppression, pré-commande)
 function initButtons() {
     // Détails du menu
-    const container = document.getElementById('menu-cards-container');
-    if (!container) {
-        console.error('Conteneur pour les cartes de menu introuvable.');
+        const container = document.getElementById('menu-cards-container');
+        if (!container) {
+            console.error('Conteneur pour les cartes de menu introuvable.');
+            return;
+        }
+        
+        container.addEventListener('click', async (e) => {
+            
+            const detailBtn = e.target.closest('.view-detail-btn');
+            if (detailBtn) {
+                const id = detailBtn.dataset.id;
+                if (!id) return;
+                try{
+                    await getMenuDetail(id);
+                    const modalEl = document.getElementById('detailscarteModal');
+                    const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+                    modalInstance.show();
+                } catch (error) {
+                    console.error("Erreur lors de la récupération des détails du menu :", error);
+                    alert("Impossible de charger les détails du menu. Veuillez réessayer plus tard.");
+                }
+            }
+            const editBtns = e.target.closest('.edit-menu-btn');
+            if (editBtns) {
+                e.preventDefault();
+                const id = editBtns.dataset.id;
+                const form = document.getElementById('editMenuForm');
+                if (form) {
+                    form.setAttribute('data-id', id);
+                }
+                if (id) {
+                    fillEditMenuModal(id);
+                } else {
+                    console.error('ID de menu non trouvé pour le bouton de modification cliqué.');
+                }
+            }
+            const deleteBtns = e.target.closest('.delete-menu-btn');
+            if (deleteBtns) {
+                e.preventDefault();
+                const id = deleteBtns.dataset.id;
+                const modalEl = document.getElementById('deleteMenuModal');
+                if (modalEl) {
+                    const confirmDeleteBtn = modalEl.querySelector('.confirmDeleteMenu');
+                    if (confirmDeleteBtn) {
+                        confirmDeleteBtn.onclick = async () => {
+                            try {
+                            await deleteMenu(id );
+                                window.location.reload();
+                            } catch (error) {
+                                console.error("Erreur lors de la suppression du menu :", error);
+                            }
+                        };
+                    }
+                    const deleteModalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+                    deleteModalInstance.show();
+                } else {
+                    console.error('Modal de confirmation de suppression introuvable.');
+                }
+            }
+            const editImgBtn = e.target.closest('.edit-img-menu-btn');
+                if (editImgBtn) {
+                    e.preventDefault();
+                    const id = editImgBtn.dataset.id;
+                    console.log("EDIT IMAGE ID:", id);
+                    if (id) openImageUpload(id);
+                    return;
+                }
+            const deleteImgBtn = e.target.closest('.delete-img-menu-btn');
+                if (deleteImgBtn) {
+                    e.preventDefault();
+                    const id = deleteImgBtn.dataset.id;
+                    console.log("DELETE IMAGE ID:", id);
+                    if (id) {
+                        try {
+                            await updateMenu(id, { picture: null });
+                            alert("Image supprimée !");
+                            const menus = await getMenus();
+                            displayMenus(menus);
+                        }
+                        catch (error) {
+                            console.error("Erreur lors de la suppression de l'image :", error);
+                            alert("Erreur lors de la suppression de l'image. Veuillez réessayer.");
+                        }
+                    }
+                    return;
+                }
+                
+        });
+
+    const addMenuBtn = document.getElementById('add-Menu-Btn');
+        if (addMenuBtn) {
+            addMenuBtn.addEventListener('click', () => {
+                const modalEl = document.getElementById('editMenuModal');
+                const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+                modalInstance.show();
+            });
+        }
+    const confirmOrderBtn = document.getElementById('confirm-order-btn');
+
+        if (confirmOrderBtn) {
+            confirmOrderBtn.addEventListener('click', async () => {
+                const orderData = getCurrentOrderData();
+                const menu = orderData.menu;
+                    if (!orderData.numberOfPeople || orderData.numberOfPeople < menu.minPeople) {
+        alert(`Minimum ${menu.minPeople} personnes`);
         return;
     }
-    container.addEventListener('click', async (e) => {
-        
-        const detailBtn = e.target.closest('.view-detail-btn');
-        if (detailBtn) {
-            const id = detailBtn.dataset.id;
-            if (!id) return;
-            try{
-                await getMenuDetail(id);
-            } catch (error) {
-                console.error("Erreur lors de la récupération des détails du menu :", error);
-                alert("Impossible de charger les détails du menu. Veuillez réessayer plus tard.");
-            }
-        }
-    const editBtns = e.target.closest('.edit-menu-btn');
-    if (editBtns) {
-        e.preventDefault();
-        const id = editBtns.dataset.id;
-        const form = document.getElementById('editMenuForm');
-        if (form) {
-            form.setAttribute('data-id', id);
-        }
-        if (id) {
-            fillEditMenuModal(id);
-        } else {
-            console.error('ID de menu non trouvé pour le bouton de modification cliqué.');
-        }
-    }
-    const deleteBtns = e.target.closest('.delete-menu-btn');
-    if (deleteBtns) {
-        e.preventDefault();
-        const id = deleteBtns.dataset.id;
-        const modalEl = document.getElementById('deleteMenuModal');
-        if (modalEl) {
-            const confirmDeleteBtn = modalEl.querySelector('.confirmDeleteMenu');
-            if (confirmDeleteBtn) {
-                confirmDeleteBtn.onclick = async () => {
-                    try {
-                    await deleteMenu(id );
-                        window.location.reload();
-                    } catch (error) {
-                        console.error("Erreur lors de la suppression du menu :", error);
-                    }
-                };
-            }
-            const deleteModalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
-            deleteModalInstance.show();
-        } else {
-            console.error('Modal de confirmation de suppression introuvable.');
-        }
-    }
-      const editDetailBtn = e.target.closest('.editCarteMenuBtn');
-    if (editDetailBtn) {
-        e.preventDefault();
-        const id = editDetailBtn.dataset.id;
-        if (id) {
-            getMenuDetail(id);
-            await fillEditDetailMenuCardModal(id);
-        } else {
-            console.error('ID de menu non trouvé pour le bouton d\'édition dans les détails du menu.');
-        }
-    }
-    
-    const editImgBtn = e.target.closest('.edit-img-menu-btn');
-        if (editImgBtn) {
-            e.preventDefault();
-            const id = editImgBtn.dataset.id;
-            console.log("EDIT IMAGE ID:", id);
-            if (id) openImageUpload(id);
-            return;
-        }
-    const deleteImgBtn = e.target.closest('.delete-img-menu-btn');
-        if (deleteImgBtn) {
-            e.preventDefault();
-            const id = deleteImgBtn.dataset.id;
-            console.log("DELETE IMAGE ID:", id);
-            if (id) {
-                try {
-                    await updateMenu(id, { picture: null });
-                    alert("Image supprimée !");
-                    const menus = await getMenus();
-                    displayMenus(menus);
-                }
-                catch (error) {
-                    console.error("Erreur lors de la suppression de l'image :", error);
-                    alert("Erreur lors de la suppression de l'image. Veuillez réessayer.");
-                }
-            }
-            return;
-        }
-});
-// Bouton d'ajout de menu
-const addMenuBtn = document.getElementById('add-Menu-Btn');
-    if (addMenuBtn) {
-        addMenuBtn.addEventListener('click', () => {
-            const modalEl = document.getElementById('editMenuModal');
-            const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
-            modalInstance.show();
-        });
-    }
-}
 
+    // ✅ validation date
+    const today = new Date();
+    const minDate = new Date();
+    minDate.setDate(today.getDate() + menu.orderBefore);
+
+    if (!orderData.deliveryDate || new Date(orderData.deliveryDate) < minDate) {
+        alert(`Commande à faire ${menu.orderBefore} jours à l'avance`);
+        return;
+    }
+
+                try {
+                    await fillNewOrderDetailsModal(orderData);
+
+                    const orderModalEl = document.getElementById('PreOrderModal');
+                    const orderModalInstance = bootstrap.Modal.getOrCreateInstance(orderModalEl);
+                    orderModalInstance.hide();
+
+                    const orderDetailsModalEl = document.getElementById('OrderDetailsModal');
+                    const orderDetailsModalInstance = bootstrap.Modal.getOrCreateInstance(orderDetailsModalEl);
+                    orderDetailsModalInstance.show();
+
+                } catch (error) {
+                    console.error("Erreur :", error);
+                    alert("Erreur lors du chargement de la commande");
+                }
+            });
+        }
+        const payOrderBtn = document.getElementById('pay-order-btn');
+            if (payOrderBtn) {
+                payOrderBtn.addEventListener('click', () => {
+                    const data = getCurrentOrderData();   
+                    try {
+                createOrder(data)
+    
+                const detailsModalEl = document.getElementById('OrderDetailsModal');
+                bootstrap.Modal.getInstance(detailsModalEl).hide();
+                    alert("Votre commande a été créée avec succès !");
+                    
+                }
+                
+                catch(error){
+                    console.error("Erreur lors de la création de la commande :", error);
+                    alert("Une erreur est survenue lors de la création de votre commande. Veuillez réessayer.");
+                }
+            });
+        }
+        
+}
     // Boutons de modification et suppression de menu
 function openImageUpload(id) {
     const input = document.createElement('input');
@@ -238,7 +288,6 @@ function openImageUpload(id) {
     input.click();
 }
 
-
 function initModals(){
     try{
     const detailModalEl = document.getElementById('detailscarteModal');
@@ -246,6 +295,7 @@ function initModals(){
     const deleteMenuModalEl = document.getElementById('deleteMenuModal');
 
     if (detailModalEl) new bootstrap.Modal(detailModalEl);
+
     if (editMenuModalEl) new bootstrap.Modal(editMenuModalEl);
     if (deleteMenuModalEl) new bootstrap.Modal(deleteMenuModalEl);
 
@@ -262,7 +312,7 @@ function initForm() {
 
     if (!form) return;
 
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener('click', async (e) => {
         e.preventDefault();
 
         console.log("Formulaire intercepté !");
@@ -308,45 +358,7 @@ function initForm() {
             console.error("Erreur API :", error);
         }
     });
-
-    const OrderForm = document.getElementById('OrderForm');
-    OrderForm.addEventListener('submit', async (e) => {
-        e.preventDefault(); 
-        const user = await getUserInfo();
-        console.log("Données utilisateur récupérées pour la commande :", user);
-        
-        // Récupérer les données du formulaire
-        const menu = e.target.getAttribute('data-id');
-        const orderData = {
-                    menu : menu,
-                    userId: user.id,
-                    numberOfPeople: parseInt(document.getElementById('numberOfPeople').value),
-                    deliveryAddress: document.getElementById('deliveryAddress').value,
-                    deliveryCity: document.getElementById('deliveryCity').value,
-                    deliveryPostalCode: document.getElementById('deliveryPostalCode').value,
-                    deliveryDate: document.getElementById('deliveryDate').value, 
-                    deliveryTime: document.getElementById('deliveryTime').value,
-                    
-        };
-        console.log("Données de commande prêtes :", orderData);
-
-        try {
-            await createOrder(orderData);
-
-            const modalEl = document.getElementById('PreOrderModal');
-            const modalInstance = bootstrap.Modal.getInstance(modalEl);
-            modalInstance.hide();// Ferme le modal de pré-commande
-
-            // Affiche le modal de détails de la commande
-            fillNewOrderDetailsModal(orderData, user);
-
-            const detailsModal = new bootstrap.Modal(document.getElementById('OrderDetailsModal'));
-            detailsModal.show();
-        } catch (error) {
-            console.error("Erreur lors de l'envoi :", error);
-        }
-    });
-
+   
 }
 // Pré-remplir le formulaire d'édition avec les détails du menu
 export async function fillEditMenuModal(id) {
@@ -387,42 +399,41 @@ export async function getMenuDetail(id) {
     try {
         const [menu, dishes] = await Promise.all([
             getMenuById(id),
-            getMenuDishes(id)
+            getListDesDishesByMenuId(id)
         ]);     
         console.log("Détails du menu récupérés :", { menu, dishes });
         fillDetailModal(menu, dishes);
-        const modalOrderBtn = document.querySelector('.pre-order-btn');
-        if (modalOrderBtn) {
-            modalOrderBtn.setAttribute('data-id', id);
+         const preOrderBtn = document.querySelector('.pre-order-btn');
+        if (preOrderBtn) {
+            preOrderBtn.setAttribute('data-id', id);
+                preOrderBtn.onclick = () => {
+                    fillPreOrderModal();
+                };
         }
-        const modalEl = document.getElementById('detailscarteModal');
-        // On nettoie les anciens voiles noirs s'ils existent
-        document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
-        document.body.classList.remove('modal-open');
-        document.body.style.overflow = '';
-        const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
-        modalInstance.show();
-        const editDetailBtn = document.getElementById('editCarteMenuBtn');  
-        if (editDetailBtn) {
-            editDetailBtn.setAttribute('data-id', id);
-        }
-        
-
+       
     } catch (error) {
-        console.error('Erreur :', error);
+        console.error("Erreur lors de la récupération des détails du menu :", error);
+        alert("Impossible de charger les détails du menu. Veuillez réessayer plus tard.");
     }
 }
 // Pré-remplir la modale de détails du menu avec les informations du menu et de ses plats
 export function fillDetailModal(menu, dishes) {
     if (!menu || !dishes) return;
+    
+    const menuPrice = parseFloat(menu.price).toFixed(2);
+    const menuAllergenes = menu.allAllergenes || 'Aucun';
+    const totalPrice = dishes.reduce((sum, dish) => sum + parseFloat(dish.price), 0).toFixed(2);
+    const dishesList = dishes.map(item => {
+        const d = item.dish; // 🔥 très important
 
-    const dishesList = dishes.map(dish => {
         return {
-            name: dish.name,
-            price: dish.price,
-            description: dish.description,
-            category: dish.category || '',
-            displayAllergens: dish.allergensName && dish.allergensName.length > 0 ? dish.allergensName.join(', ') : 'Aucun'
+            name: d.name,
+            price: d.price,
+            description: d.description,
+            category: d.category || '',
+            displayAllergens: d.allergenName && d.allergenName.length > 0 
+                ? d.allergenName.join(', ') 
+                : ''
         };
     });
     console.log("Plats prêts pour le filtrage :", dishesList);
@@ -434,44 +445,48 @@ export function fillDetailModal(menu, dishes) {
     const plats = dishesList.filter(d => d.category?.toLowerCase().includes('plat'));
     const desserts = dishesList.filter(d => d.category?.toLowerCase().includes('dessert'));
    
-    const generateHtml = (title, icon, list) => {
-        if (list.length === 0) return '';
-        
-        return `
-            <div class="menu-category mt-3">
-                <h4><i class="bi ${icon}"></i> ${title}</h4>
-                ${list.map(d => `
-                    <div class="menu-item py-2">
-                        <div class="d-flex justify-content-between">
-                            <div class="col-lg-10 menu-item-title">${d.name}?</div>
-                            <div class="col-lg-2 menu-item-price">${parseFloat(d.price).toFixed(2)} €</div>
-                        </div>
-                        <p class="menu-item-description">${d.description || ''}</p>
+   const generateHtml = (title, icon, list) => {
+    if (list.length === 0) return '';
+    
+    return `
+        <div class="menu-category mt-3">
+            <h4><i class="bi ${icon}"></i> ${title}</h4>
+            ${list.map(d => `
+                 <div class="menu-item">
+                    <div class="row row-cols-2 menu-item-header">
+                        <div class="col-lg-10 menu-item-title">${d.name}</div>
+                        <div class="col-lg-2 menu-item-price">${parseFloat(d.price).toFixed(2)} €</div>
                     </div>
-                    <small ><i class="bi bi-exclamation-triangle-fill"></i><small> Allergènes : ${d.displayAllergens}</small></small>
-                `).join('')}
-            </div>`;
-    };
+                    <p class="menu-item-description">${d.description || ''}</p>
+                    <small>
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        Allergènes : ${d.displayAllergens}
+                    </small>
+                </div> 
+            `).join('')}
+        </div>`;
+};
 
     modalBody.innerHTML = `
-    <h2 class="Menu-title text-center " id="detailscarteModalLabel">${menu.title}</h2>
+    
     <div class="container">
+        <h3 class="text-center mb-4">${menu.title}</h3>
             ${generateHtml('Entrées', 'bi-egg', entrees)}
             ${generateHtml('Plats Principaux', 'bi-main-dish', plats)}
             ${generateHtml('Desserts', 'bi-cake', desserts)}
             
-            <div class="mt-4 p-3 bg-light text-center">
-                <strong>Prix Menu : ${menu.price}€ / personne</strong>
+            <div class="mt-4 p-3 badge bg-light border">
+                <strong>Prix Menu : ${menuPrice}€ / personne</strong>
             </div>
         <div class="container mb-4 info-section">
             <div class="info-header">
                 <h5>Allergènes et informations supplémentaires :</h5>
             </div>
             <div class="info-content">
-                <ul>
-                <li><i class="bi bi-info-circle-fill"></i><small> Ce menu est conçu pour un minimum de ${menu.minPeople || '1'} personnes.</small></li>
-                <li><i class="bi bi-exclamation-triangle-fill"></i><small>Ce menu nécessite une commande ${menu.orderBefore || '2'} jours à l'avance.</small></li>
-                <li><i class="bi bi-exclamation-triangle-fill"></i><small> Ce menu contient de ${menu.allAllergenes || 'aucun'} allergènes.</small></li>
+                <ul class="list-unstyled">
+                <li><i class="bi bi-info-circle-fill"></i><small> Ce menu est conçu pour un minimum de <strong>${menu.minPeople || '1'}</strong> personnes.</small></li>
+                <li><i class="bi bi-exclamation-triangle-fill"></i><small>Ce menu nécessite une commande <strong>${menu.orderBefore || '2'}</strong> jours à l'avance.</small></li>
+                <li><i class="bi bi-exclamation-triangle-fill"></i><small> Ce menu contient de <strong>${menuAllergenes}</strong>.</small></li>
                 <li><i class="bi bi-info-circle-fill"></i><small>Contactez notre équipe pour toute demande spéciale ou question concernant le menu.</small></li>
                 </ul>
             </div>
@@ -483,13 +498,13 @@ export function fillDetailModal(menu, dishes) {
 // ====================== FILTRES ======================
 // Construire les paramètres de filtre à partir des sélections de l'utilisateur
 export function buildFilters() {
-  const filters = {};
 
   const price = document.getElementById("prixFilter").value;
   const fourchette = document.getElementById("fourchetteFilter").value;
   const minPersons = document.getElementById("personnesFilter").value;
   const themeMenu = document.getElementById("themeFilter").value;
   const dietMenu = document.getElementById("dietFilter").value;
+const filters = {};
 
     // 🎯 prix
     if (price && price > 0) {
@@ -526,7 +541,7 @@ async function applyFilters() {
     displayMenus(filteredMenus);
   } catch (error) {
     console.error("Erreur lors de l'application des filtres :", error);
-    alert("Une erreur est survenue lors de l'application des filtres. Veuillez réessayer.");
+    displayMenus([]); // Afficher aucun menu en cas d'erreur
   }
 }
 // Ajouter des écouteurs d'événements aux éléments de filtre
@@ -547,5 +562,60 @@ if (resetFiltersBtn) {
         applyFilters();
     });
 }
+if (price) price.addEventListener("change", applyFilters);
+if (fourchette) fourchette.addEventListener("change", applyFilters);
+if (minPersons) minPersons.addEventListener("change", applyFilters);
+if (themeMenu) themeMenu.addEventListener("change", applyFilters);
+if (dietMenu) dietMenu.addEventListener("change", applyFilters);
+
 // ====================== FIN FILTRES ======================
 
+
+// Pré-remplir la modale de pré-commande avec les informations du menu et de l'utilisateur
+export async function fillPreOrderModal() {
+   
+    try {
+        const user = await getUserInfo();
+        // Récupérer l'ID du menu à pré-commander depuis le bouton "Pré-commander" (data-id)
+            const menuId = document.querySelector('.pre-order-btn')?.getAttribute('data-id');  
+        if (menuId) {
+            await fillMenuSelect(menuId);
+        }
+        document.getElementById('customerName').value = user.firstName || '';
+        document.getElementById('customerPrenom').value = user.lastName || '';
+        document.getElementById('customerEmail').value = user.email || '';
+        document.getElementById('customerPhone').value = user.phone || '';
+        document.getElementById('deliveryAddress').value = user.address || '';
+        document.getElementById('factDate').value = new Date().toISOString().split('T')[0];
+        const modalEl = document.getElementById('PreOrderModal');
+        const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modalInstance.show();
+    }
+        catch (error) {
+            console.error("Erreur lors du pré-remplissage de la modale de commande :", error);
+            alert("Impossible de préremplir les informations de la commande. Veuillez réessayer plus tard.");
+        }
+}
+// Pré-remplir le menu sélectionné dans la modale de pré-commande
+export async function fillMenuSelect(menuId) {
+    try {
+        const menus = await getMenus();
+        const menuSelect = document.getElementById('menuSelect');
+        if (!menuSelect) {
+            console.error('Élément de sélection du menu introuvable.');
+            return;
+        }
+        menuSelect.innerHTML = '<option value="" disabled selected>Choisissez un menu</option>';
+        menus.forEach(menu => {
+            const option = document.createElement('option');
+            option.value = menu.id;
+            option.textContent = menu.title;
+            menuSelect.appendChild(option);
+        });
+        // Sélectionner le menu correspondant
+        menuSelect.value = menuId;
+    } catch (error) {
+        console.error("Erreur lors du remplissage de la sélection de menu :", error);
+        alert("Impossible de charger les menus pour la pré-commande. Veuillez réessayer plus tard.");
+    }
+}

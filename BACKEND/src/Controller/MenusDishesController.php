@@ -195,7 +195,7 @@ class MenusDishesController extends AbstractController
         $responseData = $this->serializer->serialize(
             $menusDishes,
             'json',
-            ['groups' => ['menu:read', 'dish:detail']]
+            ['groups' => ['menu:read', 'dish:detail', 'allergen:read']]
         );
         return new JsonResponse($responseData, Response::HTTP_OK, [], true);
     }
