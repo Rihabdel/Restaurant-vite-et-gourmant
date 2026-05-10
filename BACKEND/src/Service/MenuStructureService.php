@@ -182,13 +182,14 @@ class MenuStructureService
             if (!$dish) {
                 continue;
             }
-
+            // Récupérer la catégorie (enum)
             $category = $dish->getCategory();
-            if (!isset($dishesByCategory[$category])) {
-                $dishesByCategory[$category] = [];
+            $categoryValue = $this->extractEnumValue($category);
+            if (!isset($dishesByCategory[$categoryValue])) {
+                $dishesByCategory[$categoryValue] = [];
             }
-
-            $dishesByCategory[$category][] = [
+            // Ajouter le plat à la catégorie correspondante
+            $dishesByCategory[$categoryValue][] = [
                 'id' => $dish->getId(),
                 'name' => $dish->getName(),
                 'title' => $menuDish->getMenu()->getTitle(),

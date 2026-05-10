@@ -187,7 +187,7 @@
           <div class="modal-body">
               <div class="container-fluid">
                   <div class="row text-center">
-                <h4>Ajouter vos informations pour finaliser la commande</h4>
+                <h4>Finaliser votre commande</h4>
                   </div>
                   <div class="row">
                     <div class="col mb-3">
@@ -199,9 +199,11 @@
                     <div class="col mb-3">    
                         <label for="numberOfPeople" class="form-label"placeholder="minimum">Nombre de personnes :</label>
                         <input type="number" class="form-control" id="numberOfPeople" placeholder="Entrez le nombre de personnes">
-                        <small class="form-text">Minimum de [20-50] personnes</small></br>
+                        <p class="form-text text-muted" style="margin-top: 5px;font-size: 0.8em;">10% est appliquée pour toutes commandes ayant 5
+personnes de plus que le nombre de personnes minimum indiqué dans le menu</p></br>
                     </div>
-                  <small class="form-text minPeople">Minimum de personnes</small>  
+                  
+
                   </div>
                   <div class="row">
                     <div class="col mb-3">
@@ -237,16 +239,15 @@
                         <div class="mb-3">
                             <label for="deliveryAddress" class="form-label">Adresse de livraison</label>
                             <input type="text" class="form-control" id="deliveryAddress" placeholder="Entrez votre adresse">
+                            <p class="form-text text-muted" style="margin-top: 5px;font-size: 0.8em;">5 euros de livraison majoré de 59 centimes par kilomètre parcourus</p>
                         </div>
                         <div class="mb-3">
                             <label for="deliveryCity" class="form-label">Ville de livraison</label>
-                            <input type="text" class="form-control" id="deliveryCity" placeholder="Entrez votre ville">
-                            <small class="form-text">5 euros de livraison majoré de 59 centimes par kilomètre parcourus</small>
+                            <input type="text" class="form-control" id="deliveryCity" placeholder="Entrez votre ville">                         
                         </div>
                         <div class="mb-3">
                             <label for="deliveryPostalCode" class="form-label">Code postal</label>
                             <input type="number" class="form-control" id="deliveryPostalCode" placeholder="Entrez votre code postal">
-                            <small class="form-text">5 euros de livraison majoré de 59 centimes par kilomètre parcourus</small>
                         </div>
                   </div>
                   <div class="row delivery">
@@ -384,44 +385,6 @@
   </div>
 </div>
 
-/<!--modifier les plats par l'employée-->
-<div class="collapse" id="collapseformCarte">
-  <div class="card card-body">
-         <form id="editDetailMenuCardForm">
-              <div class="mb-3">
-                <h4 for="platType" class="form-label">Categorie</h4>
-                <label for="platTypeEdit" class="form-label">Modifier la catégorie du plat</label>
-                <select class="form-control" id="platTypeEdit">
-                  <option value="" disabled selected>Entrée</option>
-                  <option value="menu1">Plat principale</option>
-                  <option value="menu2">Desserts</option>
-                </select>
-              </div>
-              <div class="mb-3">
-                <label for="platNomEdit" class="form-label">Nom du plat</label>
-                <input type="text" class="form-control" id="platNomEdit" value="Nom du plat">
-              </div>
-              <div class="mb-3">  
-                <label for="platDescriptionEdit" class="form-label">Description du plat</label>
-                <textarea class="form-control" id="platDescriptionEdit" rows="3">Description du plat</textarea>
-                
-                <label for="allergeneSelectEdit" class="form-label">Allergène</label>
-                <select class="form-select mt-2" id="allergeneSelectEdit">
-                  <option value="" disabled selected>Choisir un allergène</option>
-                  <option value="gluten">Gluten</option>
-                  <option value="produits_laitiers">Produits laitiers</option>
-                  <option value="oeufs">Œufs</option>
-                  <option value="soja">Soja</option>
-                </select>
-              </div>
-              <div class="mb-3">
-                <label for="platPrixEdit" class="form-label">Prix du plat</label>
-                <input type="string" class="form-control" id="platPrixEdit" value="Prix du plat">
-              </div>
-            </form>
-  </div>
-  </div>  
-  
 <!--modal de confirmation de suppression de la carte de menu-->
 <div class="modal fade" id="deleteMenuModal" tabindex="-1" aria-labelledby="deleteMenuModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -440,7 +403,27 @@
     </div>
   </div>
 </div>
-<!-- modal d'ajout d'un plat à un menu -->
+<!-- modal de connexion requise avant de commander   -->
+<div class="modal fade" id="loginRequiredModal" tabindex="-1" aria-labelledby="loginRequiredModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title" id="loginRequiredModalLabel"><i class="bi bi-lock"></i> Connexion requise</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <h2 class="form-label text-center">Vous devez être connecté</h2>
+        <h6 class="mb-0 text-center text-muted">Connectez-vous ou créez un compte pour passer commande.</h6>
+      </div>
+      <div class="modal-footer">
+        <div class="d-flex justify-content-center gap-2">
+          <a href="/connexion" class="btn btn-primary">Se connecter</a>
+          <a href="/inscription" class="btn btn-outline-primary">Créer un compte</a>
+        </div>
+      </div>
+    </div>
+  </div> 
+</div> 
 
 
 <script type="module" src="../js/menu.js"></script>

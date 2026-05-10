@@ -1,5 +1,5 @@
-import { getMenus, getMenuById, getMenuDishes, enregistrerMenu, updateMenu, deleteMenu, createOrder, getUserInfo, getDishes, getListDesDishesByMenuId} from './api.js';
-import { showAndHideElementsForRoles, getToken } from './script.js';
+import { getMenus, getMenuById, getMenuDishes, enregistrerMenu, updateMenu, deleteMenu, createOrder, getUserInfo, getDishes, getListDesDishesByMenuId,previewOrder} from './api.js';
+import { showAndHideElementsForRoles, getToken} from './script.js';
 import { getCurrentOrderData,fillNewOrderModal,fillNewOrderDetailsModal } from './orders.js';
 // Initialiser la page des menus
 export default async function initMenu() {
@@ -30,7 +30,7 @@ export async function displayMenus(menus){
     }
 
     
-    const visibleMenus = menus.filter(menu => menu.isAvailable);
+    const visibleMenus = menus.filter(menu => menu.isAvailable=== true);
     container.innerHTML = visibleMenus.map(menu=> {
 
 const pictureUrl = menu.pictureUrl ? `http://127.0.0.1:8000${menu.pictureUrl}` : '/scss/images/viteGourmand.png';
@@ -98,10 +98,15 @@ function initButtons() {
                 const id = detailBtn.dataset.id;
                 if (!id) return;
                 try{
-                    await getMenuDetail(id);
+                    
+                   
                     const modalEl = document.getElementById('detailscarteModal');
                     const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
                     modalInstance.show();
+                    document.getElementById('detailsMenuContent').innerHTML =
+            '<p>Chargement...</p>';
+                    await getMenuDetail(id);
+                    
                 } catch (error) {
                     console.error("Erreur lors de la récupération des détails du menu :", error);
                     alert("Impossible de charger les détails du menu. Veuillez réessayer plus tard.");
@@ -187,24 +192,30 @@ function initButtons() {
         if (confirmOrderBtn) {
             confirmOrderBtn.addEventListener('click', async () => {
                 const orderData = getCurrentOrderData();
-                const menu = orderData.menu;
-                    if (!orderData.numberOfPeople || orderData.numberOfPeople < menu.minPeople) {
-        alert(`Minimum ${menu.minPeople} personnes`);
-        return;
-    }
+                const preview = await previewOrder(orderData);
+                console.log("Données de prévisualisation de la commande :", preview);
+               const menu = orderData.menu;
+                    if (
+                    !orderData.numberOfPeople ||
+                    Number(orderData.numberOfPeople) < menu.minPeople
+                    ) {
+                    alert(
+                        `Minimum ${menu.minPeople} personnes`
+                    );
+                    return;
+                }
+            
+            console.log("Données de la commande avant validation :", orderData);
+                const today = new Date();
+                const minDate = new Date();
+                minDate.setDate(today.getDate() + menu.orderBefore);
 
-    // ✅ validation date
-    const today = new Date();
-    const minDate = new Date();
-    minDate.setDate(today.getDate() + menu.orderBefore);
-
-    if (!orderData.deliveryDate || new Date(orderData.deliveryDate) < minDate) {
-        alert(`Commande à faire ${menu.orderBefore} jours à l'avance`);
-        return;
-    }
-
+                if (!orderData.deliveryDate || new Date(orderData.deliveryDate) < minDate) {
+                    alert(`Commande à faire ${menu.orderBefore} jours à l'avance`);
+                    return;
+                }
                 try {
-                    await fillNewOrderDetailsModal(orderData);
+                    await fillNewOrderDetailsModal(orderData, preview);
 
                     const orderModalEl = document.getElementById('PreOrderModal');
                     const orderModalInstance = bootstrap.Modal.getOrCreateInstance(orderModalEl);
@@ -406,11 +417,8 @@ export async function getMenuDetail(id) {
          const preOrderBtn = document.querySelector('.pre-order-btn');
         if (preOrderBtn) {
             preOrderBtn.setAttribute('data-id', id);
-                preOrderBtn.onclick = () => {
-                    fillPreOrderModal();
-                };
+            preOrderBtn.onclick = fillPreOrderModal;
         }
-       
     } catch (error) {
         console.error("Erreur lors de la récupération des détails du menu :", error);
         alert("Impossible de charger les détails du menu. Veuillez réessayer plus tard.");
@@ -438,8 +446,7 @@ export function fillDetailModal(menu, dishes) {
     });
     console.log("Plats prêts pour le filtrage :", dishesList);
     const modalBody = document.getElementById('detailsMenuContent');
-    const modalTitle = document.getElementById('detailscarteModalLabel');
-    modalTitle.textContent = menu.title;
+
     // 2. FILTRAGE : séparer les plats par catégorie
     const entrees = dishesList.filter(d => d.category?.toLowerCase().includes('entree'));
     const plats = dishesList.filter(d => d.category?.toLowerCase().includes('plat'));
@@ -493,6 +500,8 @@ export function fillDetailModal(menu, dishes) {
         </div>
     </div>
     `;
+    modalBody.scrollTop = 0;
+    
 }
 
 // ====================== FILTRES ======================
@@ -573,11 +582,16 @@ if (dietMenu) dietMenu.addEventListener("change", applyFilters);
 
 // Pré-remplir la modale de pré-commande avec les informations du menu et de l'utilisateur
 export async function fillPreOrderModal() {
-   
     try {
         const user = await getUserInfo();
+        if (!user) {
+            const modalEl = document.getElementById('loginRequiredModal');
+            const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+            modalInstance.show();
+        }
         // Récupérer l'ID du menu à pré-commander depuis le bouton "Pré-commander" (data-id)
-            const menuId = document.querySelector('.pre-order-btn')?.getAttribute('data-id');  
+        const menuId = document.querySelector('.pre-order-btn')?.dataset.id;
+            console.log("Menu ID pour pré-commande :", menuId); 
         if (menuId) {
             await fillMenuSelect(menuId);
         }
@@ -585,15 +599,17 @@ export async function fillPreOrderModal() {
         document.getElementById('customerPrenom').value = user.lastName || '';
         document.getElementById('customerEmail').value = user.email || '';
         document.getElementById('customerPhone').value = user.phone || '';
-        document.getElementById('deliveryAddress').value = user.address || '';
+        document.getElementById('factAddress').value = user.address || '';
         document.getElementById('factDate').value = new Date().toISOString().split('T')[0];
         const modalEl = document.getElementById('PreOrderModal');
         const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
         modalInstance.show();
     }
         catch (error) {
-            console.error("Erreur lors du pré-remplissage de la modale de commande :", error);
-            alert("Impossible de préremplir les informations de la commande. Veuillez réessayer plus tard.");
+            
+            console.error("Erreur lors du remplissage de la modale de pré-commande :", error);
+            alert("Impossible de charger les informations utilisateur pour la pré-commande. Veuillez vous connecter ou réessayer plus tard.");
+
         }
 }
 // Pré-remplir le menu sélectionné dans la modale de pré-commande

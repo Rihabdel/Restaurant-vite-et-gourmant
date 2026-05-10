@@ -1,5 +1,5 @@
 
-import { createOrder, getOrdersByUserId, getMenus, updateOrder, cancelOrder, getMenuById, getOrderById} from './api.js';
+import { createOrder, getOrdersByUserId, getMenus, updateOrder, cancelOrder, getMenuById, getOrderById,previewOrder}from './api.js';
 import { getUserInfo, showAndHideElementsForRoles } from './script.js';
 
 
@@ -67,7 +67,6 @@ function displayOrders(orders) {
     }
 function fillEditOrderModalUser(orderId) {
   const menuSelected = document.getElementById('menuSelected');
-  const menuId = menuSelected ? menuSelected.value : null;
     const numberOfPeople = document.getElementById('numberOfPeople');
      const deliveryCity = document.getElementById('deliveryCity');
     const deliveryAddress = document.getElementById('deliveryAddress');
@@ -184,7 +183,10 @@ function initButtons() {
             const data = getCurrentOrderData();
           createOrder(data)
                 .then(() => {
-                    alert("Votre commande a été créée avec succès !");
+                    alert("un email de confirmation de commande vous a été envoyé, merci pour votre commande!");
+                    const modalEL = document.getElementById('OrderDetailsModal');
+                    const modalInstance = bootstrap.Modal.getInstance(modalEL);
+                    if (modalInstance) modalInstance.hide();
                     loadOrders();
                 })
                 .catch(error => {
@@ -247,19 +249,19 @@ export async function fillNewOrderDetailsModal(orderData) {
         // 🔥 récupération menu
         const menuId = Number(orderData.menu);
         const menu = await getMenuById(menuId);
+        const preview = await previewOrder(orderData);
+        if (!preview) {
+            throw new Error("Impossible de prévisualiser la commande");
+        }
 
                 if (!menu) {
             throw new Error("Menu introuvable");
         }
-        const menuPrice = Number(menu?.price ?? 0).toFixed(2);
-const deliveryCost = Number(orderData.deliveryCost || 0).toFixed(2);
-const totalPrice = Number(orderData.totalPrice || 0).toFixed(2);
 
-console.log("FULL ORDER DATA:", orderData);
-console.log("MENU:", orderData?.menu);
-console.log("MENU PRICE:", orderData?.menu?.price);
+        console.log("FULL ORDER DATA:", orderData);
+        console.log("MENU:", orderData?.menu);
+        console.log("MENU PRICE:", orderData?.menu?.price);
     const orderDetails = document.getElementById('orderDetails');
-
 
     if (!orderDetails) {
         console.error("Élément 'orderDetails' introuvable dans le DOM.");
@@ -289,16 +291,20 @@ console.log("MENU PRICE:", orderData?.menu?.price);
             </div>
             <div class="p-3 border rounded bg-light mb-3">
             <h4 class="mb-3">Informations de livraison</h4>
-                <p><strong>Date de livraison :</strong> ${orderData.deliveryDate ? new Date(orderData.deliveryDate).toLocaleDateString() : 'N/A'}</p>
-                <p><strong>Heure de livraison :</strong> ${orderData.deliveryTime || 'N/A'}</p>
+                <p><strong>Date de livraison :</strong> ${orderData.deliveryDate ? new Date(orderData.deliveryDate).toLocaleDateString('fr-FR') : 'N/A'}</p>
+                <p><strong>Heure de livraison :</strong> ${orderData.deliveryTime? new Date(orderData.deliveryTime).toTimeString().slice(0,5)
+        : 'N/A'}</p>
             </div>
 
             <div class="p-3 border rounded bg-light mt-3">  
             <h4 class="mb-3">Prix</h4>
             <p><strong>Statut de la commande :</strong> En attente de paiement</p>
-            <p><strong>Prix du menu :</strong> ${menuPrice}</p>
-            <p><strong>Frais de livraison :</strong> ${deliveryCost}</p>
-            <p><strong>Prix total :</strong> ${totalPrice}</p>
+            <p><strong id="menuPrice">Prix du menu :</strong> ${preview.menuPrice} €</p>
+            
+            <p><strong id="deliveryCost">Frais de livraison :</strong> ${preview.deliveryCost.toFixed(2) ?? 'N/A'} €</p>
+            <p><strong id="totalPrice">Prix total :</strong> ${preview.totalPrice ?? 'N/A'} €</p>
+            <p><strong id="discount" style="color: green;">Remise :${preview.discount.toFixed(2) ?? 'N/A'} €</strong> </p>
+            <small class="text-muted"><em>une remise de ${preview.discount.toFixed(2) ?? 'N/A'} € est appliquée sur votre commande </em></small>
                             
             </div>
         `;
@@ -321,6 +327,9 @@ export function getCurrentOrderData() {
         deliveryPostalCode: document.getElementById('deliveryPostalCode').value,
         deliveryDate: document.getElementById('deliveryDate').value,
         deliveryTime: document.getElementById('deliveryTime').value,
+        
+
+
 
     };
 }
@@ -367,8 +376,8 @@ export async function fillEditOrderModal(orderId) {
         const editMenuSection = document.getElementById('edit-menu-section');
 if (editMenuSection && order.menu) {
     // 1. On sécurise les données numériques
-    const priceValue = parseFloat(order.menu.price || 0);
-    const formattedPrice = !isNaN(priceValue) ? priceValue.toFixed(2) + ' €' : 'N/A';
+    const totalPrice = Number(order.totalPrice ?? 0).toFixed(2);
+
 
     // 2. On injecte le HTML
     editMenuSection.innerHTML = `
@@ -376,7 +385,7 @@ if (editMenuSection && order.menu) {
         <div class="p-3 border rounded bg-light">
             <p class="mb-1"><strong>Menu :</strong> ${order.menu.title || 'N/A'}</p>
             <p class="mb-1 text-muted small">${order.menu.descriptionMenu || 'Pas de description'}</p>
-            <p class="mb-1"><strong>Prix :</strong> ${formattedPrice}</p>
+            <p class="mb-1"><strong>Prix :</strong> ${totalPrice} €</p>
             <p class="mb-1"><strong>Nombre de convives :</strong> ${order.numberOfPeople || 'N/A'}</p>
             <p class="mb-0 text-info"><em>Minimum requis : ${order.menu.minPeople || 'N/A'}</em></p>
         </div>

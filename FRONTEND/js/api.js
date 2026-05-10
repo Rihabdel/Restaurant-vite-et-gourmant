@@ -348,6 +348,19 @@ export async function cancelOrder(id) {
     }
     return await response.json();
 }
+// --- Fonction API pour prévisualiser une commande ---
+export async function previewOrder(data) {
+    const response = await fetch(`${API_BASE}/orders/preview`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-AUTH-TOKEN': getToken()
+        },
+        body: JSON.stringify(data)
+    });
+
+    return await response.json();
+}
 // --- Fonction API pour récupérer les informations de l'utilisateur connecté ---
 export async function getUserInfo() {
      let myHeaders = new Headers();

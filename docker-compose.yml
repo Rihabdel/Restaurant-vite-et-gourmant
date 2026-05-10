@@ -19,6 +19,8 @@ services:
       - symfony_vendor:/var/www/html/vendor   # ← ajout
     depends_on:
       - database
+    environment:
+      MAILER_DSN: "smtp://acf1e19e0218c6:b3254a640fa61a@sandbox.smtp.mailtrap.io:2525"
 
   # Ta base de données
   database:
@@ -40,8 +42,17 @@ services:
       - "8081:80"
     environment:
       PMA_HOST: database
-
+      
+  mongo:
+    image: mongo:7
+    container_name: mongo_db
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
 volumes:
   symfony_var:
   symfony_vendor:
   db_data:
+  mongo_data:

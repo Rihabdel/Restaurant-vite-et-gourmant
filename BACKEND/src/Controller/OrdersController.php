@@ -20,6 +20,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use App\Service\MailService;
 
 #[Route('api', name: 'app_api_orders_')]
 final class OrdersController extends AbstractController
@@ -27,7 +28,8 @@ final class OrdersController extends AbstractController
     public function __construct(
         private EntityManagerInterface $entityManager,
         private SerializerInterface $serializer,
-        private ValidatorInterface $validator
+        private ValidatorInterface $validator,
+        private MailService $mailService
     ) {}
 
     #[Route('/orders/new', methods: ['POST'], name: 'new')]
@@ -36,16 +38,16 @@ final class OrdersController extends AbstractController
         tags: ["Orders"],
         summary: "Créer une nouvelle commande",
         requestBody: new OA\RequestBody(
-            description: "Détails de la commande",
+            description: "Détails de la commande à créer",
             required: true,
             content: new OA\JsonContent(
                 example: [
                     "menu" => 1,
-                    "numberOfPeople" => 15,
+                    "numberOfPeople" => 30,
                     "deliveryAddress" => "123 Rue Exemple",
                     "deliveryCity" => "Bordeaux",
                     "deliveryPostalCode" => "33000",
-                    "deliveryDate" => "2026-03-31",
+                    "deliveryDate" => "2026-07-15",
                     "deliveryTime" => "19:00"
                 ]
             )
@@ -53,36 +55,15 @@ final class OrdersController extends AbstractController
         responses: [
             new OA\Response(
                 response: 201,
-                description: "Commande créée avec succès",
-                content: new OA\JsonContent(
-                    example: [
-                        "id" => 1,
-                        "menu" => "Menu Dégustation",
-                        "number_of_people" => 15,
-                        "delivery_info" => [
-                            "address" => "123 Rue Exemple",
-                            "city" => "Bordeaux",
-                            "postal_code" => "33000",
-                            "date" => "2026-03-31",
-                            "time" => "19:00"
-                        ],
-                        "prices" => [
-                            "menu_price" => 100.0,
-                            "delivery_cost" => 0.0,
-                            "total_price" => 100.0
-                        ],
-                        "status" => "en_attente",
-                        "created_at" => "2024-11-01 12:00:00"
-                    ]
-                )
+                description: "Commande créée avec succès"
             ),
             new OA\Response(
                 response: 400,
-                description: "Requête invalide (ex: champ manquant, données invalides)"
+                description: "Données invalides ou contraintes non respectées"
             ),
             new OA\Response(
-                response: 500,
-                description: "Erreur serveur lors de la création de la commande"
+                response: 401,
+                description: "Utilisateur non authentifié"
             )
         ]
     )]
@@ -135,12 +116,11 @@ final class OrdersController extends AbstractController
                 return $this->json(['error' => "La date de livraison doit respecter le délai de préparation ({$menu->getOrderBefore()} heures)"], Response::HTTP_BAD_REQUEST);
             }
 
-            $distanceKm = 0;
             $deliveryCost = $this->calculateDeliveryCost(
                 $data['deliveryCity'],
                 $data['deliveryPostalCode'],
-                $distanceKm
-            );
+                10.0
+            ); //en attendant d'avoir une vraie logique de calcul de distance.
 
             $totalPrice =
                 $menu->getPriceEstimate($data['numberOfPeople'])
@@ -158,12 +138,24 @@ final class OrdersController extends AbstractController
                 ->setCreatedAt(new \DateTimeImmutable())
                 ->setDeliveryCost($deliveryCost)
                 ->setTotalPrice($totalPrice)
-                ->setStatus(Status::en_attente->value);
+                ->setStatus(Status::en_attente->value)
+
+            ;
             $this->entityManager->persist($order);
             $this->entityManager->flush();
-            return $this->json($order, Response::HTTP_CREATED, [], ['groups' => ['orders:read', 'menu:read']]);
+            $menu->setStock($menu->getStock() - $data['numberOfPeople']);
+            $this->entityManager->flush();
+            $this->mailService->sendOrderConfirmation($order);
+
+
+            return $this->json(
+                $order,
+                Response::HTTP_CREATED,
+                [],
+                ['groups' => ['orders:read', 'menu:read']]
+            );
         } catch (\Exception $e) {
-            return $this->json(['error' => 'Erreur lors de la création de la commande: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->json(['error' => 'Une erreur est survenue lors de la création de la commande : ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -201,6 +193,39 @@ final class OrdersController extends AbstractController
             )
         ]
     )]
+    #[Route('/orders/preview', methods: ['POST'], name: 'preview')]
+    #[IsGranted('ROLE_USER')]
+    public function preview(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $menu = $this->entityManager
+            ->getRepository(Menus::class)
+            ->find($data['menu']);
+
+        if (!$menu) {
+            return $this->json(['error' => 'Menu introuvable'], 404);
+        }
+
+        $deliveryCost = $this->calculateDeliveryCost(
+            $data['deliveryCity'],
+            $data['deliveryPostalCode'],
+            10.0
+        );
+
+        $totalPrice =
+            $menu->getPriceEstimate($data['numberOfPeople'])
+            + $deliveryCost;
+
+        $discount = $this->discount((new Orders())->setNumberOfPeople($data['numberOfPeople'])->setMenu($menu));
+
+        return $this->json([
+            'menuPrice' => $menu->getPrice(),
+            'totalPrice' => $totalPrice,
+            'deliveryCost' => $deliveryCost,
+            'discount' => $discount
+        ]);
+    }
     // Afficher les détails d'une commande (accessible uniquement par le propriétaire de la commande, les admins et les employés)
     public function show(int $id, OrdersRepository $ordersRepository): JsonResponse
     {
