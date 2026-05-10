@@ -1,5 +1,5 @@
 import { API_BASE,getDishes, createDish, getDishById,updateDish,deleteDish,addDishAllergens,getAllergens
-    ,getMenus,getMenuById, updateMenu,addDishToMenu, deleteMenu,getOrderById,deleteDishFromMenu} from "./api.js";
+    ,getMenus,getMenuById, updateMenu,addDishToMenu, deleteMenu,getOrderById,deleteDishFromMenu, enregistrerMenu} from "./api.js";
 import { getToken} from "./script.js";
 import {fillEditMenuModal} from "./menu.js";
 import { validateEmail,validatePassword,validateConfirmPassword,validateRequired } from "./auth/inscription.js";
@@ -308,7 +308,7 @@ function initMenuEvents() {
                 alert("Une erreur est survenue lors de la mise à jour de la disponibilité.");
             }
              }
-    }    );
+    });
     menuList.addEventListener("click", async (e) => {
         const editBtn = e.target.closest('.edit-menu-btn');
         if (editBtn){
@@ -391,9 +391,43 @@ function initMenuEvents() {
                 alert("Une erreur est survenue lors de la mise à jour des plats du menu.");
             }
         }
+
     });
 
+    const addMenuButton = document.getElementById('addMenuButton');
+    if (addMenuButton) {
+            addMenuButton.addEventListener('click', () => {
+                const modalEl = document.getElementById('editMenuModal');
+                const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+                modalInstance.show();
+            });
+        }
+        const editMenuForm = document.getElementById('editMenuForm');
+        if (editMenuForm) {
+            editMenuForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(editMenuForm);
+                const menuData = {
+                    title: formData.get('title'),
+                    descriptionMenu: formData.get('descriptionMenu'),
+                    price: formData.get('priceMenu'),
+                    minPeople:parseInt(formData.get('minPersons')),
+                    orderBefore: parseInt(formData.get('orderBefore')),
+                    stock: parseInt(formData.get('stock')),
+                    themeMenu: formData.get('themeMenu'),
+                    dietMenu: formData.get('dietMenu'),
+                    isAvailable: formData.get('isAvailable') === 'on',
+                    picture: formData.get('file') || null
+                }
+                await enregistrerMenu(menuData);
+                });
+            }
+
+
+
+
 }
+// Initialiser le formulaire d'édition de menu pour la création et la modification
 
 
 
