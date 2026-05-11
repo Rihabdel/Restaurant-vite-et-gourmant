@@ -659,4 +659,33 @@ final class OrdersController extends AbstractController
 
         return $this->json(['message' => 'Statut de la commande mis à jour avec succès'], Response::HTTP_OK);
     }
+    //afficher les statistiques de commandes pour les admins (nombre de commandes par menu et par jour et chiffre d'affaires)
+    #[Route('/admin/orders/statistics', methods: ['GET'], name: 'admin_statistics')]
+    #[IsGranted('ROLE_ADMIN')]
+    #[OA\Get(
+        tags: ["Orders"],
+        summary: "Afficher les statistiques de commandes (admin)",
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Statistiques de commandes récupérées avec succès"
+            ),
+            new OA\Response(
+                response: 403,
+                description: "Accès non autorisé"
+            )
+        ]
+    )]
+    public function statistics(OrdersRepository $ordersRepository): JsonResponse
+    {
+        $startDate = (new \DateTime())->modify('-30 days');
+        $endDate = new \DateTime();
+        $statsByMenu = $ordersRepository->getOrderStatisticsByMenu($startDate, $endDate);
+        $totalRevenue = $ordersRepository->calculateTotalRevenue($startDate, $endDate);
+        return $this->json([
+            'statsByMenu' => $statsByMenu,
+            'totalRevenue' => $totalRevenue
+
+        ]);
+    }
 }

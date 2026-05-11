@@ -4,6 +4,7 @@ import { getToken} from "./script.js";
 import {fillEditMenuModal} from "./menu.js";
 import { validateEmail,validatePassword,validateConfirmPassword,validateRequired } from "./auth/inscription.js";
 
+
 // Attendre que le DOM soit chargé
 export default async function initAdmin() {
     console.log("initialisation admin");
@@ -12,6 +13,8 @@ export default async function initAdmin() {
     const dishList = document.getElementById("dishList");
     const employeeList = document.getElementById("employeeList");
     const menuList = document.getElementById("menuList");
+    const totalRevenue= document.getElementById("totalRevenue");
+    
 
     
     if (dishList) {
@@ -30,8 +33,10 @@ export default async function initAdmin() {
         await loadOrders();
         initOrdersListeners();
     }
+if (totalRevenue) {
+    loadStatistics();
 }
-
+}
 // afficher les plats
 async function loadDishes() {
     try {
@@ -954,3 +959,132 @@ if (user) user.addEventListener("change", applyFilters);
 if (deliveryDate) deliveryDate.addEventListener("change", applyFilters);
 if (status) status.addEventListener("change", applyFilters);
 if (menu) menu.addEventListener("change", applyFilters);
+
+
+
+
+export async function getStatictics() {
+    const response = await fetch(`${API_BASE}/admin/orders/statistics`, {
+        method: 'GET',
+        headers: {
+            'X-AUTH-TOKEN': getToken()
+        }
+    }); 
+    if (!response.ok) {
+        throw new Error('Erreur de chargement des statistiques');
+    }
+    return await response.json();
+}
+ function loadStatistics() {
+    const totalRevenue = document.getElementById('totalRevenue');
+    if (totalRevenue) {
+        getStatictics().then(statistics => {
+            totalRevenue.textContent = `${statistics.totalRevenue.toFixed(2)} €`;
+        }).catch(error => {
+            console.error("Erreur lors du chargement des statistiques :", error);
+            totalRevenue.textContent = "Erreur de chargement des statistiques";
+        }
+        );
+    }
+ }
+
+const menuChart = document.getElementById('menuChart').getContext('2d');
+const menuChartConfig = {
+    type: 'bar',
+    data: {
+        labels: await getMenus().then(menus => menus.map(menu => menu.title)).catch(error => {
+            console.error("Erreur lors du chargement des menus pour le graphique :", error);
+            return [];
+        }
+        ),
+        datasets: [{
+            label: 'Nombre de commandes',
+            data: await getOrdersAdmin().then(orders => {
+                const menuCounts = {};
+                orders.forEach(order => {
+                    const menuTitle = order.menu?.title || 'Inconnu';
+                    menuCounts[menuTitle] = (menuCounts[menuTitle] || 0) + 1;
+                }
+                );
+                return Object.values(menuCounts);
+            }).catch(error => {
+                console.error("Erreur lors du chargement des commandes pour le graphique :", error);
+                return [];
+            }
+            ),
+            backgroundColor: 'rgba(46, 95, 43, 0.5)',
+            borderColor: 'rgba(14, 31, 13, 0.5)',
+            borderWidth: 1
+        }]  
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: 'Nombre de commandes par menu'
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                precision: 0
+            }
+        }
+    }
+};
+const menuBarChart = new Chart(menuChart, menuChartConfig);
+
+
+
+const chiffreAffairesByMenu = document.getElementById('chiffreAffairesByMenu').getContext('2d');
+const chiffreAffairesConfig = {
+    type: 'bar',
+    data: {
+        labels: await getMenus().then(menus => menus.map(menu => menu.title)).catch(error => {
+            console.error("Erreur lors du chargement des menus pour le graphique :", error);
+            return [];
+        }
+        ),
+        datasets: [{
+            label: 'chiffre d\'affaires par menu',
+            data: await getOrdersAdmin().then(orders => {
+                const menuCounts = {};
+                orders.forEach(order => {
+                    const menuTitle = order.menu?.title || 'Inconnu';
+                    menuCounts[menuTitle] = (menuCounts[menuTitle] || 0) + (order.menu?.price || 0) * order.numberOfPeople;
+                });
+                return Object.values(menuCounts);
+            }).catch(error => {
+                console.error("Erreur lors du chargement des commandes pour le graphique :", error);
+                return [];
+            }
+            ),
+            backgroundColor: 'rgba(46, 95, 43, 0.5)',
+            borderColor: 'rgba(14, 31, 13, 0.5)',
+            borderWidth: 1
+        }]  
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: 'Chiffre d\'affaires par menu'
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                precision: 0
+            }
+        }
+    }
+};
+const chiffreAffairesChart = new Chart(chiffreAffairesByMenu, chiffreAffairesConfig);
