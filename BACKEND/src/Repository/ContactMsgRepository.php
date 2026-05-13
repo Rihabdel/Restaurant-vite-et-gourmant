@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\ContactMsg;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Override;
 
 /**
  * @extends ServiceEntityRepository<ContactMsg>
@@ -15,29 +16,9 @@ class ContactMsgRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, ContactMsg::class);
     }
-
-//    /**
-//     * @return ContactMsg[] Returns an array of ContactMsg objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('c')
-//            ->andWhere('c.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('c.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?ContactMsg
-//    {
-//        return $this->createQueryBuilder('c')
-//            ->andWhere('c.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    #[Override]
+    public function findAll(): array
+    {
+        return parent::findAll();
+    }
 }

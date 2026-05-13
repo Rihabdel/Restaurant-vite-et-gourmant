@@ -397,3 +397,5 @@ modal.show();
         alert("Impossible de charger les détails de la commande. Veuillez réessayer plus tard.");
     }
 }
+
+
