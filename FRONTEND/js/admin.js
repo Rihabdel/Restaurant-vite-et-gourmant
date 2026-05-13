@@ -14,6 +14,7 @@ export default async function initAdmin() {
     const employeeList = document.getElementById("employeeList");
     const menuList = document.getElementById("menuList");
     const totalRevenue= document.getElementById("totalRevenue");
+    const contactMessagesTable = document.getElementById("contactMessagesTable");
     
 
     
@@ -36,7 +37,12 @@ export default async function initAdmin() {
 if (totalRevenue) {
     loadStatistics();
 }
+if (contactMessagesTable) {
+    await loadContactMsg();
+        initContactMsgListeners();
 }
+}
+
 // afficher les plats
 async function loadDishes() {
     try {
@@ -484,8 +490,14 @@ if (employeeList) {
 
         const employeeId = btn.dataset.id;
         if (!employeeId) return;
-
-        if (!confirm("Êtes-vous sûr de vouloir supprimer cet employé ?")) return;
+        const modal = new bootstrap.Modal(document.getElementById('deleteEmployeeModal'));
+        const confirmBtn = document.getElementById('confirmDeleteEmployeeBtn');
+        if (confirmBtn) {
+            confirmBtn.dataset.id = employeeId;
+            modal.show();
+        }
+        if (confirmBtn) {
+            confirmBtn.addEventListener('click', async () => {
 
         try {
             const response = await fetch(`${API_BASE}/admin/employees/${employeeId}`, {
@@ -496,13 +508,18 @@ if (employeeList) {
             if (!response.ok) throw new Error("Erreur suppression");
 
             alert("Employé supprimé !");
+            const modalEl = document.getElementById('deleteEmployeeModal');
+            const modalInstance = bootstrap.Modal.getInstance(modalEl);
+            if (modalInstance) modalInstance.hide();
             loadEmployees();
 
         } catch (error) {
             console.error(error);
         }
     });
-}    
+        }
+    });
+}
 }
 // --- Ajouter un nouvel utilisateur ---
 async function newEmployee(event) {
@@ -1088,3 +1105,145 @@ const chiffreAffairesConfig = {
     }
 };
 const chiffreAffairesChart = new Chart(chiffreAffairesByMenu, chiffreAffairesConfig);
+
+
+// afficher lesmessages de contact
+
+async function getContactMsg() {
+    const response = await fetch(`${API_BASE}/contact/all`, {
+        method: 'GET',
+        headers: {
+            'X-AUTH-TOKEN': getToken()
+        }
+    });
+    if (!response.ok) {
+        throw new Error('Erreur de chargement des messages de contact');
+    }
+    return await response.json();
+
+}
+// gérer les actions sur les messages de contact (supprimer, marquer comme traité)
+function initContactMsgListeners() {
+    const contactMessagesTable = document.getElementById("contactMessagesTable");
+    contactMessagesTable.addEventListener("click", async (e) => {
+        const deleteBtn = e.target.closest('.delete-contact-msg-btn');
+        if (deleteBtn) {
+            const msgId = deleteBtn.dataset.id;
+            console.log("ID du message à supprimer :", msgId);
+            if (!msgId) {
+                console.error("ID du message de contact manquant");
+                alert("Erreur technique");
+                return;
+            }
+            const modal = new bootstrap.Modal(document.getElementById('deleteContactMsgModal'));
+            const confirmDeleteBtn = document.getElementById('confirmDeleteContactMsgBtn');
+             confirmDeleteBtn.addEventListener('click', handleConfirmDelete, { once: true });
+            modal.show();
+            async function handleConfirmDelete() {
+                try {
+                    await deleteContactMsg(msgId);
+                    alert("Message de contact supprimé !");
+                    loadContactMsg();
+                    const modalEl = document.getElementById('deleteContactMsgModal');
+                    const modalInstance = bootstrap.Modal.getInstance(modalEl);
+                    if (modalInstance) modalInstance.hide();
+                } catch (error) {
+                    console.error("Erreur :", error);
+                    alert("Une erreur est survenue");
+                }
+
+        }      
+           
+           
+    }
+        const checkBtn = e.target.closest('.check-btn');
+        if (checkBtn) {
+            const msgId = checkBtn.dataset.id;
+            if (!msgId) {
+                console.error("ID du message de contact manquant");
+                alert("Erreur technique");
+                return;
+            }
+            try {
+                await markContactMsgAsTreated(msgId);
+                alert("Message de contact marqué comme traité !");
+                loadContactMsg();
+            }
+            catch (error) {
+                console.error("Erreur :", error);
+                alert("Une erreur est survenue");
+            }
+        }
+    });
+
+}
+
+async function loadContactMsg() {
+    const contactMessagesTable = document.getElementById("contactMessagesTable");
+    if (!contactMessagesTable) {
+        console.error("Tableau des messages de contact introuvable");
+        return;
+    }
+    try {
+        const messages = await getContactMsg();
+        console.log("Messages de contact récupérés pour affichage :", messages);
+        displayContactMsg(messages);
+    }
+        catch (error) {
+        console.error("Erreur lors du chargement des messages de contact :", error);
+        contactMessagesTable.innerHTML = `<tr><td colspan="5">Erreur : ${error.message}</td></tr>`;
+    }
+}
+// afficher les messages de contact dans le tableau
+function displayContactMsg(messages) {
+    const contactMessagesTable = document.getElementById("contactMessagesTable");
+    contactMessagesTable.innerHTML = "";
+    if (!messages || messages.length === 0) {
+        contactMessagesTable.innerHTML = `<tr><td colspan="5" class="text-center">Aucun message de contact</td></tr>`;
+        return;
+    }
+    contactMessagesTable.innerHTML = messages.map(msg => `
+        <tr>
+            <td>${msg.email}</td>
+            <td>${msg.title}</td>
+            <td>${msg.message}</td>
+            <td><button class="btn btn-sm btn-danger delete-contact-msg-btn" data-id="${msg.id}">
+                    <i class="bi bi-trash">Supprimer</i>
+                </button>
+                <button class="check-btn btn btn-sm ${msg.traite ? 'btn-secondary' : 'btn-success'}"
+                data-id="${msg.id}" py-1>
+                <i class="bi bi-check"></i>
+                <span>${msg.traite ? 'Traité' : 'Nouveau'}</span>
+                </button>
+            </td>
+            <td>${new Date(msg.createdAt).toLocaleString()}</td>
+        </tr>
+    `).join("");
+}
+// supprimer un message de contact
+async function deleteContactMsg(id) {
+    const response = await fetch(`${API_BASE}/contact/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'X-AUTH-TOKEN': getToken()
+        }
+    });
+    if (!response.ok) {
+        throw new Error('Erreur de suppression du message de contact');
+    }
+    console.log("Message de contact supprimé");
+}
+// marquer un message de contact comme traité
+async function markContactMsgAsTreated(id) {
+    const response = await fetch(`${API_BASE}/contact/${id}/treated`, {
+        method: 'PUT',
+        headers: {
+            'X-AUTH-TOKEN': getToken()
+        }
+    });
+    if (!response.ok) {
+        throw new Error('Erreur de mise à jour du message de contact');
+    }
+    console.log("Message de contact marqué comme traité");
+}
+

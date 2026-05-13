@@ -65,8 +65,8 @@
                         <!-- LISTE PLATS -->
                         <div class="admin-gestion mb-3" id="gestion-dishes">
                             <h2 class="mb-4">Gestion des plats</h2>
-                            <table class="table table-striped table-hover align-middle">
-                                <thead class="table-dark">
+                            <table class="table table-striped admin-table table-hover align-middle">
+                                <thead>
                                     <tr>
                                         <th>ID</th>
                                         <th>Catégorie</th>
@@ -156,7 +156,7 @@
                         <div class="admin-gestion" id="menu-table-admin">
                             <h2 class="mb-4">Gestion des menus</h2>
                             <table class="table table-striped admin-table table-hover align-middle">
-                                <thead class="table-dark">
+                                <thead>
                                     <tr>
                                         <th>Titre</th>
                                         <th>Description</th>
@@ -309,7 +309,25 @@
                                 </div>
                             </div>
                             </div>  
-                    </div>  
+                    </div> 
+                    <!--modal de suppression d'employé-->
+                    <div class="modal fade" id="deleteEmployeeModal" tabindex="-1" aria-labelledby="deleteEmployeeModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="deleteEmployeeModalLabel">Supprimer un employé</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Êtes-vous sûr de vouloir supprimer cet employé ?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                    <button type="button" class="btn btn-danger" id="confirmDeleteEmployeeBtn">Supprimer</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="tab-pane fade" id="v-pills-commandes" role="tabpanel" aria-labelledby="v-pills-commandes-tab" tabindex="0">
                         <!-- Filtres -->
                             <div class="filters-section">
@@ -379,76 +397,104 @@
                                     </div>
                             </div>
                             <!--annuler une commande-->
-                    <div class="modal fade" id="deleteOrderModal" aria-hidden="true" aria-labelledby="deleteCommandeModalLabel" tabindex="-1">
-                    <div class="modal-dialog modal-dialog-centered delete-commande-modal*">
-                        <div class="modal-content">
-                        <div class="modal-body">
-                            <h5>Êtes-vous sûr de vouloir annuler cette commande ?</h5>
-                            <p>Cette action est irréversible.</p>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                            <button type="button" class="btn btn-danger" id="confirmCancelBtn">Confirmer l'annulation</button>
-                        </div>
-                        </div>
-                    </div>
-                    </div>
-                    </div>
-                    <!-- Modal pour modifier une commande -->
-                    <div class="modal fade" id="editOrderModal" tabindex="-1" aria-labelledby="editOrderModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="editOrderModalLabel">Modifier une commande</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            <div class="modal fade" id="deleteOrderModal" aria-hidden="true" aria-labelledby="deleteCommandeModalLabel" tabindex="-1">
+                            <div class="modal-dialog modal-dialog-centered delete-commande-modal*">
+                                <div class="modal-content">
+                                <div class="modal-body">
+                                    <h5>Êtes-vous sûr de vouloir annuler cette commande ?</h5>
+                                    <p>Cette action est irréversible.</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                    <button type="button" class="btn btn-danger" id="confirmCancelBtn">Confirmer l'annulation</button>
+                                </div>
+                                </div>
                             </div>
-                            <div class="modal-body">
-                                <form id="editOrderForm">
-                                    <input type="hidden" id="editOrderId" name="editOrderId">
-
-                                    <div class="mb-3">
-                                        <label for="menuSelectEdit" class="form-label">Menu</label>
-                                        <select class="form-select" id="menuSelectEdit" name="menuSelectEdit" required>
-                                            <option value="">Sélectionnez un menu</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="numberOfPeople" class="form-label">Nombre de personnes</label>
-                                        <input type="number" class="form-control" id="numberOfPeople" name="numberOfPeople" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="deliveryCity" class="form-label">Ville de livraison</label>
-                                        <input type="text" class="form-control" id="deliveryCity" name="deliveryCity" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="deliveryAddress" class="form-label">Adresse de livraison</label>
-                                        <input type="text" class="form-control" id="deliveryAddress" name="deliveryAddress" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="deliveryDate" class="form-label">Date de livraison</label>
-                                        <input type="date" class="form-control" id="deliveryDate" name="deliveryDate" required>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="deliveryTime" class="form-label">Heure de livraison</label>
-                                        <input type="time" class="form-control" id="deliveryTime" name="deliveryTime" required>
-                                    </div>
-
-                                    <div class="text-center">
-                                        <button type="submit" class="btn btn-primary">
-                                            Enregistrer les modifications
-                                        </button>
-                                    </div>
-                                </form>
                             </div>
+                            <!-- Modal pour modifier une commande -->
+                            <div class="modal fade" id="editOrderModal" tabindex="-1" aria-labelledby="editOrderModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="editOrderModalLabel">Modifier une commande</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form id="editOrderForm">
+                                            <input type="hidden" id="editOrderId" name="editOrderId">
 
+                                            <div class="mb-3">
+                                                <label for="menuSelectEdit" class="form-label">Menu</label>
+                                                <select class="form-select" id="menuSelectEdit" name="menuSelectEdit" required>
+                                                    <option value="">Sélectionnez un menu</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label for="numberOfPeople" class="form-label">Nombre de personnes</label>
+                                                <input type="number" class="form-control" id="numberOfPeople" name="numberOfPeople" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="deliveryCity" class="form-label">Ville de livraison</label>
+                                                <input type="text" class="form-control" id="deliveryCity" name="deliveryCity" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="deliveryAddress" class="form-label">Adresse de livraison</label>
+                                                <input type="text" class="form-control" id="deliveryAddress" name="deliveryAddress" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="deliveryDate" class="form-label">Date de livraison</label>
+                                                <input type="date" class="form-control" id="deliveryDate" name="deliveryDate" required>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label for="deliveryTime" class="form-label">Heure de livraison</label>
+                                                <input type="time" class="form-control" id="deliveryTime" name="deliveryTime" required>
+                                            </div>
+
+                                            <div class="text-center">
+                                                <button type="submit" class="btn btn-primary">
+                                                    Enregistrer les modifications
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                </div>
+                            </div>
+                            </div>
+                    </div>
+                    <div class="tab-pane fade" id="v-pills-messages" role="tabpanel" aria-labelledby="v-pills-disabled-tab" tabindex="0"                  >
+                       
+                        <div class="admin-gestion">
+                            <h2 class="mb-4">Gestion des messages de contact</h2>
+                            <div class="table-responsive">
+                                <table class="table table-striped admin-table table-hover align-middle">
+                                    <thead>
+                                        <tr><th>Email</th><th>Date</th><th>Sujet</th><th>Message</th><th>Actions</th></tr>
+                                    </thead>
+                                    <tbody id="contactMessagesTable">
+                                        <tr>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                    </div>
-                    </div>
-                    </div>
-                    <div class="tab-pane fade" id="v-pills-disabled" role="tabpanel" aria-labelledby="v-pills-disabled-tab" tabindex="0"                  >
-                        <p>Content for Disabled tab.</p>
+                        
+                        <div class="modal fade" id="deleteContactMsgModal" tabindex="-1" aria-labelledby="deleteContactMsgModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        <p>Êtes-vous sûr de vouloir supprimer ce message de contact ?</p>
+                                        <div class="text-center">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                            <button type="button" class="btn btn-danger" id="confirmDeleteContactMsgBtn" data-id="${msg.id}">Supprimer</button>
+                                        </div>
+
+                                    </div>  
+                                </div>
+                            </div>
+                            </div>
                     </div>
                     <div class="tab-pane fade" id="v-pills-devis" role="tabpanel" aria-labelledby="v-pills-messages-tab" tabindex="0">
                         <!--liste des messages -->

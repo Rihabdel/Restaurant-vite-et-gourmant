@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\ContactMsgRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: ContactMsgRepository::class)]
 class ContactMsg
@@ -12,22 +13,30 @@ class ContactMsg
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups("contact:read")]
     private ?int $id = null;
-
+    #[Groups("contact:read")]
     #[ORM\Column(length: 100)]
     private ?string $title = null;
 
+    #[Groups("contact:read")]
     #[ORM\Column(type: Types::TEXT)]
     private ?string $message = null;
 
+    #[Groups("contact:read")]
     #[ORM\Column(length: 100)]
     private ?string $email = null;
 
+    #[Groups("contact:read")]
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[Groups("contact:read")]
     #[ORM\ManyToOne(inversedBy: 'contactMsgs')]
     private ?User $user = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $traite = null;
 
     public function getId(): ?int
     {
@@ -90,6 +99,18 @@ class ContactMsg
     public function setUser(?User $user): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+    #[Groups("contact:read")]
+    public function isTraite(): ?bool
+    {
+        return $this->traite;
+    }
+
+    public function setTraite(?bool $traite): static
+    {
+        $this->traite = $traite;
 
         return $this;
     }

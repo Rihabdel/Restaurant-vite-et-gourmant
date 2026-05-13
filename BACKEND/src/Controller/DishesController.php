@@ -18,11 +18,12 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use symfony\component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use OpenApi\Attributes as OA;
 
 #[Route('api/dishes', name: 'app_api_dishes_')]
+
 final class DishesController extends AbstractController
 {
     public function __construct(
@@ -74,6 +75,7 @@ final class DishesController extends AbstractController
             ]
         )
     ]
+    #[IsGranted('ROLE_ADMIN')]
     public function new(Request $request): JsonResponse
     {
         try {

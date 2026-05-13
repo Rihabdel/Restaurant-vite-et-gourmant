@@ -8,7 +8,7 @@ $dark: #350903; // Example: change dark color
 $bg_dark: #744c58; // Example: change dark background color
 $secondary: #5c4643; // Example: change accent color
 $success: #146633; // Example: change success color
-$body-bg:  #dbcbca; // Example: change body background color
+$body-bg:  rgb(233, 227, 227); // Example: change body background color
 
 @import "../node_modules/bootstrap/scss/bootstrap";
 

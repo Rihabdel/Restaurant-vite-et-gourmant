@@ -52,7 +52,7 @@ class Menus
     private ?string $price = null;
 
     #[Groups(['menu:read', 'menu:list', 'menu:write', 'menu:detail'])]
-    #[ORM\Column(type: Types::TEXT)]
+    #[ORM\Column(type: 'text', nullable: true)]
     private ?string $conditions = null;
 
     #[Groups(['menu:read', 'menu:list', 'menu:write', 'menu:detail', 'order:read'])]

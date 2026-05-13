@@ -81,8 +81,8 @@
   --bs-body-line-height: 1.5;
   --bs-body-color: #212529;
   --bs-body-color-rgb: 33, 37, 41;
-  --bs-body-bg: #dbcbca;
-  --bs-body-bg-rgb: 219, 203, 202;
+  --bs-body-bg: rgb(233, 227, 227);
+  --bs-body-bg-rgb: 233, 227, 227;
   --bs-emphasis-color: #000;
   --bs-emphasis-color-rgb: 0, 0, 0;
   --bs-secondary-color: rgba(33, 37, 41, 0.75);
@@ -2476,10 +2476,10 @@ textarea.form-control-lg {
   outline: 0;
 }
 .form-range:focus::-webkit-slider-thumb {
-  box-shadow: 0 0 0 1px #dbcbca, 0 0 0 0.25rem rgba(165, 98, 98, 0.25);
+  box-shadow: 0 0 0 1px rgb(233, 227, 227), 0 0 0 0.25rem rgba(165, 98, 98, 0.25);
 }
 .form-range:focus::-moz-range-thumb {
-  box-shadow: 0 0 0 1px #dbcbca, 0 0 0 0.25rem rgba(165, 98, 98, 0.25);
+  box-shadow: 0 0 0 1px rgb(233, 227, 227), 0 0 0 0.25rem rgba(165, 98, 98, 0.25);
 }
 .form-range::-moz-focus-outer {
   border: 0;
@@ -12338,13 +12338,12 @@ li {
 }
 
 .menu-item-description {
-  color: #dbcbca;
+  color: rgb(233, 227, 227);
   margin-bottom: 0;
   font-size: 1rem;
 }
 
 .info-section {
-  background-color: #dbcbca;
   color: #A93C3C;
   border-radius: 15px;
   margin-top: 10px;
@@ -12432,7 +12431,6 @@ h2, .h2 {
 /*-- ----------------------------------/**tableau des commandes**/
 ----------------------------------* .orders-section {
   padding: 80px 0;
-  background-color: #dbcbca;
   border-radius: 40px;
   margin: 40px 0;
   BORDER: 2PX SOLID RGBA(212, 167, 106, 0.2);
@@ -12486,7 +12484,6 @@ td button {
 
 .order-recap {
   padding: 20px;
-  background-color: #dbcbca;
   border-radius: 10px;
   border: 2px solid rgba(212, 167, 106, 0.2);
 }
@@ -12695,7 +12692,6 @@ td button {
 ----------------------------------* .prestations-section,
 .service-section {
   padding: 80px 0;
-  background-color: #dbcbca;
   border-radius: 40px;
   margin: 40px 0;
   border: 2px solid rgba(212, 167, 106, 0.2);
@@ -12846,7 +12842,7 @@ td button {
 }
 
 .service-highlight {
-  background-color: #dbcbca;
+  background-color: rgb(233, 227, 227);
   border-radius: 15px;
   padding: 30px;
   margin-top: 40px;
@@ -12872,7 +12868,6 @@ td button {
   display: flex;
   flex-direction: column;
   border-radius: 20px;
-  background-color: #dbcbca;
 }
 
 /*-- ----------------------------------/**CALL TO ACTION BUTTON**/

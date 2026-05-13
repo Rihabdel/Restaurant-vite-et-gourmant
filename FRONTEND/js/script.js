@@ -126,13 +126,60 @@ export async function updateUserInfo(updatedData) {
     }
     return await response.json();
 }
+const form = document.getElementById("contactForm");
+if (form) {
+    console.log("Formulaire contact trouvé, ajout de l'événement submit");
+    form.addEventListener("submit", newContactMsg);
+}
+
+//contacter 
+async function newContactMsg(event) {
+    event.preventDefault();
+    const form= document.getElementById("contactForm");
+    const formData = new FormData(form);
+    const contactData = {
+       
+        email: formData.get("email"),
+        title: formData.get("subject"),
+        message: formData.get("message")
+    };
+    try {
+        await addConctactMsg(contactData);
+        alert("Message envoyé avec succès !");
+        form.reset();
+    }
+    catch (error) {
+        console.error("Erreur lors de l'envoi du message : ", error);
+        alert("Une erreur est survenue. Veuillez réessayer.");
+    }
+}
+
+
+async function addConctactMsg(contactData) {
+    const response = await fetch(`${API_BASE}/contact/add`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(contactData),
+        redirect: 'follow'
+    }).then(response => {
+        if (response.ok) {
+            alert("Message envoyé avec succès !");
+        } else {
+            return response.json().then(errorData => {
+                throw new Error(errorData.message || `Erreur ${response.status}`);
+            });
+        }
+    }).catch(error => {
+        console.error("Erreur lors de l'envoi du message de contact : ", error);
+        alert("Une erreur est survenue. Veuillez réessayer.");
+    });
+    return response;
+}
 
 
 
 
 
-
-
-// Initialisation au chargement
-console.log("script.js chargé - Token:", getToken(), "Rôle:", getRole());
 showAndHideElementsForRoles();
