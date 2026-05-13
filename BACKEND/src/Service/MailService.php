@@ -6,6 +6,7 @@ use App\Entity\Orders;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Mime\Address;
 
 
 
@@ -35,8 +36,9 @@ class MailService
         }
 
         $email = (new Email())
-            ->from('noreply@vitegourmand.fr')
-            ->to("test@mailtrap.io")
+            ->from('adminjuliejose@gmail.com')
+            ->to("{$user->getEmail()}")
+            ->cc(new Address('adminjuliejose@ gmail.com'))
             ->subject('Confirmation de votre commande')
             ->html("
                 <h2>Commande confirmée</h2>
@@ -76,11 +78,11 @@ class MailService
         dump('2 APRES SEND');
         dump($user->getEmail());
     }
-
+    //
     public function sendContactConfirmation(string $name, string $email, string $message): void
     {
         $confirmationEmail = (new Email())
-            ->from('noreply@vitegourmand.fr')
+            ->from('adminjuliejose@gmail.com')
             ->to($email)
             ->subject('Confirmation de votre message')
             ->html("
@@ -103,6 +105,21 @@ class MailService
             dump('EMAIL DE CONFIRMATION ENVOYÉ'); // 🔥 test
         } catch (\Exception $e) {
             dump('Erreur lors de l\'envoi de l\'email de confirmation : ' . $e->getMessage());
+        }
+    }
+
+    public function sendContactEmail(string $title, string $email, string $message): void
+    {
+        $contactEmail = (new Email())
+            ->from($email)
+            ->to('adminjuliejose@gmail.com')
+            ->subject($title)
+            ->text($message);
+        try {
+            $this->mailer->send($contactEmail);
+            dump('EMAIL DE CONTACT ENVOYÉ'); // 🔥 test
+        } catch (\Exception $e) {
+            dump('Erreur lors de l\'envoi de l\'email de contact : ' . $e->getMessage());
         }
     }
 }
