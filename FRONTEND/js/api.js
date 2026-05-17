@@ -358,9 +358,14 @@ export async function previewOrder(data) {
         },
         body: JSON.stringify(data)
     });
-
+    if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Détails serveur :", errorData);
+        throw new Error('Erreur de prévisualisation de la commande');
+    }
     return await response.json();
 }
+
 // --- Fonction API pour récupérer les informations de l'utilisateur connecté ---
 export async function getUserInfo() {
      let myHeaders = new Headers();

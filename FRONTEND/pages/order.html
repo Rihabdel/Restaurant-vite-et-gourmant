@@ -49,28 +49,28 @@
                                     </div>
 
                                     <div class="mb-3">
-                                        <label for="numberOfPeople" class="form-label">Nombre de personnes</label>
-                                        <input type="number" class="form-control" id="numberOfPeople" name="numberOfPeople" required>
+                                        <label for="numberOfPersons" class="form-label">Nombre de personnes</label>
+                                        <input type="number" class="form-control" id="numberOfPersons" name="numberOfPersons" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="deliveryCity" class="form-label">Ville de livraison</label>
-                                        <input type="text" class="form-control" id="deliveryCity" name="deliveryCity" required>
+                                        <label for="livraisonVille" class="form-label">Ville de livraison</label>
+                                        <input type="text" class="form-control" id="livraisonVille" name="livraisonVille" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="deliveryAddress" class="form-label">Adresse de livraison</label>
-                                        <input type="text" class="form-control" id="deliveryAddress" name="deliveryAddress" required>
+                                        <label for="livraisonAdresse" class="form-label">Adresse de livraison</label>
+                                        <input type="text" class="form-control" id="livraisonAdresse" name="livraisonAdresse" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="deliveryDate" class="form-label">Date de livraison</label>
-                                        <input type="date" class="form-control" id="deliveryDate" name="deliveryDate" required>
+                                        <label for="livraisonDate" class="form-label">Date de livraison</label>
+                                        <input type="date" class="form-control" id="livraisonDate" name="livraisonDate" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="deliveryPostalCode" class="form-label">Code postal de livraison</label>
-                                        <input type="text" class="form-control" id="deliveryPostalCode" name="deliveryPostalCode" required>
+                                        <label for="livraisonCodePostal" class="form-label">Code postal de livraison</label>
+                                        <input type="text" class="form-control" id="livraisonCodePostal" name="livraisonCodePostal" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="deliveryTime" class="form-label">Heure de livraison</label>
-                                        <input type="time" class="form-control" id="deliveryTime" name="deliveryTime" required>
+                                        <label for="livraisonHeure" class="form-label">Heure de livraison</label>
+                                        <input type="time" class="form-control" id="livraisonHeure" name="livraisonHeure" required>
                                     </div>
 
                                     <div class="text-center">
@@ -111,14 +111,17 @@
                     </div>
                     <div class="row">
                       <div class="col mb-3">
-                          <label for="menuSelect" class="form-label">Titre du menu :</label>
-                          <select class="form-select" id="menuSelect" name="menuId">
-                          <option value="">Sélectionnez un menu</option>
-                          </select>
-                          <label for="numberOfPeople" class="form-label"placeholder="minimum">Nombre de personnes :</label>
-                          <input type="number" class="form-control" id="numberOfPeople" placeholder="Entrez le nombre de personnes">
-                          <small class="form-text">Minimum de 20 personnes</small></br>
-                      </div>
+                            <label for="menuSelect" class="form-label">Titre du menu :</label>
+                            <select class="form-select" id="menuSelect" name="menuId">
+                            <option value="">Sélectionnez un menu</option>
+                            </select>
+                        </div>
+                    <div class="col mb-3">    
+                        <label for="numberOfPeople" class="form-label"placeholder="minimum">Nombre de personnes :</label>
+                        <input type="number" class="form-control" id="numberOfPeople" placeholder="Entrez le nombre de personnes">
+                        <p class="form-text text-muted" style="margin-top: 5px;font-size: 0.8em;">10% est appliquée pour toutes commandes ayant 5
+personnes de plus que le nombre de personnes minimum indiqué dans le menu</p></br>
+                    </div>
                     </div>
                     <div class="row">
                       <div class="col mb-3">
@@ -151,20 +154,20 @@
                         </div>
                     </div>
                     <div class="delivery row">
-                          <div class="mb-3">
-                              <label for="deliveryAddress" class="form-label">Adresse de livraison</label>
-                              <input type="text" class="form-control" id="deliveryAddress" placeholder="Entrez votre adresse">
-                          </div>
-                          <div class="mb-3">
-                              <label for="deliveryCity" class="form-label">Ville de livraison</label>
-                              <input type="text" class="form-control" id="deliveryCity" placeholder="Entrez votre ville">
-                              <small class="form-text">5 euros de livraison majoré de 59 centimes par kilomètre parcourus</small>
-                          </div>
-                          <div class="mb-3">
-                              <label for="deliveryPostalCode" class="form-label">Code postal</label>
-                              <input type="number" class="form-control" id="deliveryPostalCode" placeholder="Entrez votre code postal">
-                              <small class="form-text">5 euros de livraison majoré de 59 centimes par kilomètre parcourus</small>
-                          </div>
+                            <div class="mb-3">
+                                <label for="deliveryAddress" class="form-label">Adresse de livraison</label>
+                                <input type="text" class="form-control" id="deliveryAddress" placeholder="Entrez votre adresse">
+                            </div>
+                            <div class="mb-3">
+                                <label for="deliveryCity" class="form-label">Ville de livraison</label>
+                                <input type="text" class="form-control" id="deliveryCity" placeholder="Entrez votre ville">
+                                <small class="form-text">5 euros de livraison majoré de 59 centimes par kilomètre parcourus</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="deliveryPostalCode" class="form-label">Code postal</label>
+                                <input type="number" class="form-control" id="deliveryPostalCode" placeholder="Entrez votre code postal">
+                                <small class="form-text">5 euros de livraison majoré de 59 centimes par kilomètre parcourus</small>
+                            </div>
                     </div>
                     <div class="row delivery">
                           <div class="col mb-3">

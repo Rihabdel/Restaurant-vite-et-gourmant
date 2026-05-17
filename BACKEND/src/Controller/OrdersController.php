@@ -159,6 +159,74 @@ final class OrdersController extends AbstractController
         }
     }
 
+
+    #[Route('/orders/preview', methods: ['POST'], name: 'preview')]
+    #[IsGranted('ROLE_USER')]
+    #[OA\Post(
+        tags: ["Orders"],
+        summary: "Prévisualiser une commande avant de la créer",
+        requestBody: new OA\RequestBody(
+            description: "Détails de la commande à prévisualiser",
+            required: true,
+            content: new OA\JsonContent(
+                example: [
+                    "menu" => 1,
+                    "numberOfPeople" => 30,
+                    "deliveryCity" => "Bordeaux",
+                    "deliveryPostalCode" => "33000"
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Prévisualisation de la commande réussie"
+            ),
+            new OA\Response(
+                response: 400,
+                description: "Données invalides ou contraintes non respectées"
+            ),
+            new OA\Response(
+                response: 401,
+                description: "Utilisateur non authentifié"
+            )
+        ]
+    )]
+    public function preview(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $menu = $this->entityManager
+            ->getRepository(Menus::class)
+            ->find($data['menu']);
+
+        if (!$menu) {
+            return $this->json(['error' => 'Menu introuvable'], 404);
+        }
+
+        $deliveryCost = $this->calculateDeliveryCost(
+            $data['deliveryCity'],
+            $data['deliveryPostalCode'],
+            10.0
+        );
+
+        $totalPrice =
+            $menu->getPriceEstimate($data['numberOfPeople'])
+            + $deliveryCost;
+        $order = (new Orders())
+            ->setMenu($menu)
+            ->setNumberOfPeople((int) $data['numberOfPeople'])
+            ->setDeliveryCity($data['deliveryCity'])
+            ->setDeliveryPostalCode($data['deliveryPostalCode']);
+        $discount = $this->discount($order);
+
+        return $this->json([
+            'menuPrice' => $menu->getPrice(),
+            'totalPrice' => $totalPrice,
+            'deliveryCost' => $deliveryCost,
+            'discount' => $discount
+        ], Response::HTTP_OK);
+    }
     #[Route(
         '/orders/{id}',
         name: 'orders_show',
@@ -193,40 +261,7 @@ final class OrdersController extends AbstractController
             )
         ]
     )]
-    #[Route('/orders/preview', methods: ['POST'], name: 'preview')]
-    #[IsGranted('ROLE_USER')]
-    public function preview(Request $request): JsonResponse
-    {
-        $data = json_decode($request->getContent(), true);
 
-        $menu = $this->entityManager
-            ->getRepository(Menus::class)
-            ->find($data['menu']);
-
-        if (!$menu) {
-            return $this->json(['error' => 'Menu introuvable'], 404);
-        }
-
-        $deliveryCost = $this->calculateDeliveryCost(
-            $data['deliveryCity'],
-            $data['deliveryPostalCode'],
-            10.0
-        );
-
-        $totalPrice =
-            $menu->getPriceEstimate($data['numberOfPeople'])
-            + $deliveryCost;
-
-        $discount = $this->discount((new Orders())->setNumberOfPeople($data['numberOfPeople'])->setMenu($menu));
-
-        return $this->json([
-            'menuPrice' => $menu->getPrice(),
-            'totalPrice' => $totalPrice,
-            'deliveryCost' => $deliveryCost,
-            'discount' => $discount
-        ]);
-    }
-    // Afficher les détails d'une commande (accessible uniquement par le propriétaire de la commande, les admins et les employés)
     public function show(int $id, OrdersRepository $ordersRepository): JsonResponse
     {
         $order = $ordersRepository->find($id);
