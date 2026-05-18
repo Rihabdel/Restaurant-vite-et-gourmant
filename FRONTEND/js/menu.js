@@ -98,8 +98,7 @@ function initButtons() {
                 const id = detailBtn.dataset.id;
                 if (!id) return;
                 try{
-                    
-                   
+
                     const modalEl = document.getElementById('detailscarteModal');
                     const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
                     modalInstance.show();
@@ -343,7 +342,7 @@ function initForm() {
 
         const fileInput = document.getElementById('editMenuPicture');
 
-        // 👉 image seulement si choisie
+        //  image seulement si choisie
         if (fileInput && fileInput.files.length > 0) {
             formData.append("picture", fileInput.files[0]);
         }
@@ -482,14 +481,14 @@ export function fillDetailModal(menu, dishes) {
             ${generateHtml('Plats Principaux', 'bi-main-dish', plats)}
             ${generateHtml('Desserts', 'bi-cake', desserts)}
             
-            <div class="mt-4 p-3 badge bg-light border">
-                <strong>Prix Menu : ${menuPrice}€ / personne</strong>
+            <div class="mt-4 p-3 bg-secondary rounded text-center">
+                <p class="mb-0 menu-item-price ">Prix du menu : ${menuPrice}€ / personne</p>
             </div>
         <div class="container mb-4 info-section">
             <div class="info-header">
                 <h5>Allergènes et informations supplémentaires :</h5>
             </div>
-            <div class="info-content">
+            <div class="info-content p-3">
                 <ul class="list-unstyled">
                 <li><i class="bi bi-info-circle-fill"></i><small> Ce menu est conçu pour un minimum de <strong>${menu.minPeople || '1'}</strong> personnes.</small></li>
                 <li><i class="bi bi-exclamation-triangle-fill"></i><small>Ce menu nécessite une commande <strong>${menu.orderBefore || '2'}</strong> jours à l'avance.</small></li>

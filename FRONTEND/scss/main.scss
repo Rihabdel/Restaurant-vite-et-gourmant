@@ -37,7 +37,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 li{
-    
     color: $dark;
     font-size: 1.1rem;
 }
@@ -309,18 +308,19 @@ li{
         //*-- ----------------------------------/**DETAIL MENU CARD **/----------------------------------*//
         .menu-title{
             color: $accent;
-            font-size: 2.5rem;
+            font-size: 3rem;
             font-weight: 700;
             margin-bottom: 20px;
             text-align: center;
             position: relative;
         }
         .details .modal-content {
-            background-color: rgba($dark,0.9);
+            background-color: rgba($dark,0.8);
             color: $primary;
             border-radius: 25px;
             border-color: $secondary    ;
             text-decoration-style: wavy;
+            height: auto;
         }
 
        
@@ -343,29 +343,33 @@ li{
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
-            font-size: 1.2rem;
+            font-size: 1.25rem;
         }
         
         .menu-item-title {
             font-weight: 600;
             color: white;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             margin-bottom: 5px;
         }
         
         .menu-item-price {
-
+            justify-content: center;
             color: white;
+            font-weight: 600;
+            font-size: 1.25rem;
             padding: 5px 15px;
             border-radius: 20px;
-            font-weight: 600;
             margin-bottom: 5px;
+            
         }
         
         .menu-item-description {
             color:$body-bg;
             margin-bottom: 0;
-            font-size: 1rem;
+            font-style: italic;
+            font-size: 1.1rem;
+            font-weight: 400;
         }
         .info-section {
             
@@ -381,9 +385,16 @@ li{
         .info-content li {
             margin-bottom: 8px;
             font-size: 1rem;
+            font-family: 'Playfair Display', serif;
+            background-color: $secondary;
+            border-radius: 10%;
+            padding: 10px;
+             color: white;
         }
         .info-content li i {
             margin-right: 8px;
+            
+            padding: 4px;
             color:$accent;
         }
               

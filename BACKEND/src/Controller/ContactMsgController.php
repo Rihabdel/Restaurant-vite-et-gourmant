@@ -27,29 +27,6 @@ class ContactMsgController extends AbstractController
     ) {}
 
     #[Route('/all', name: 'contact_list', methods: ['GET'])]
-    #[OA\Get(
-        summary: "Récupérer tous les messages de contact",
-        description: "Permet de récupérer la liste de tous les messages de contact reçus",
-        responses: [
-            new OA\Response(
-                response: 200,
-                description: "Liste des messages de contact récupérée avec succès",
-                content: new OA\JsonContent(
-                    type: "array",
-                    items: new OA\Items(ref: "#/components/schemas/ContactMsg")
-                )
-            ),
-            new OA\Response(
-                response: 500,
-                description: "Erreur lors de la récupération des messages de contact",
-                content: new OA\JsonContent(
-                    example: [
-                        'error' => 'Une erreur est survenue lors de la récupération des messages de contact'
-                    ]
-                )
-            )
-        ]
-    )]
     #[IsGranted('ROLE_ADMIN')]
     public function index(): Response
     {

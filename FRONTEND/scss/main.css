@@ -12283,7 +12283,7 @@ li {
 
 .menu-title {
   color: #A93C3C;
-  font-size: 2.5rem;
+  font-size: 3rem;
   font-weight: 700;
   margin-bottom: 20px;
   text-align: center;
@@ -12291,11 +12291,12 @@ li {
 }
 
 .details .modal-content {
-  background-color: rgba(53, 9, 3, 0.9);
+  background-color: rgba(53, 9, 3, 0.8);
   color: #A56262;
   border-radius: 25px;
   border-color: #5c4643;
   text-decoration-style: wavy;
+  height: auto;
 }
 
 .menu-category h3 i, .menu-category .h3 i {
@@ -12319,28 +12320,32 @@ li {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
-  font-size: 1.2rem;
+  font-size: 1.25rem;
 }
 
 .menu-item-title {
   font-weight: 600;
   color: white;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   margin-bottom: 5px;
 }
 
 .menu-item-price {
+  justify-content: center;
   color: white;
+  font-weight: 600;
+  font-size: 1.25rem;
   padding: 5px 15px;
   border-radius: 20px;
-  font-weight: 600;
   margin-bottom: 5px;
 }
 
 .menu-item-description {
   color: rgb(233, 227, 227);
   margin-bottom: 0;
-  font-size: 1rem;
+  font-style: italic;
+  font-size: 1.1rem;
+  font-weight: 400;
 }
 
 .info-section {
@@ -12356,10 +12361,16 @@ li {
 .info-content li {
   margin-bottom: 8px;
   font-size: 1rem;
+  font-family: "Playfair Display", serif;
+  background-color: #5c4643;
+  border-radius: 10%;
+  padding: 10px;
+  color: white;
 }
 
 .info-content li i {
   margin-right: 8px;
+  padding: 4px;
   color: #A93C3C;
 }
 
