@@ -1,13 +1,11 @@
 doctrine:
     dbal:
         url: "%env(resolve:DATABASE_URL)%"
-        # On supprime 'driver' et 'server_version' d'ici car ils sont directement
-        # détectés automatiquement par Symfony grâce à l'URL de la base de données !
-
-        charset: "%env(default:utf8:DB_CHARSET)%"
+        # On dit à Symfony que 'utf8' et 'utf8_unicode_ci' sont de simples chaînes de caractères (string)
+        charset: "%env(default:string:utf8:DB_CHARSET)%"
         default_table_options:
-            charset: "%env(default:utf8:DB_CHARSET)%"
-            collate: "%env(default:utf8_unicode_ci:DB_COLLATE)%"
+            charset: "%env(default:string:utf8:DB_CHARSET)%"
+            collate: "%env(default:string:utf8_unicode_ci:DB_COLLATE)%"
 
         profiling_collect_backtrace: "%kernel.debug%"
         use_savepoints: true
