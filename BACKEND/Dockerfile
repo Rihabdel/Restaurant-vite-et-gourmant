@@ -1,7 +1,7 @@
 FROM php:8.3-apache
 
 # 1. Dossier de travail standard Apache
-WORKDIR /var/www/html
+WORKDIR /var/www/html/BACKEND
 
 # 2. Extensions nécessaires pour Symfony, MySQL ET PostgreSQL (libpq-dev et pdo_pgsql ajoutés)
 RUN apt-get update && apt-get install -y \
