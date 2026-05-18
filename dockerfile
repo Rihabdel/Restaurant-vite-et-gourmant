@@ -26,6 +26,7 @@ RUN cp -R /var/www/html/FRONTEND/* /var/www/html/BACKEND/public/
 
 # 8. L'ÉTAPE CRUCIALE POUR RENDER : On va dans le dossier BACKEND et on installe les dépendances
 ENV COMPOSER_ALLOW_SUPERUSER=1
+ENV APP_ENV=prod
 RUN cd /var/www/html/BACKEND && composer install --no-dev --optimize-autoloader
 
 # 9. Droits d'accès pour Apache
