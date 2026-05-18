@@ -24,20 +24,20 @@ class SecurityController extends AbstractController
 {
     public function __construct(private EntityManagerInterface $manager, private SerializerInterface $serializer) {}
 
-    #[Route('/registration', name: 'registration', methods: 'POST')]
+    #[Route('/register', name: 'register', methods: ['POST'])]
     #[OA\Post(
         tags: ['Authentication'],
-        description: 'Registration endpoint',
+        description: 'Register endpoint',
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
                 properties: [
-                    new OA\Property(property: 'email', type: 'string'),
-                    new OA\Property(property: 'password', type: 'string'),
-                    new OA\Property(property: 'firstName', type: 'string'),
-                    new OA\Property(property: 'lastName', type: 'string'),
-                    new OA\Property(property: 'phone', type: 'int'),
-                    new OA\Property(property: 'address', type: 'string'),
+                    new OA\Property(property: 'email', type: 'string', example: 'user@example.com'),
+                    new OA\Property(property: 'password', type: 'string', example: 'password123'),
+                    new OA\Property(property: 'firstName', type: 'string', example: 'John'),
+                    new OA\Property(property: 'lastName', type: 'string', example: 'Doe'),
+                    new OA\Property(property: 'phone', type: 'int', example: 1234567890),
+                    new OA\Property(property: 'address', type: 'string', example: '123 Main St'),
                 ]
             )
         ),
@@ -59,45 +59,61 @@ class SecurityController extends AbstractController
         ]
     )]
 
-    public function register(Request $request, UserPasswordHasherInterface $passwordHasher): JsonResponse
-    {
-        $data = json_decode($request->getContent(), true);
+    public function register(
+        Request $request,
+        UserPasswordHasherInterface $passwordHasher,
+        EntityManagerInterface $entityManager
+    ): JsonResponse {
+        try {
+            $data = json_decode($request->getContent(), true);
 
-        if (!$data) {
-            return new JsonResponse(['error' => 'JSON invalide'], 400);
+            if (!$data) {
+                return new JsonResponse(['error' => 'JSON invalide'], Response::HTTP_BAD_REQUEST);
+            }
+
+            if (empty($data['email']) || empty($data['password'])) {
+                return new JsonResponse(['error' => 'Champs obligatoires manquants'], Response::HTTP_BAD_REQUEST);
+            }
+
+            $user = new User();
+            $user->setEmail($data['email']);
+            $user->setPhone($data['phone'] ?? null);
+            $user->setAddress($data['address'] ?? null);
+            $user->setLastName($data['lastName'] ?? null);
+            $user->setFirstName($data['firstName'] ?? null);
+
+            $user->setPassword(
+                $passwordHasher->hashPassword($user, $data['password'])
+            );
+
+            // Gérer les rôles
+            if (isset($data['roles']) && is_array($data['roles'])) {
+                $user->setRoles($data['roles']);
+            } else {
+                $user->setRoles(['ROLE_USER']);
+            }
+
+            $user->setCreatedAt(new \DateTimeImmutable());
+
+            // On utilise la variable $entityManager fraîchement injectée
+            $entityManager->persist($user);
+            $entityManager->flush();
+
+            return new JsonResponse([
+                'user' => $user->getUserIdentifier(),
+                'firstName' => $user->getFirstName(),
+                'lastName' => $user->getLastName(),
+                'phone' => $user->getPhone(),
+                'address' => $user->getAddress(),
+                'roles' => $user->getRoles()
+            ], Response::HTTP_CREATED);
+        } catch (\Exception $e) {
+            // En cas de crash, on intercepte l'erreur et on la renvoie proprement en JSON
+            return new JsonResponse([
+                'error' => 'Erreur lors de l\'inscription',
+                'message' => $e->getMessage() // <-- Ce message te dira EXACTEMENT ce que PostgreSQL reproche à tes données !
+            ], Response::HTTP_INTERNAL_SERVER_ERROR); // Erreur 500 propre
         }
-
-        if (empty($data['email']) || empty($data['password'])) {
-            return new JsonResponse(['error' => 'Champs obligatoires manquants'], 400);
-        }
-
-        $user = new User();
-        $user->setEmail($data['email']);
-        $user->setPhone($data['phone'] ?? null);
-        $user->setAddress($data['address'] ?? null);
-        $user->setLastName($data['lastName'] ?? null);
-        $user->setFirstName($data['firstName'] ?? null);
-        $user->setPassword(
-            $passwordHasher->hashPassword($user, $data['password'])
-        );
-        // gerer les roles
-        if (isset($data['roles']) && is_array($data['roles'])) {
-            $user->setRoles($data['roles']);
-        } else {
-            $user->setRoles(['ROLE_USER']);
-        }
-        $user->setCreatedAt(new DateTimeImmutable());
-        $this->manager->persist($user);
-        $this->manager->flush();
-
-        return new JsonResponse([
-            'user' => $user->getUserIdentifier(),
-            'firstName' => $user->getFirstName(),
-            'lastName' => $user->getLastName(),
-            'phone' => $user->getPhone(),
-            'address' => $user->getAddress(),
-            'roles' => $user->getRoles()
-        ], Response::HTTP_CREATED);
     }
 
     #[Route('/login', name: 'login', methods: ['POST'])]

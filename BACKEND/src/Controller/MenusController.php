@@ -187,29 +187,31 @@ final class MenusController extends AbstractController
     public function list(MenusRepository $repository, Request $request): JsonResponse
     {
         try {
-            // Récupérer et normaliser les filtres
-            $filters = [
+            // Récupérer et filtrer les paramètres de requête
+            $filters = array_filter([
                 'price_max' => $request->query->get('price_max'),
                 'price_min' => $request->query->get('price_min'),
                 'theme' => $request->query->get('theme'),
                 'diet' => $request->query->get('diet'),
                 'min_persons' => $request->query->get('min_persons'),
                 'isAvailable' => $request->query->get('isAvailable')
-            ];
+            ], function ($value) {
+                return $value !== null && $value !== '';
+            });
 
-            // Si pas de filtres, retourner tout
             if (count($filters) === 0) {
                 $menu = $repository->findAll();
+
                 error_log("=== METHODE findAll UTILISEE ===");
                 error_log("Nombre de résultats: " . count($menu));
-                $menusDishes = $this->entityManager->getRepository(MenusDishesRepository::class)->findAll();
 
-                $responseData = $this->serializer->serialize($menusDishes, 'json', [
-                    'groups' => ['menu:list'],
+                // On sérialise directement les menus trouvés
+                return $this->json($menu, Response::HTTP_OK, [], [
+                    'groups' => ['menu:list', 'dish:list']
                 ]);
-                return new JsonResponse($responseData, Response::HTTP_OK, [], true);
             }
-            // Convertir les enums 
+
+            // Convertir les enums si les filtres existent
             if (isset($filters['theme'])) {
                 $filters['theme'] = Theme::tryFrom($filters['theme']);
             }
@@ -218,8 +220,7 @@ final class MenusController extends AbstractController
                 $filters['diet'] = Diet::tryFrom($filters['diet']);
             }
 
-            //Appeler la méthode de filtrage du repository
-
+            //  Appeler la méthode de filtrage du repository
             $menu = $repository->findWithFilters($filters);
 
             if (empty($menu)) {
@@ -229,13 +230,17 @@ final class MenusController extends AbstractController
                 );
             }
 
-            // 6. Sérialiser la réponse
+            //  Sérialiser la réponse avec filtres
             return $this->json($menu, Response::HTTP_OK, [], [
                 'groups' => ['menu:list', 'dish:list']
             ]);
         } catch (\Exception $e) {
+            // Grâce à ça, tu verras le vrai message SQL de PostgreSQL dans ton inspecteur
             return new JsonResponse(
-                ['error' => 'Erreur lors de la récupération des menus', 'message' => $e->getMessage()],
+                [
+                    'error' => 'Erreur lors de la récupération des menus',
+                    'message' => $e->getMessage()
+                ],
                 Response::HTTP_BAD_REQUEST
             );
         }
