@@ -1,0 +1,3 @@
+services:
+  dbmysql:
+    type: mysql:10.6

@@ -1,0 +1,16 @@
+applications:
+  app:
+    type: "custom"
+    build:
+      flavor: "dockerfile" # Il va chercher le Dockerfile à la racine
+    web:
+      commands:
+        start: "/usr/sbin/apache2ctl -D FOREGROUND"
+      upstream:
+        protocol: http
+        port: 80
+    mounts:
+      "BACKEND/var/cache": { source: local, source_path: cache }
+      "BACKEND/var/log": { source: local, source_path: log }
+    relationships:
+      database: "dbmysql:mysql"
