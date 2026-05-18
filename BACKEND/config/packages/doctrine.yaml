@@ -1,11 +1,10 @@
 doctrine:
     dbal:
         url: "%env(resolve:DATABASE_URL)%"
-        # On dit à Symfony que 'utf8' et 'utf8_unicode_ci' sont de simples chaînes de caractères (string)
-        charset: "%env(default:string:utf8:DB_CHARSET)%"
+        charset: "%env(DB_CHARSET)%"
         default_table_options:
-            charset: "%env(default:string:utf8:DB_CHARSET)%"
-            collate: "%env(default:string:utf8_unicode_ci:DB_COLLATE)%"
+            charset: "%env(DB_CHARSET)%"
+            collate: "%env(DB_COLLATE)%"
 
         profiling_collect_backtrace: "%kernel.debug%"
         use_savepoints: true
