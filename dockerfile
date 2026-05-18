@@ -33,4 +33,8 @@ RUN cd /var/www/html/BACKEND && composer install --no-dev --optimize-autoloader
 
 # 9. Droits d'accès pour Apache
 RUN chown -R www-data:www-data /var/www/html
-CMD cd /var/www/html/BACKEND && php bin/console doctrine:schema:update --force && apache2-foreground
+# 10. Exposition du port 80 pour Apache
+EXPOSE 80
+# 11. Commande de démarrage d'Apache
+CMD ["apache2-foreground"]
+
