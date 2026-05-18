@@ -3,16 +3,16 @@ FROM php:8.3-apache
 # 1. Dossier de travail standard Apache
 WORKDIR /var/www/html/BACKEND
 
-# 2. Extensions nécessaires pour Symfony, MySQL ET PostgreSQL (libpq-dev et pdo_pgsql ajoutés)
+# 2. Extensions nécessaires pour Symfony et MySQL
 RUN apt-get update && apt-get install -y \
-    git unzip zip libzip-dev libicu-dev libpq-dev \
-    && docker-php-ext-install pdo pdo_mysql pdo_pgsql intl zip
+    git unzip zip libzip-dev libicu-dev \
+    && docker-php-ext-install pdo pdo_mysql intl zip
 
 # 3. Activation du module de réécriture (Crucial pour les routes Symfony)
 RUN a2enmod rewrite
 
 # 4. On force Apache à pointer sur le dossier /public
-ENV APACHE_DOCUMENT_ROOT /var/www/html/public
+ENV APACHE_DOCUMENT_ROOT /var/www/html/BACKEND/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
