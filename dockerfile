@@ -29,5 +29,8 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV APP_ENV=prod
 RUN cd /var/www/html/BACKEND && composer install --no-dev --optimize-autoloader
 
+
+
 # 9. Droits d'accès pour Apache
 RUN chown -R www-data:www-data /var/www/html
+CMD cd /var/www/html/BACKEND && php bin/console doctrine:schema:update --force && apache2-foreground
