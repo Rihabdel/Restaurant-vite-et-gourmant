@@ -23,8 +23,6 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-av
 ENV APP_ENV=prod
 ENV APP_DEBUG=0
 
-RUN php bin/console cache:clear --env=prod
-RUN php bin/console cache:warmup --env=prod
 
 RUN chown -R www-data:www-data /var/www/html
 
