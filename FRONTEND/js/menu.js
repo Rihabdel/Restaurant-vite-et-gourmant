@@ -1,4 +1,4 @@
-import { getMenus, getMenuById, getMenuDishes, enregistrerMenu, updateMenu, deleteMenu, createOrder, getUserInfo, getDishes, getListDesDishesByMenuId,previewOrder} from './api.js';
+import { getMenus, getMenuById, getMenuDishes, enregistrerMenu, updateMenu, deleteMenu, createOrder, getUserInfo, getDishes, getListDesDishesByMenuId,previewOrder, API_BASE} from './api.js';
 import { showAndHideElementsForRoles, getToken} from './script.js';
 import { getCurrentOrderData,fillNewOrderModal,fillNewOrderDetailsModal } from './orders.js';
 // Initialiser la page des menus
@@ -33,7 +33,7 @@ export async function displayMenus(menus){
     const visibleMenus = menus.filter(menu => menu.isAvailable=== true);
     container.innerHTML = visibleMenus.map(menu=> {
 
-const pictureUrl = menu.pictureUrl ? `http://127.0.0.1:8000${menu.pictureUrl}` : '/scss/images/viteGourmand.png';
+const pictureUrl = menu.pictureUrl ? `${API_BASE}${menu.pictureUrl}` : '/scss/images/viteGourmand.png';
         return `
             <div class="col-lg-3 col-md-4 mb-4 p-2">
                 <div class="card menu-card">
@@ -270,7 +270,7 @@ function openImageUpload(id) {
         formData.append('picture', file);
 
         try {
-            const res = await fetch(`http://localhost:8000/api/menu/${id}/picture`, {
+            const res = await fetch(`${API_BASE}/menu/${id}/picture`, {
                 method: "POST",
                 headers: {
                     'X-AUTH-TOKEN': getToken()

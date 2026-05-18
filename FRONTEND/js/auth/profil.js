@@ -1,5 +1,5 @@
 import {getToken, showAndHideElementsForRoles,getUserInfo,updateUserInfo,signout , isConnected } from '../script.js';
-
+import { API_BASE } from '../api.js';
 export default async function initProfil() {
     console.log("Initialisation page profil");
     try {
