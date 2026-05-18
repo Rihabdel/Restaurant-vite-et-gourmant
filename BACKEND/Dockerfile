@@ -3,10 +3,10 @@ FROM php:8.3-apache
 # 1. Dossier de travail standard Apache
 WORKDIR /var/www/html
 
-# 2. Extensions nécessaires pour Symfony et MySQL
+# 2. Extensions nécessaires pour Symfony, MySQL ET PostgreSQL (libpq-dev et pdo_pgsql ajoutés)
 RUN apt-get update && apt-get install -y \
-    git unzip zip libzip-dev libicu-dev \
-    && docker-php-ext-install pdo pdo_mysql intl zip
+    git unzip zip libzip-dev libicu-dev libpq-dev \
+    && docker-php-ext-install pdo pdo_mysql pdo_pgsql intl zip
 
 # 3. Activation du module de réécriture (Crucial pour les routes Symfony)
 RUN a2enmod rewrite
