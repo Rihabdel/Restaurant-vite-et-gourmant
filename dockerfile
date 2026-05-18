@@ -5,8 +5,8 @@ WORKDIR /var/www/html
 
 # 2. Installation des extensions nécessaires pour Symfony et MySQL
 RUN apt-get update && apt-get install -y \
-    git unzip zip libzip-dev libicu-dev \
-    && docker-php-ext-install pdo pdo_mysql intl zip
+    git unzip zip libzip-dev libicu-dev libpq-dev \
+    && docker-php-ext-install pdo pdo_mysql pdo_pgsql intl zip
 
 # 3. Activation du module rewrite d'Apache (indispensable pour Symfony et ton Router JS)
 RUN a2enmod rewrite
@@ -15,7 +15,6 @@ RUN a2enmod rewrite
 ENV APACHE_DOCUMENT_ROOT /var/www/html/BACKEND/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
-
 # 5. Récupération de Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -25,5 +24,9 @@ COPY . .
 # 7. LA MAGIE DE LA FUSION : On déplace automatiquement le dossier FRONTEND dans le public du BACKEND
 RUN cp -R /var/www/html/FRONTEND/* /var/www/html/BACKEND/public/
 
-# 8. Droits d'accès pour Apache
+# 8. L'ÉTAPE CRUCIALE POUR RENDER : On va dans le dossier BACKEND et on installe les dépendances
+ENV COMPOSER_ALLOW_SUPERUSER=1
+RUN cd /var/www/html/BACKEND && composer install --no-dev --optimize-autoloader
+
+# 9. Droits d'accès pour Apache
 RUN chown -R www-data:www-data /var/www/html
