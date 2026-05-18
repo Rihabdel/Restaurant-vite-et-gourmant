@@ -12057,7 +12057,7 @@ li {
 
 .menu-section {
   border-radius: 40px;
-  margin: 40px;
+  margin: 20px 0 40px 0;
   BORDER: 2PX SOLID RGBA(212, 167, 106, 0.2);
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
 }
@@ -12068,7 +12068,7 @@ li {
 
 .section-title {
   color: #A56262;
-  font-size: 3rem;
+  font-size: 2.7rem;
   font-weight: 700;
   margin-bottom: 20px;
   text-align: center;
