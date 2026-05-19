@@ -1,10 +1,20 @@
 nelmio_cors:
     defaults:
         origin_regex: true
-        allow_origin: ["^https?://.*"]
-        allow_methods: ["GET", "OPTIONS", "POST", "PUT", "PATCH", "DELETE"]
+        allow_origin:
+            - "^https?://localhost(:[0-9]+)?$"
+            - '^https://.*\.onrender\.com$'
+
+        allow_methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
         allow_headers: ["Content-Type", "Authorization", "X-AUTH-TOKEN"]
         expose_headers: ["Link"]
         max_age: 3600
+
     paths:
-        "^api/": ~
+        "^/api/":
+            allow_origin:
+                - "^https?://localhost(:[0-9]+)?$"
+                - '^https://.*\.onrender\.com$'
+            allow_headers: ["Content-Type", "Authorization", "X-AUTH-TOKEN"]
+            allow_methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
+            max_age: 3600
