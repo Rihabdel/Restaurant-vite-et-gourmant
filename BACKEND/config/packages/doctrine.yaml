@@ -1,10 +1,6 @@
 doctrine:
     dbal:
         url: "%env(resolve:DATABASE_URL)%"
-        charset: "%env(DB_CHARSET)%"
-        default_table_options:
-            charset: "%env(DB_CHARSET)%"
-            collate: "%env(DB_COLLATE)%"
 
         profiling_collect_backtrace: "%kernel.debug%"
         use_savepoints: true
