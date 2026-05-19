@@ -12703,8 +12703,9 @@ td button {
 ----------------------------------* .prestations-section,
 .service-section {
   padding: 80px 0;
-  border-radius: 40px;
   margin: 40px 0;
+  background-color: white;
+  border-radius: 40px;
   border: 2px solid rgba(212, 167, 106, 0.2);
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
   margin-bottom: 50px;
