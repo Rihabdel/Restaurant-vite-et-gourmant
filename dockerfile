@@ -22,7 +22,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 COPY . .
 
 # 7. LA MAGIE DE LA FUSION : On déplace automatiquement le dossier FRONTEND dans le public du BACKEND
-RUN cp -R /var/www/html/FRONTEND/* /var/www/html/BACKEND/public/
+RUN cp -R /var/www/html/FRONTEND/. /var/www/html/BACKEND/public/
 
 # 8. L'ÉTAPE CRUCIALE POUR RENDER : On va dans le dossier BACKEND et on installe les dépendances
 ENV COMPOSER_ALLOW_SUPERUSER=1

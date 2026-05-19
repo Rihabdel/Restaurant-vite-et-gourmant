@@ -1,0 +1,423 @@
+<section class="menu-section text-center">
+    <div class="menu-section-header mb-4">
+          <h2 class="section-title">Nos cartes de menus pour vos événements</h2>
+          <p class="section-subtitle">Découvrez nos offres personnalisées pour rendre vos événements inoubliables grâce à notre service traiteur de qualité.</p>
+              <!-- Filtres -->
+              <div class="filters-section">
+                <div class="section-subtitle mb-3">
+                <button class="btn btn-filtres" data-bs-toggle="collapse" href="#filtresCollapse" onclick="" aria-expanded="false" aria-controls="filtresCollapse" onkeypress="onmouseover"><i class="bi bi-funnel"></i> Filtrer les cartes de menus par</button>
+                </div>
+                  <div class="collapse" id="filtresCollapse"> 
+                <div class="container filter">
+                      <div class="">
+                          <label for="fourchetteFilter" class="form-label">Fourchette de prix</label>
+                          <select class="form-select" id="fourchetteFilter">
+                              <option value="all">Tous</option>
+                              <option value="low">Faible (&lt; 10€)</option>
+                              <option value="medium">Moyen (10€ - 50€)</option>
+                              <option value="high">Élevé (&gt; 50€)</option>
+                          </select>
+                      </div>
+                      <div class="d-flex flex-column align-items-center">
+                          <label for="prixFilter" class="form-label">Prix</label>
+                          <input type="range" class="form-range" id="prixFilter" min="0" max="50" step="2" value="50">
+                          <span id="prixFilterValue">0€ - 50€</span>
+                      </div>  
+                      
+                      <div class="">
+                          <label for="personnesFilter" class="form-label">Nombre des personnes</label>
+                        <input type="number" class="form-control" id="personnesFilter" placeholder="Entrez le nombre de personnes" min="1">
+                        <span class="form-text">Minimum de 1 personne</span>
+                        </div>
+                      <div class="">
+                          <label for="themeFilter" class="form-label">Thème</label>
+                          <select aria-label="Thème" class="form-select" id="themeFilter">
+                              <option value="all">Tous</option>
+                              <option value="anniversaire">Anniversaire</option>
+                              <option value="classique">Classique</option>
+                              <option value="mariage">Mariage</option>
+                              <option value="bapteme">Bapteme</option>
+                              <option value="entreprise">Entreprise</option>
+                              <option value="familiale">Familiale</option>
+                              <option value="noel">Noël</option>
+                              <option value="autres">Autres</option>
+                          </select>
+                      </div>
+                      <div class="">
+                          <label for="dietFilter" class="form-label">Régime</label>
+                          <select aria-label="Régime" class="form-select" id="dietFilter">
+                              <option value="all">Tous</option>
+                              <option value="classique">Classique</option>
+                              <option value="vegetarian">Vegetarien</option>
+                              <option value="vegan">Vegan</option>
+                              <option value="sans_gluten">Sans Gluten</option>
+                              <option value="autres">Autres</option>
+                          </select>
+                      </div>
+                      
+                      <div class="d-flex align-items-end">
+                          <button class="btn btn-outline-primary w-100" id="resetFilters">
+                              <i class="bi bi-arrow-counterclockwise"></i> Réinitialiser
+                          </button>
+                      </div>
+                  </div>
+                
+              </div>
+              </div>
+    </div>
+  <!-- carte de menu -->
+    <div class="menu-section-content">
+        <div class="row menu-cards" id="menu-cards-container">
+            <!-- Les cartes de menus seront injectées ici dynamiquement -->
+        </div>
+    </div>
+</section>
+
+<!-- Modal d'ajout ou modification de menu-->
+<div class="modal fade" id="editMenuModal" tabindex="-1" aria-labelledby="editMenuModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="editMenuModalLabel">Ajouter ou Modifier la carte de menu</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editMenuForm">
+            <div class="mb-3">
+                <label for="editMenuPicture" class="form-label">Image du menu</label>
+                <input type="file" class="form-control" id="editMenuPicture" name="picture">
+            </div>
+            <div class="mb-3">
+                <label for="editMenuTitle" class="form-label">Titre du menu</label>
+                <input type="text" class="form-control" id="editMenuTitle" placeholder="Entrez le titre du menu" name="title">
+            </div>
+            <div class="mb-3">
+                <label for="editMenuDescription" class="form-label">Description du menu</label>
+                <textarea class="form-control" id="editMenuDescription" rows="3" placeholder="Entrez la description du menu" name="descriptionMenu"></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="editMenuMinPersons" class="form-label">Minimum pour :</label>
+                <input type="number" class="form-control" id="editMenuMinPersons" placeholder="Entrez le nombre minimum de personnes" name="minPersons">
+            </div>
+            <div class="mb-3">
+                <label for="editMenuPrice" class="form-label">Prix par personne</label>
+                <input type="number" class="form-control" id="editMenuPrice" placeholder="Entrez le prix par personne" name="priceMenu" step="0.01">
+            </div>
+            <div class="mb-3">
+                <label for="editMenuTheme" class="form-label">Thème du menu</label>
+                <select class="form-select" id="editMenuTheme" name="themeMenu">
+                    <option value="" disabled selected>Choisissez un thème</option>
+                    <option value="classique">classique</option>
+                    <option value="anniversaire">Anniversaire</option>
+                    <option value="mariage">Mariage</option>
+                    <option value="bapteme">Bapteme</option>
+                    <option value="entreprise">Entreprise</option>
+                    <option value="familiale">Familiale</option>
+                    <option value="noel">Noël</option>
+                    <option value="paques">Pâques</option>
+                    <option value="halloween">Halloween</option>
+                    <option value="autres">Autres</option>
+                </select>
+            </div>
+            <div class ="mb-3">
+                <label for="editMenuDiet" class="form-label">Régime du menu</label>
+                <select class="form-select" id="editMenuDiet" name="dietMenu">
+                    <option value="" disabled selected>Choisissez un régime</option>
+                    <option value="vegetarien">Végétarien</option>
+                    <option value="vegan">vegan</option>
+                    <option value="sans-gluten">Sans gluten</option>
+                    <option value="autres">Autres</option>
+                </select>
+            </div>
+            <div class="mb-3">
+              <label for="editMenuOrderBefore" class="form-label">commander avant</label>
+              <input type="number" class="form-control" id="editMenuOrderBefore" name="orderBefore">
+            </div>
+            <div class="mb-3">
+              <label for="editMenuStock" class="form-label">Stock</label>
+              <input type="number" class="form-control" id="editMenuStock" name="stock">
+            </div>
+            <div class="mb-3 form-check">
+              <input type="checkbox" class="form-check-input" id="editMenuAvailable" name="isAvailable">
+              <label class="form-check-label" for="editMenuAvailable">Disponible</label>
+            </div>
+            <button type="submit" class="btn btn-primary" id="saveMenuBtn">Enregistrer les modifications</button>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+    </div>
+  </div>
+</div>
+</div>  
+
+<!-- modal details de la carte de menu -->
+<div class="modal fade" id="detailscarteModal" aria-hidden="true" aria-labelledby="detailscarteModalToggleLabel" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg details">
+    <div class="modal-content" id="detailscarteModalContent">
+      <div class="modal-body" id="detailsMenuContent">
+          <div class="container menu-card-detail">
+                      <h2 class="Menu-title text-center" id="detailscarteModalLabel">titre du menu</h2>
+                        <div class="menu-category">
+                            
+                        </div>    
+
+          </div>
+      </div>
+      <div class="modal-footer d-flex justify-content-center">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+        <button type="button" class="btn btn-primary pre-order-btn">Commander ce menu</button>
+      </div>
+    </div>  
+  </div>
+      
+</div>
+
+<!---modal de pré-commande-->
+<div class="modal fade" id="PreOrderModal" aria-hidden="true" aria-labelledby="recapCommandeModalLabel" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered recap-commande-modal*">
+    <div class="modal-content">
+        <form id="OrderForm">
+          <div class="modal-body">
+              <div class="container-fluid">
+                  <div class="row text-center">
+                <h4>Finaliser votre commande</h4>
+                  </div>
+                  <div class="row">
+                    <div class="col mb-3">
+                      <label for="menuSelect" class="form-label">Titre du menu :</label>
+                          <select class="form-select" id="menuSelect" name="menuId">
+                          <option value="" disabled selected>Choisissez un menu</option>
+                          </select>
+                    </div>
+                    <div class="col mb-3">    
+                        <label for="numberOfPeople" class="form-label"placeholder="minimum">Nombre de personnes :</label>
+                        <input type="number" class="form-control" id="numberOfPeople" placeholder="Entrez le nombre de personnes">
+                        <p class="form-text text-muted" style="margin-top: 5px;font-size: 0.8em;">10% est appliquée pour toutes commandes ayant 5
+personnes de plus que le nombre de personnes minimum indiqué dans le menu</p></br>
+                    </div>
+                  
+
+                  </div>
+                  <div class="row">
+                    <div class="col mb-3">
+                        <label for="customerName" class="form-label">Nom du client</label>
+                        <input type="text" class="form-control" id="customerName" placeholder="Entrez votre nom">
+                    </div>
+                    <div class="col mb-3">
+                        <label for="customerPrenom" class="form-label">Prénom du client</label>
+                        <input type="text" class="form-control" id="customerPrenom" placeholder="Entrez votre prénom">
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col mb-3">
+                        <label for="customerEmail" class="form-label">Email du client</label>
+                        <input type="email" class="form-control" id="customerEmail" placeholder="Entrez votre email">
+                    </div>
+                    <div class="col mb-3">
+                        <label for="customerPhone" class="form-label">Numéro de téléphone</label>
+                        <input type="number" class="form-control" id="customerPhone" placeholder="Entrez votre numéro de téléphone">
+                    </div>
+                  </div>
+                  <div class="row facture">
+                      <div class="col mb-3">
+                          <label for="factAddress" class="form-label">Adresse de facturation</label>
+                          <input type="text" class="form-control" id="factAddress" placeholder="Entrez votre adresse">
+                      </div>
+                      <div class="col mb-3">
+                          <label for="factDate" class="form-label">Date de facturation</label>
+                          <input type="date" class="form-control" id="factDate" placeholder="Entrez votre adresse">
+                      </div>
+                  </div>
+                  <div class="delivery row">
+                        <div class="mb-3">
+                            <label for="deliveryAddress" class="form-label">Adresse de livraison</label>
+                            <input type="text" class="form-control" id="deliveryAddress" placeholder="Entrez votre adresse">
+                            <p class="form-text text-muted" style="margin-top: 5px;font-size: 0.8em;">5 euros de livraison majoré de 59 centimes par kilomètre parcourus</p>
+                        </div>
+                        <div class="mb-3">
+                            <label for="deliveryCity" class="form-label">Ville de livraison</label>
+                            <input type="text" class="form-control" id="deliveryCity" placeholder="Entrez votre ville">                         
+                        </div>
+                        <div class="mb-3">
+                            <label for="deliveryPostalCode" class="form-label">Code postal</label>
+                            <input type="number" class="form-control" id="deliveryPostalCode" placeholder="Entrez votre code postal">
+                        </div>
+                  </div>
+                  <div class="row delivery">
+                        <div class="col mb-3">
+                            <label for="deliveryDate" class="form-label">Date de livraison</label>
+                            <input type="date" class="form-control" id="deliveryDate">
+                        </div>
+                        <div class="col mb-3">
+                            <label for="deliveryTime" class="form-label">Heure de livraison</label>
+                            <input type="time" class="form-control" id="deliveryTime">
+                        </div>
+                  </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#detailscarteModal">Retour</button>
+                  <button type="button" class="btn btn-primary" id="confirm-order-btn">Confirmer vos informations</button>
+                </div>
+              </div>
+          </div>
+          </form>
+    </div>
+  </div>
+</div>
+
+<!--détails de la commande-->
+<div class="modal fade" id="OrderDetailsModal" aria-hidden="true" aria-labelledby="detailsCommandeModalLabel" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered details-commande-modal*">
+    <div class="modal-content">
+        <div class="modal-body" id="orderDetails">
+          <h3 class="text-center mb-4">Récapitulatif de votre commande</h3>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Retour</button>
+          <button type="button" class="btn btn-primary" id="pay-order-btn" data-bs-dismiss="modal">payer</button>
+          </div>
+    </div>
+  </div>  
+</div>
+
+<!---modal paiement de menu-->
+<div class="modal fade" id="paiementModal" aria-hidden="true" aria-labelledby="paiementModalToggleLabel" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered paiement-modal*">
+    <div class="modal-content">
+      <div class="modal-body">
+        <form>
+            <div class="mb-3">
+                <label for="cardNumber" class="form-label">Numéro de carte</label>
+                <input type="text" class="form-control" id="cardNumber" placeholder="Entrez le numéro de votre carte">
+            </div>
+            <div class="mb-3">
+                <label for="cardExpiry" class="form-label">Date d'expiration</label>
+                <input type="text" class="form-control" id="cardExpiry" placeholder="MM/AA">
+            </div>
+            <div class="mb-3">
+                <label for="cardCVC" class="form-label">CVC</label>
+                <input type="text" class="form-control" id="cardCVC" placeholder="Entrez le code CVC">
+            </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#commandeModal">Retour</button>
+        <button type="button" class="btn btn-primary">Payer maintenant</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--modifier les plats par l'employée-->
+<div class="modal fade" id="editDetailMenuCardModal" aria-hidden="true" aria-labelledby="detailscarteModalToggleLabel" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg details">
+    <div class="modal-header">
+        <h1 class="modal-title fs-5" id="editDetailMenuCardModalLabel">Modifier les plats de la carte de menu</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+    <div class="modal-content">
+      <div class="modal-body" id="editDetailMenuCardContent">
+          <div class="container plat-card-detail">
+            <form id="editDetailMenuCardForm">
+                        <div class="menu-category">
+                            <h3><i class="bi bi-egg-fried"></i> Entrées</h3>
+                            <div class="menu-item">
+                                <div class="row row-cols-2 menu-item-header">
+                                    <div class="col-lg-10 menu-item-title">
+                                      <select id="entreeSelectEdit">
+                                        <option value="" disabled selected>Choisir une entrée</option>
+                                        <!-- Les options seront ajoutées dynamiquement via JavaScript -->
+                                      </select>
+                                    </div>
+                                    <div class="col-lg-2 menu-item-price">prix</div>
+                                </div>
+                                <p class="menu-item-description">description de l'entrée</p>
+                                <small ><i class="bi bi-exclamation-triangle-fill"></i>allergène</small>
+                            </div> 
+                          </div>    
+                        <div class="menu-category">
+                            <h3><i class="bi bi-cup-hot"></i> Plats Principaux</h3>
+                            <div class="menu-item">
+                                <div class="row row-cols-2 menu-item-header">
+                                    <div class="col-lg-10 menu-item-title">
+                                      <select id="platSelectEdit">
+                                        <option value="" disabled selected>Choisir un plat principal</option>
+                                        <!-- Les options seront ajoutées dynamiquement via JavaScript -->
+                                      </select>
+                                    </div>
+                                    <div class="col-lg-2 menu-item-price">prix</div>
+                                </div>
+                                <p class="menu-item-description">description du plat principal</p>
+                                <small ><i class="bi bi-exclamation-triangle-fill"></i>allergène</small>
+                            </div>
+                        </div>   
+                        <div class="menu-category">
+                            <h3><i class="bi bi-cake2"></i> Desserts</h3>
+                            <div class="menu-item">
+                                <div class="row row-cols-2 menu-item-header">
+                                    <div class="col-lg-10 menu-item-title">
+                                      <select id="dessertSelectEdit">
+                                        <option value="" disabled selected>Choisir un dessert</option>
+                                        <!-- Les options seront ajoutées dynamiquement via JavaScript -->
+                                      </select>
+                                    </div>
+                                    <div class="col-lg-2 menu-item-price">prix</div>  
+                                    <p class="menu-item-description">description du dessert</p>
+                                    <small ><i class="bi bi-exclamation-triangle-fill"></i>allergène</small>
+                                    </div>
+                                </div>
+                            </div>
+           </div>
+      </div>
+      <div class="modal-footer d-flex justify-content-center">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+        <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--modal de confirmation de suppression de la carte de menu-->
+<div class="modal fade" id="deleteMenuModal" tabindex="-1" aria-labelledby="deleteMenuModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="deleteMenuModalLabel">Supprimer la carte de menu</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Êtes-vous sûr de vouloir supprimer cette carte de menu ? Cette action est irréversible.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+        <button type="button" class="btn btn-danger confirmDeleteMenu">Supprimer</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- modal de connexion requise avant de commander   -->
+<div class="modal fade" id="loginRequiredModal" tabindex="-1" aria-labelledby="loginRequiredModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title" id="loginRequiredModalLabel"><i class="bi bi-lock"></i> Connexion requise</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <h2 class="form-label text-center">Vous devez être connecté</h2>
+        <h6 class="mb-0 text-center text-muted">Connectez-vous ou créez un compte pour passer commande.</h6>
+      </div>
+      <div class="modal-footer">
+        <div class="d-flex justify-content-center gap-2">
+          <a href="/connexion" class="btn btn-primary">Se connecter</a>
+          <a href="/inscription" class="btn btn-outline-primary">Créer un compte</a>
+        </div>
+      </div>
+    </div>
+  </div> 
+</div> 
+
+
+<script type="module" src="../js/menu.js"></script>

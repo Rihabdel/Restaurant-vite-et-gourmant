@@ -6,13 +6,7 @@ RUN apt-get update && apt-get install -y \
 
 RUN a2enmod rewrite
 
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-WORKDIR /var/www/html
-
-COPY . .
-
-RUN composer install --no-dev --optimize-autoloader
 
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 
@@ -20,12 +14,18 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-av
     && sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf \
     && sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/conf-available/*.conf
 
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www/html
+
+COPY . .
+
+RUN composer install --no-dev --optimize-autoloader    
 ENV APP_ENV=prod
 ENV APP_DEBUG=0
 
 
-RUN chown -R www-data:www-data /var/www/html
-
+RUN chown -R www-data:www-data /var/www/html/var
 EXPOSE 80
 
 CMD ["apache2-foreground"]
