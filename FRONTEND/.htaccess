@@ -2,13 +2,14 @@
     RewriteEngine On
     RewriteBase /
 
-    #  Si la requête demande une vraie route d'API Symfony, on ne touche à rien
+    # 1. Si la requête demande une vraie route d'API Symfony, on ne touche à rien
     RewriteCond %{REQUEST_URI} ^/api
     RewriteRule ^(.*)$ index.php [QSA,L]
 
-    # Si le fichier ou le dossier demandé n'existe pas réellement...
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
+    # 2. Si l'utilisateur demande un vrai fichier existant (comme une image, du CSS, ou un script JS)
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
 
     # ...alors on renvoie tout vers index.html
     RewriteRule . /index.html [L]

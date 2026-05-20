@@ -23,7 +23,8 @@ COPY . .
 
 # 7. LA MAGIE DE LA FUSION : On déplace automatiquement le dossier FRONTEND dans le public du BACKEND
 RUN cp -R /var/www/html/FRONTEND/. /var/www/html/BACKEND/public/
-
+# ÉTAPE 7.5 : ON FORCE LA COPIE DU HTACCESS DU FRONT
+RUN cp /var/www/html/FRONTEND/.htaccess /var/www/html/BACKEND/public/.htaccess
 # 8. L'ÉTAPE CRUCIALE POUR RENDER : On va dans le dossier BACKEND et on installe les dépendances
 ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV APP_ENV=prod
