@@ -1,11 +1,16 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteBase /
-    
+
+    #  Si la requête demande une vraie route d'API Symfony, on ne touche à rien
+    RewriteCond %{REQUEST_URI} ^/api
+    RewriteRule ^(.*)$ index.php [QSA,L]
+
     # Si le fichier ou le dossier demandé n'existe pas réellement...
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    
+
     # ...alors on renvoie tout vers index.html
     RewriteRule . /index.html [L]
+
 </IfModule>
