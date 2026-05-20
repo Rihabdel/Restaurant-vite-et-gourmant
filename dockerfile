@@ -1,45 +1,39 @@
 FROM php:8.3-apache
 
-# 1. Configuration du dossier de travail dans le conteneur
-WORKDIR /var/www/html
-
-# 2. Installation des extensions nécessaires pour Symfony et MySQL
 RUN apt-get update && apt-get install -y \
-    git unzip zip libzip-dev libicu-dev libpq-dev \
-    && docker-php-ext-install pdo pdo_mysql pdo_pgsql intl zip
+    zip unzip libzip-dev libicu-dev libpq-dev \
+    && docker-php-ext-install pdo pdo_pgsql intl zip
 
-# 3. Activation du module rewrite d'Apache (indispensable pour Symfony et ton Router JS)
 RUN a2enmod rewrite
 
-# 4. On force Apache à pointer sur le dossier public du backend
 ENV APACHE_DOCUMENT_ROOT /var/www/html/BACKEND/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
-# 5. Récupération de Composer
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
+    && sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf \
+    && sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/conf-available/*.conf
+
+# Configuration Apache FORCÉE pour les routes API
+RUN echo '<Directory /var/www/html/BACKEND/public>' >> /etc/apache2/apache2.conf && \
+    echo '    Options Indexes FollowSymLinks' >> /etc/apache2/apache2.conf && \
+    echo '    AllowOverride All' >> /etc/apache2/apache2.conf && \
+    echo '    Require all granted' >> /etc/apache2/apache2.conf && \
+    echo '    RewriteEngine On' >> /etc/apache2/apache2.conf && \
+    echo '    RewriteCond %{REQUEST_FILENAME} !-f' >> /etc/apache2/apache2.conf && \
+    echo '    RewriteRule ^api/.*$ /index.php [L]' >> /etc/apache2/apache2.conf && \
+    echo '</Directory>' >> /etc/apache2/apache2.conf
+
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# 6. Copie de TOUT le projet (BACKEND et FRONTEND) dans le conteneur
-COPY . .
+WORKDIR /var/www/html
 
-# 7. LA MAGIE DE LA FUSION : On déplace automatiquement le dossier FRONTEND dans le public du BACKEND
-RUN cp -R /var/www/html/FRONTEND/. /var/www/html/BACKEND/public/
-# ÉTAPE 7.5 : ON FORCE LA COPIE DU HTACCESS DU FRONT
-RUN cp /var/www/html/FRONTEND/.htaccess /var/www/html/BACKEND/public/.htaccess
+COPY BACKEND/ BACKEND/
+COPY FRONTEND/ BACKEND/public/
 
+RUN cd BACKEND && composer install --no-dev --optimize-autoloader --no-scripts
 
-
-# 🔥 AJOUT 2 : Supprimer vendor et composer.lock pour éviter les conflits
-RUN rm -rf /var/www/html/BACKEND/vendor /var/www/html/BACKEND/composer.lock 2>/dev/null || true
-
-# 8. Installation des dépendances (sans exécuter les scripts)
-ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV APP_ENV=prod
-RUN cd /var/www/html/BACKEND && composer install --no-dev --optimize-autoloader --no-scripts --no-interaction
+ENV APP_DEBUG=0
 
-# 8.5 Exécuter les scripts manuellement
-RUN cd /var/www/html/BACKEND && composer run-script post-install-cmd --no-interaction || true
-RUN cd /var/www/html/BACKEND && php bin/console cache:clear --env=prod --no-debug || true
+RUN chown -R www-data:www-data BACKEND/var
 
-# 9. Config Apache pour servir index.html en priorité
-RUN echo "DirectoryIndex index.html index.php" > /etc/apache2/conf-available/directory-index.conf \
-    && a2enconf directory-index
+EXPOSE 80
+CMD ["apache2-foreground"]

@@ -1,21 +1,15 @@
-<Files "index.html">
-    SetHandler default-handler
-</Files>
+RewriteEngine On
+RewriteBase /
 
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-    RewriteBase /
+# API routes → index.php
 
-    # Ne pas réécrire les fichiers existants
-    RewriteCond %{REQUEST_FILENAME} -f
-    RewriteRule ^ - [L]
+RewriteRule ^api/.\*$ /index.php [L]
 
-    # API → index.php
-    RewriteRule ^api(/.*)?$ /index.php [QSA,L]
+# Fichiers existants → servir directement
 
-    # Racine → index.html
-    RewriteRule ^$ /index.html [L]
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
 
-    # Tout le reste → index.html
-    RewriteRule ^(.*)$ /index.html [L]
-</IfModule>
+# Tout le reste → index.html
+
+RewriteRule ^ /index.html [L]
