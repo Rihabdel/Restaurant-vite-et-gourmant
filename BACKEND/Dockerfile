@@ -20,7 +20,8 @@ WORKDIR /var/www/html
 
 COPY . .
 
-RUN composer install --no-dev --optimize-autoloader    
+RUN composer install --no-dev --optimize-autoloader  
+RUN cd BACKEND && php bin/console doctrine:migrations:migrate --env=prod --no-interaction || true  
 ENV APP_ENV=prod
 ENV APP_DEBUG=0
 

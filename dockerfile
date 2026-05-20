@@ -26,15 +26,11 @@ RUN cp -R /var/www/html/FRONTEND/. /var/www/html/BACKEND/public/
 # ÉTAPE 7.5 : ON FORCE LA COPIE DU HTACCESS DU FRONT
 RUN cp /var/www/html/FRONTEND/.htaccess /var/www/html/BACKEND/public/.htaccess
 
-RUN git config --global --add safe.directory /var/www/html
-RUN git config --global --add safe.directory /var/www/html/BACKEND
+
 
 # 🔥 AJOUT 2 : Supprimer vendor et composer.lock pour éviter les conflits
-RUN rm -rf /var/www/html/BACKEND/vendor /var/www/html/BACKEND/composer.lock
+RUN rm -rf /var/www/html/BACKEND/vendor /var/www/html/BACKEND/composer.lock 2>/dev/null || true
 
-# 8. L'ÉTAPE CRUCIALE POUR RENDER : On va dans le dossier BACKEND et on installe les dépendances
-ENV COMPOSER_ALLOW_SUPERUSER=1
-ENV APP_ENV=prod
 # 8. Installation des dépendances (sans exécuter les scripts)
 ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV APP_ENV=prod
