@@ -1,0 +1,5 @@
+BACKEND/vendor/
+BACKEND/var/
+FRONTEND/node_modules/
+.git/
+*.log

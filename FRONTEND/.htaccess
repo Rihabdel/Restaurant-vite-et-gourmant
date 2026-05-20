@@ -1,17 +1,16 @@
+<Files "index.html">
+    SetHandler default-handler
+</Files>
+
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteBase /
 
-    # 1. Si la requête demande une vraie route d'API Symfony, on ne touche à rien
-    RewriteCond %{REQUEST_URI} ^/api
-    RewriteRule ^(.*)$ index.php [QSA,L]
+    RewriteRule ^$ index.html [L]
+    RewriteRule ^api(/.*)?$ index.php [QSA,L]
 
-    # 2. Si l'utilisateur demande un vrai fichier existant (comme une image, du CSS, ou un script JS)
-    RewriteCond %{REQUEST_FILENAME} -f [OR]
-    RewriteCond %{REQUEST_FILENAME} -d
-    RewriteRule ^ - [L]
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule \.(js|css|png|jpg|jpeg|gif|svg|ico|json|html|txt|webmanifest)$ - [L]
 
-    # ...alors on renvoie tout vers index.html
-    RewriteRule . /index.html [L]
-
+    RewriteRule ^(.*)$ index.html [L]
 </IfModule>

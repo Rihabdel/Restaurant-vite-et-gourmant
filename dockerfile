@@ -25,17 +25,25 @@ COPY . .
 RUN cp -R /var/www/html/FRONTEND/. /var/www/html/BACKEND/public/
 # ÉTAPE 7.5 : ON FORCE LA COPIE DU HTACCESS DU FRONT
 RUN cp /var/www/html/FRONTEND/.htaccess /var/www/html/BACKEND/public/.htaccess
+
+RUN git config --global --add safe.directory /var/www/html
+RUN git config --global --add safe.directory /var/www/html/BACKEND
+
+# 🔥 AJOUT 2 : Supprimer vendor et composer.lock pour éviter les conflits
+RUN rm -rf /var/www/html/BACKEND/vendor /var/www/html/BACKEND/composer.lock
+
 # 8. L'ÉTAPE CRUCIALE POUR RENDER : On va dans le dossier BACKEND et on installe les dépendances
 ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV APP_ENV=prod
-RUN cd /var/www/html/BACKEND && composer install --no-dev --optimize-autoloader
+# 8. Installation des dépendances (sans exécuter les scripts)
+ENV COMPOSER_ALLOW_SUPERUSER=1
+ENV APP_ENV=prod
+RUN cd /var/www/html/BACKEND && composer install --no-dev --optimize-autoloader --no-scripts --no-interaction
 
+# 8.5 Exécuter les scripts manuellement
+RUN cd /var/www/html/BACKEND && composer run-script post-install-cmd --no-interaction || true
+RUN cd /var/www/html/BACKEND && php bin/console cache:clear --env=prod --no-debug || true
 
-
-# 9. Droits d'accès pour Apache
-RUN chown -R www-data:www-data /var/www/html
-# 10. Exposition du port 80 pour Apache
-EXPOSE 80
-# 11. Commande de démarrage d'Apache
-CMD ["apache2-foreground"]
-
+# 9. Config Apache pour servir index.html en priorité
+RUN echo "DirectoryIndex index.html index.php" > /etc/apache2/conf-available/directory-index.conf \
+    && a2enconf directory-index
