@@ -17,6 +17,7 @@ services:
       - ./BACKEND:/var/www/html
       - symfony_var:/var/www/html/var   # ← ajout
       - symfony_vendor:/var/www/html/vendor   # ← ajout
+      - ./BACKEND/public:/var/www/html/public
     depends_on:
       - database
     environment:
