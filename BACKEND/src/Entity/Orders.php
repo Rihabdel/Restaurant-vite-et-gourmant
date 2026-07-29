@@ -74,7 +74,7 @@ class Orders
     #[ORM\JoinColumn(nullable: false)]
     private ?Menus $menu = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(mappedBy: 'commande', cascade: ['persist', 'remove'])]
     private ?Reviews $review = null;
     #[Groups(['orders:read'])]
     #[ORM\Column(length: 50)]

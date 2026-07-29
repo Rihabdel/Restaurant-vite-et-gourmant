@@ -27,6 +27,7 @@ final class DishAllergenController extends AbstractController
         private SerializerInterface $serializer
     ) {}
     // ajouter un allergène à un plat
+    
     #[Route('/{id}', name: 'add_allergen', methods: ['POST'])]
     #[OA\Post(
         summary: 'Ajouter un allergène à un plat',
@@ -136,14 +137,13 @@ final class DishAllergenController extends AbstractController
                 $dishAllergen = new DishAllergen();
                 $dishAllergen->setDish($dish);
                 $dishAllergen->setAllergen($allergen);
+                $dish->addAllergenToDish($dishAllergen);
             } else {
                 return new JsonResponse(
                     ['message' => 'Le plat est déjà associé à cet allergène'],
                     Response::HTTP_OK
                 );
             }
-
-
             // 7. Valider l'entité
             $errors = $this->validator->validate($dishAllergen);
             if (count($errors) > 0) {
@@ -151,13 +151,11 @@ final class DishAllergenController extends AbstractController
                 foreach ($errors as $error) {
                     $errorMessages[] = $error->getPropertyPath() . ': ' . $error->getMessage();
                 }
-
                 return new JsonResponse(
                     ['errors' => $errorMessages],
                     Response::HTTP_UNPROCESSABLE_ENTITY
                 );
             }
-
             // 8. Persister et sauvegarder
             $this->entityManager->persist($dishAllergen);
             $this->entityManager->flush();

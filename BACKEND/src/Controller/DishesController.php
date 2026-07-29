@@ -93,7 +93,6 @@ final class DishesController extends AbstractController
                     Response::HTTP_UNPROCESSABLE_ENTITY
                 );
             }
-
             $category = CategoryDishes::tryFrom($data['category']);
             if (!$category) {
                 return new JsonResponse(
@@ -109,7 +108,6 @@ final class DishesController extends AbstractController
                     $allergen = $this->entityManager
                         ->getRepository(Allergens::class)
                         ->find($allergenId);
-
                     if ($allergen) {
                         $dishAllergen = new DishAllergen();
                         $dishAllergen->setDish($dish);
@@ -119,7 +117,6 @@ final class DishesController extends AbstractController
                     }
                 }
             }
-
             // Préparer les données pour la désérialisation
             unset($data['category']);
             if (isset($data['allergens'])) {
@@ -148,7 +145,6 @@ final class DishesController extends AbstractController
                     }
                 }
             }
-
             // Validation de l'entité
             $errors = $this->validator->validate($dish);
             if (count($errors) > 0) {
@@ -159,27 +155,22 @@ final class DishesController extends AbstractController
                         'message' => $error->getMessage()
                     ];
                 }
-
                 return new JsonResponse(
                     ['erreurs' => $messagesErreur],
                     Response::HTTP_UNPROCESSABLE_ENTITY
                 );
             }
-
             // Persist et flush
             $this->entityManager->persist($dish);
             $this->entityManager->flush();
-
             $responseData = $this->serializer->serialize($dish, 'json', [
                 'groups' => ['dish:read', 'dish:write']
             ]);
-
             $location = $this->generateUrl(
                 'app_api_dishes_show',
                 ['id' => $dish->getId()],
                 UrlGeneratorInterface::ABSOLUTE_URL
             );
-
             return new JsonResponse($responseData, Response::HTTP_CREATED, [
                 'Location' => $location
             ], true);

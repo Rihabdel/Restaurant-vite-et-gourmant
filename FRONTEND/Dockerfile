@@ -1,7 +1,14 @@
+FROM node:20-alpine
 
-FROM httpd:2.4-alpine
-RUN sed -i 's/#LoadModule rewrite_module/LoadModule rewrite_module/' /usr/local/apache2/conf/httpd.conf \
-    && sed -i 's/AllowOverride None/AllowOverride All/' /usr/local/apache2/conf/httpd.conf
-COPY . /usr/local/apache2/htdocs/
+WORKDIR /app
 
-EXPOSE 80  
+# On copie les fichiers de configuration pour installer les dépendances
+COPY package*.json ./
+RUN npm install
+
+# On copie le reste du code frontend
+COPY . .
+RUN npm run build
+
+EXPOSE 8080
+CMD ["npm", "run", "preview"]

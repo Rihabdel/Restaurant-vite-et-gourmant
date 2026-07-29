@@ -2,14 +2,13 @@
 // Option A: Include all of Bootstrap
 
 // Include any default variable overrides here (though functions won’t be available)
-$primary: #A56262; // Example: change primary color
-$accent: #A93C3C; // Example: change secondary color
-$dark: #350903; // Example: change dark color
-$bg_dark: #744c58; // Example: change dark background color
-$secondary: #5c4643; // Example: change accent color
-$success: #146633; // Example: change success color
-$body-bg:  rgb(233, 227, 227); // Example: change body background color
-
+$primary: #A56262; 
+$accent: #A93C3C; 
+$dark: #350903; 
+$bg_dark: #744c58; 
+$secondary: #5c4643; 
+$success: #146633;
+$body-bg:  rgb(233, 227, 227); 
 @import "../node_modules/bootstrap/scss/bootstrap";
 
 // Then add additional custom code hereS

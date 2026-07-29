@@ -29,10 +29,8 @@ export async function displayMenus(menus){
         return;
     }
 
-    
     const visibleMenus = menus.filter(menu => menu.isAvailable=== true);
     container.innerHTML = visibleMenus.map(menu=> {
-
 const pictureUrl = menu.pictureUrl ? `${API_BASE}${menu.pictureUrl}` : '/scss/images/viteGourmand.png';
         return `
             <div class="col-lg-3 col-md-4 mb-4 p-2">

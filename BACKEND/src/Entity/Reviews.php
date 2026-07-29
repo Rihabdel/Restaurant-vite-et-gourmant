@@ -26,7 +26,8 @@ class Reviews
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\OneToOne(inversedBy: 'reviews')]
+    #[ORM\OneToOne(inversedBy: 'review')]
+    #[ORM\JoinColumn(nullable: false)]
     private ?Orders $commande = null;
 
     public function getId(): ?int

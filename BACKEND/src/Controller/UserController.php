@@ -28,10 +28,7 @@ final class UserController extends AbstractController
         private EntityManagerInterface $entityManager,
         private SerializerInterface $serializer,
         private UserRepository $userRepository,
-
-
     ) {}
-
 
     public function edit(Request $request, User $user): Response
     {

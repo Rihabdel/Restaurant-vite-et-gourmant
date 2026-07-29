@@ -3,39 +3,41 @@ services:
     build: ./FRONTEND
     container_name: vite_gourmand_front
     volumes:
-      - ./FRONTEND:/usr/local/apache2/htdocs/
-
+      - ./FRONTEND:/app
+      - /app/node_modules
     ports:
-      - "8080:80"
-
+      - "8080:8080"
+    command: npm run dev -- --host   
+    depends_on:
+      - api  
   api:
     build: ./BACKEND
     container_name: vite_gourmand_back
     ports:
-      - "8000:80"
+      - "8000:8000"
     volumes:
       - ./BACKEND:/var/www/html
-      - symfony_var:/var/www/html/var   # ← ajout
-      - symfony_vendor:/var/www/html/vendor   # ← ajout
+      - symfony_var:/var/www/html/var 
+      - symfony_vendor:/var/www/html/vendor  
       - ./BACKEND/public:/var/www/html/public
     depends_on:
       - database
     environment:
       MAILER_DSN: "smtp://acf1e19e0218c6:b3254a640fa61a@sandbox.smtp.mailtrap.io:2525"
+      DATABASE_URL: "postgresql://postgres:1234@database:5432/viteEtGourmand_clean?serverVersion=16&charset=utf8"
 
-  # Ta base de données
   database:
-    image: mysql:8
+    image: postgres:16-alpine
     container_name: symfony_db
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: viteEtGourmand_clean
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: viteEtGourmand_clean
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - db_data:/var/lib/mysql
+      - db_data:/var/lib/postgresql/data
 
-  # phpMyAdmin
   phpmyadmin:
     image: phpmyadmin:latest
     container_name: symfony_pma
@@ -43,7 +45,7 @@ services:
       - "8081:80"
     environment:
       PMA_HOST: database
-      
+      PMA_USER: root
   mongo:
     image: mongo:7
     container_name: mongo_db

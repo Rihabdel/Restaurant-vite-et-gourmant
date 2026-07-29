@@ -318,7 +318,7 @@ function initMenuEvents() {
                 console.error("Erreur lors de la mise à jour de la disponibilité :", error);
                 alert("Une erreur est survenue lors de la mise à jour de la disponibilité.");
             }
-             }
+            }
     });
     menuList.addEventListener("click", async (e) => {
         const editBtn = e.target.closest('.edit-menu-btn');
@@ -402,7 +402,6 @@ function initMenuEvents() {
                 alert("Une erreur est survenue lors de la mise à jour des plats du menu.");
             }
         }
-
     });
 
     const addMenuButton = document.getElementById('addMenuButton');
@@ -433,11 +432,8 @@ function initMenuEvents() {
                 await enregistrerMenu(menuData);
                 });
             }
-
-
-
-
 }
+
 // Initialiser le formulaire d'édition de menu pour la création et la modification
 
 

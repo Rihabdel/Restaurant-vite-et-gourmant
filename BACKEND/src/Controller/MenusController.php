@@ -67,7 +67,7 @@ final class MenusController extends AbstractController
     {
         //decoder le json
         $data = json_decode($request->getContent(), true);
-        //
+        
         if (isset($data['themeMenu']) || isset($data['dietMenu'])) {
             $themeMenu = Theme::tryFrom($data['themeMenu']  ?? '');
             $dietMenu = Diet::tryFrom($data['dietMenu'] ?? '');
@@ -86,12 +86,9 @@ final class MenusController extends AbstractController
                 Response::HTTP_UNPROCESSABLE_ENTITY
             );
         }
-
-
         //supprimer les champs enum du tableau
         unset($data['themeMenu']);
         unset($data['dietMenu']);
-
         //reecreer un json sans enum
         $jsonSansEnum = json_encode($data);
         //deserializer le json en entité
@@ -109,14 +106,12 @@ final class MenusController extends AbstractController
         $menu->setThemeMenu($themeMenu);
         $menu->setDietMenu($dietMenu);
         //valider l'entité
-
         $errors = $this->validator->validate($menu);
         if (count($errors) > 0) {
             $messagesErreur = [];
             foreach ($errors as $error) {
                 $messagesErreur[] = $error->getMessage();
             }
-
             return new JsonResponse(
                 ['erreurs' => $messagesErreur],
                 Response::HTTP_UNPROCESSABLE_ENTITY
@@ -198,19 +193,15 @@ final class MenusController extends AbstractController
             ], function ($value) {
                 return $value !== null && $value !== '';
             });
-
             if (count($filters) === 0) {
                 $menu = $repository->findAll();
-
                 error_log("=== METHODE findAll UTILISEE ===");
                 error_log("Nombre de résultats: " . count($menu));
-
                 // On sérialise directement les menus trouvés
                 return $this->json($menu, Response::HTTP_OK, [], [
                     'groups' => ['menu:list', 'dish:list']
                 ]);
             }
-
             // Convertir les enums si les filtres existent
             if (isset($filters['theme'])) {
                 $filters['theme'] = Theme::tryFrom($filters['theme']);
@@ -332,21 +323,17 @@ final class MenusController extends AbstractController
         if (!$menus) {
             return new JsonResponse(
                 ['message' => 'Menus not found'],
-                Response::HTTP_NOT_FOUND
-            );
+                Response::HTTP_NOT_FOUND);
         }
         //decoder le json
         $data = json_decode($request->getContent(), true);
         if (!$data) {
             return new JsonResponse(
                 ['message' => 'Invalid JSON'],
-                Response::HTTP_BAD_REQUEST
-            );
+                Response::HTTP_BAD_REQUEST);
         }
         $this->serializer->deserialize(
-            json_encode($data),
-            Menus::class,
-            'json',
+            json_encode($data), Menus::class,'json',
             [AbstractNormalizer::OBJECT_TO_POPULATE => $menus]
         );
         if (isset($data['themeMenu'])) {
@@ -354,8 +341,7 @@ final class MenusController extends AbstractController
             if (!$themeMenu) {
                 return new JsonResponse(
                     ['erreurs' => 'Thème invalide'],
-                    Response::HTTP_UNPROCESSABLE_ENTITY
-                );
+                    Response::HTTP_UNPROCESSABLE_ENTITY);
             }
             $menus->setThemeMenu($themeMenu);
         }
@@ -369,17 +355,13 @@ final class MenusController extends AbstractController
             }
             $menus->setDietMenu($dietMenu);
         }
-
         $menus->setUpdatedAt(new DateTimeImmutable());
         $entityManager->persist($menus);
         $entityManager->flush();
         return $this->json($menus, Response::HTTP_OK, [
-            'Location' => $this->generateUrl(
-                'app_api_menus_show',
-                ['id' => $menus->getId()],
+            'Location' => $this->generateUrl('app_api_menus_show',['id' => $menus->getId()],
                 UrlGeneratorInterface::ABSOLUTE_URL
-            )
-        ], ['groups' => 'menu:list']);
+            )], ['groups' => 'menu:list']);
     }
     #[Route('/{id}', methods: ['DELETE'], name: 'delete')]
     #[OA\Delete(
@@ -469,45 +451,35 @@ final class MenusController extends AbstractController
     public function uploadPicture(int $id, Request $request, EntityManagerInterface $em): JsonResponse
     {
         $menu = $em->getRepository(Menus::class)->find($id);
-
         if (!$menu) {
             return new JsonResponse(['error' => 'Menu introuvable'], 404);
         }
-
         $file = $request->files->get('picture');
-
         if (!$file) {
             return new JsonResponse(['error' => 'Aucun fichier reçu'], 400);
         }
-
         if (!in_array($file->getMimeType(), ['image/jpeg', 'image/png', 'image/webp'])) {
             return new JsonResponse(['error' => 'Format invalide'], 400);
         }
-
         $extension = $file->guessExtension() ?: 'jpg';
         $fileName = uniqid() . '.' . $extension;
-
         try {
             $file->move(
                 $this->getParameter('menus_pictures_directory'),
                 $fileName
             );
-
             if ($menu->getPicture()) {
                 $oldPath = rtrim($this->getParameter('menus_pictures_directory'), '/')
                     . '/' . $menu->getPicture();
-
                 if (file_exists($oldPath)) {
                     unlink($oldPath);
                 }
             }
-
             $menu->setPicture($fileName);
             $em->flush();
         } catch (FileException $e) {
             return new JsonResponse(['error' => 'Erreur upload'], 500);
         }
-
         return new JsonResponse([
             'message' => 'Image enregistrée avec succès',
             'path' => $fileName
