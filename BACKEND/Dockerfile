@@ -21,9 +21,10 @@ WORKDIR /var/www/html
 
 COPY . .
 
-RUN composer install --no-dev --optimize-autoloader  
-
 ENV APP_ENV=prod
 ENV APP_DEBUG=0
+
+RUN composer install --no-dev --optimize-autoloader  
+
 
 EXPOSE 80
