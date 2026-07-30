@@ -12,11 +12,10 @@ final class HomeController extends AbstractController
     #[Route('/', name: 'app_home')]
     function index(): Response
     {
-        return $this->render('home/index.html.twig', [
-            'controller_name' => 'HomeController',
+        
+        return $this->json([
+            'message' => 'API Vite et Gourmand opérationnelle !',
+            'status' => 'online'
         ]);
-        return new Response(
-            '<html><body>Hello HomeController!</body></html>'
-        );
     }
 }

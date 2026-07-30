@@ -31,8 +31,8 @@ security:
 
     access_control:
         - { path: ^/api/doc, roles: PUBLIC_ACCESS }
-        - { path: ^/api/login }
-        - { path: ^/api/registration }
+        - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/registration, roles: PUBLIC_ACCESS }
 
         - { path: ^/api, roles: PUBLIC_ACCESS, methods: [GET] }
         # sécurisation de l'API : les routes commençant par /api sont accessibles à tous, mais les autres routes nécessitent des rôles spécifiques
