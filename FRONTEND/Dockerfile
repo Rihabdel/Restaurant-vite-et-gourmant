@@ -1,14 +1,9 @@
-FROM node:20-alpine
+FROM nginx:alpine
 
-WORKDIR /app
+# Copie tous vos fichiers statiques dans le dossier web par défaut de Nginx
+COPY . /usr/share/nginx/html
 
-# On copie les fichiers de configuration pour installer les dépendances
-COPY package*.json ./
-RUN npm install
+# Nginx écoute sur le port 80 par défaut
+EXPOSE 80
 
-# On copie le reste du code frontend
-COPY . .
-RUN npm run build
-
-EXPOSE 8080
-CMD ["npm", "run", "preview"]
+CMD ["nginx", "-g", "daemon off;"]
