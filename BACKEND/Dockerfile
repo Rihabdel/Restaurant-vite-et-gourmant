@@ -25,6 +25,10 @@ ENV APP_ENV=prod
 ENV APP_DEBUG=0
 
 RUN composer install --no-dev --optimize-autoloader  
-
+# Donne les droits d'exécution au script
+RUN chmod +x docker/entrypoint.sh
 
 EXPOSE 80
+
+# Utilisation du script comme point d'entrée
+ENTRYPOINT ["docker/entrypoint.sh"]
