@@ -127,9 +127,8 @@ export function newUser(event) {
             if (response.ok) {
                 return response.json();
             } else {
-                return response.json().then(err => {
-                    throw new Error(err.message || "Erreur lors de l'inscription");
-                });
+                alert("Erreur lors de l'inscription. Veuillez vérifier vos informations et réessayer.");
+                throw new Error(`Erreur HTTP: ${response.status}`);
             }
         })
         .then(result => {
