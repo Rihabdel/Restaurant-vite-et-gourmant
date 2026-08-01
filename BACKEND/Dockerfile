@@ -28,5 +28,3 @@ RUN composer install --no-dev --optimize-autoloader
 
 
 EXPOSE 80
-# AUTOMATISATION DES MIGRATIONS AU DÉMARRAGE DU CONTENEUR
-RUN php bin/console doctrine:migrations:migrate --no-interaction
