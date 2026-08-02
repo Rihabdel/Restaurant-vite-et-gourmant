@@ -105,12 +105,12 @@ export function newUser(event) {
     myHeaders.append("Content-Type", "application/json");
     
     const raw = JSON.stringify({
-        firstName: document.getElementById("PrenomInput").value,
-        lastName: document.getElementById("NomInput").value,
-        phone: document.getElementById("gsmInput")?.value || "",
-        address: document.getElementById("AddressePostaleInput")?.value || "",
-        email: document.getElementById("EmailInput").value,
-        password: document.getElementById("PasswordInput").value
+        firstName: sanitizeHtml(document.getElementById("PrenomInput").value),
+        lastName: sanitizeHtml(document.getElementById("NomInput").value),
+        phone: sanitizeHtml(document.getElementById("gsmInput")?.value) || "",
+        address: sanitizeHtml(document.getElementById("AddressePostaleInput")?.value) || "",
+        email: sanitizeHtml(document.getElementById("EmailInput").value),
+        password:document.getElementById("PasswordInput").value
     });
     
     console.log("Données envoyées:", raw);
@@ -122,7 +122,7 @@ export function newUser(event) {
         redirect: "follow"
     };
     
-    fetch(`${API_BASE}/registration`, requestOptions)
+    fetch(`${API_BASE}/register`, requestOptions)
         .then(response => {
             if (response.ok) {
                 return response.json();
@@ -132,7 +132,7 @@ export function newUser(event) {
             }
         })
         .then(result => {
-            const firstName = document.getElementById("PrenomInput")?.value || "";
+            const firstName = sanitizeHtml(document.getElementById("PrenomInput")?.value) || "";
             alert(`Bravo ${firstName}, vous êtes maintenant inscrit, vous pouvez vous connecter.`);
             document.location.href = "/connexion";
         })

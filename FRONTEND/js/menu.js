@@ -1,5 +1,5 @@
 import { getMenus, getMenuById, getMenuDishes, enregistrerMenu, updateMenu, deleteMenu, createOrder, getUserInfo, getDishes, getListDesDishesByMenuId,previewOrder, API_BASE} from './api.js';
-import { showAndHideElementsForRoles, getToken} from './script.js';
+import { showAndHideElementsForRoles, getToken, sanitizeHtml} from './script.js';
 import { getCurrentOrderData,fillNewOrderModal,fillNewOrderDetailsModal } from './orders.js';
 // Initialiser la page des menus
 export default async function initMenu() {
@@ -31,44 +31,44 @@ export async function displayMenus(menus){
 
     const visibleMenus = menus.filter(menu => menu.isAvailable=== true);
     container.innerHTML = visibleMenus.map(menu=> {
-const pictureUrl = menu.pictureUrl ? `${API_BASE}${menu.pictureUrl}` : '/scss/images/viteGourmand.png';
+const pictureUrl = sanitizeHtml(menu.pictureUrl) ? `${API_BASE}${sanitizeHtml(menu.pictureUrl)}` : '/scss/images/viteGourmand.png';
         return `
             <div class="col-lg-3 col-md-4 mb-4 p-2">
                 <div class="card menu-card">
                     <div class="card-image">
                         <img src="${pictureUrl}" class="card-img-top" alt="Image du menu ${pictureUrl}">
                         <div class="action-image-buttons" data-show="ROLE_ADMIN,ROLE_EMPLOYEE" style="display:none">
-                            <button class="btn btn-outline-light edit-img-menu-btn" data-id="${menu.id}">
+                            <button class="btn btn-outline-light edit-img-menu-btn" data-id="${sanitizeHtml(menu.id)}">
                                 <i class="bi bi-pencil"></i> Modifier
                             </button> 
-                            <button class="btn btn-outline-light delete-img-menu-btn" data-id="${menu.id}">
+                            <button class="btn btn-outline-light delete-img-menu-btn" data-id="${sanitizeHtml(menu.id)}">
                                 <i class="bi bi-trash"></i> Supprimer
                             </button>
                         </div>
                     </div>
                     <div class="card-body d-flex flex-column">
-                        <h4 class="menu-card__title text-center">${menu.title}</h4>
+                        <h4 class="menu-card__title text-center">${sanitizeHtml(menu.title)}</h4>
                         <div class="menu-card__tags">
                             <span class="tag tag-theme"><i class="bi bi-palette"></i>
-                                    ${menu.themeMenu}
+                                    ${sanitizeHtml(menu.themeMenu)}
                             </span>
                             <span class="tag tag-regime"><i class="bi bi-egg-fried"></i>
-                                    ${menu.dietMenu}
+                                    ${sanitizeHtml(menu.dietMenu)}
                             </span>
                         </div>
-                        <p class="menu-card__desc">${menu.descriptionMenu?.substring(0, 80) || ''}…</p>
+                        <p class="menu-card__desc">${sanitizeHtml(menu.descriptionMenu)?.substring(0, 80) || ''}…</p>
                         <div class="menu-price">
                             <i class="bi bi-currency-euro"></i> ${parseFloat(menu.price).toFixed(2)} € / pers
                         </div>
-                        <small><i class="bi bi-exclamation-triangle-fill"></i> Allergènes : ${menu.allAllergenes || 'Aucune allergènes'}</small>
+                        <small><i class="bi bi-exclamation-triangle-fill"></i> Allergènes : ${sanitizeHtml(menu.allAllergenes) || 'Aucune allergènes'}</small>
                         <div class="d-flex justify-content-center py-2">
-                        <button class="btn btn-primary view-detail-btn" data-id="${menu.id}">
+                        <button class="btn btn-primary view-detail-btn" data-id="${sanitizeHtml(menu.id)}">
                             Détails du menu
                         </button>
                         </div>
                     <div class="card-footer menu-card__footer" data-show="ROLE_ADMIN,ROLE_EMPLOYEE" style="display:none;">
-                        <button class="btn btn-outline-success btn-sm edit-menu-btn" data-id="${menu.id}">Modifier</button>
-                        <button class="btn btn-outline-danger btn-sm delete-menu-btn" data-id="${menu.id}">Supprimer</button>
+                        <button class="btn btn-outline-success btn-sm edit-menu-btn" data-id="${sanitizeHtml(menu.id)}">Modifier</button>
+                        <button class="btn btn-outline-danger btn-sm delete-menu-btn" data-id="${sanitizeHtml(menu.id)}">Supprimer</button>
                     </div>
                     </div>
                 </div>
@@ -326,16 +326,16 @@ function initForm() {
         console.log("Formulaire intercepté !");
         const formData = new FormData(form);
         const $data = {
-            title: formData.get('title'),
-            descriptionMenu: formData.get('descriptionMenu'),
-            price: formData.get('priceMenu'),
+            title: sanitizeHtml(formData.get('title')),
+            descriptionMenu: sanitizeHtml(formData.get('descriptionMenu')),
+            price: sanitizeHtml(formData.get('priceMenu')),
             minPeople:parseInt(formData.get('minPersons')),
             orderBefore: parseInt(formData.get('orderBefore')),
             stock: parseInt(formData.get('stock')),
-            themeMenu: formData.get('themeMenu'),
-            dietMenu: formData.get('dietMenu'),
-            isAvailable: formData.get('isAvailable') === 'on',
-            picture: formData.get('file') || null
+            themeMenu: sanitizeHtml(formData.get('themeMenu')),
+            dietMenu: sanitizeHtml(formData.get('dietMenu')),
+            isAvailable: sanitizeHtml(formData.get('isAvailable')) === 'on',
+            picture: sanitizeHtml(formData.get('file')) || null
         }
 
         const fileInput = document.getElementById('editMenuPicture');
@@ -345,7 +345,7 @@ function initForm() {
             formData.append("picture", fileInput.files[0]);
         }
 
-        const menuId = form.getAttribute('data-id');
+        const menuId = sanitizeHtml(form.getAttribute('data-id'));
 
         try {
             if (menuId) {
@@ -425,17 +425,17 @@ export async function getMenuDetail(id) {
 export function fillDetailModal(menu, dishes) {
     if (!menu || !dishes) return;
     
-    const menuPrice = parseFloat(menu.price).toFixed(2);
-    const menuAllergenes = menu.allAllergenes || 'Aucun';
-    const totalPrice = dishes.reduce((sum, dish) => sum + parseFloat(dish.price), 0).toFixed(2);
+    const menuPrice = parseFloat(sanitizeHtml(menu.price)).toFixed(2);
+    const menuAllergenes = sanitizeHtml(menu.allAllergenes) || 'Aucun';
+    const totalPrice = dishes.reduce((sum, dish) => sum + parseFloat(sanitizeHtml(dish.price)), 0).toFixed(2);
     const dishesList = dishes.map(item => {
         const d = item.dish; // 🔥 très important
 
         return {
-            name: d.name,
-            price: d.price,
-            description: d.description,
-            category: d.category || '',
+            name: sanitizeHtml(d.name),
+            price: sanitizeHtml(d.price),
+            description: sanitizeHtml(d.description),
+            category: sanitizeHtml(d.category) || '',
             displayAllergens: d.allergenName && d.allergenName.length > 0 
                 ? d.allergenName.join(', ') 
                 : ''
@@ -454,17 +454,17 @@ export function fillDetailModal(menu, dishes) {
     
     return `
         <div class="menu-category mt-3">
-            <h4><i class="bi ${icon}"></i> ${title}</h4>
+            <h4><i class="bi ${sanitizeHtml(icon)}"></i> ${sanitizeHtml(title)}</h4>
             ${list.map(d => `
                  <div class="menu-item">
                     <div class="row row-cols-2 menu-item-header">
-                        <div class="col-lg-10 menu-item-title">${d.name}</div>
-                        <div class="col-lg-2 menu-item-price">${parseFloat(d.price).toFixed(2)} €</div>
+                        <div class="col-lg-10 menu-item-title">${sanitizeHtml(d.name)}</div>
+                        <div class="col-lg-2 menu-item-price">${parseFloat(sanitizeHtml(d.price)).toFixed(2)} €</div>
                     </div>
-                    <p class="menu-item-description">${d.description || ''}</p>
+                    <p class="menu-item-description">${sanitizeHtml(d.description) || ''}</p>
                     <small>
                         <i class="bi bi-exclamation-triangle-fill"></i>
-                        Allergènes : ${d.displayAllergens}
+                        Allergènes : ${sanitizeHtml(d.displayAllergens) || 'Aucun'  }
                     </small>
                 </div> 
             `).join('')}
@@ -474,7 +474,7 @@ export function fillDetailModal(menu, dishes) {
     modalBody.innerHTML = `
     
     <div class="container">
-        <h3 class="text-center mb-4">${menu.title}</h3>
+        <h3 class="text-center mb-4">${sanitizeHtml(menu.title)}</h3>
             ${generateHtml('Entrées', 'bi-egg', entrees)}
             ${generateHtml('Plats Principaux', 'bi-main-dish', plats)}
             ${generateHtml('Desserts', 'bi-cake', desserts)}
@@ -488,9 +488,9 @@ export function fillDetailModal(menu, dishes) {
             </div>
             <div class="info-content p-3">
                 <ul class="list-unstyled">
-                <li><i class="bi bi-info-circle-fill"></i><small> Ce menu est conçu pour un minimum de <strong>${menu.minPeople || '1'}</strong> personnes.</small></li>
-                <li><i class="bi bi-exclamation-triangle-fill"></i><small>Ce menu nécessite une commande <strong>${menu.orderBefore || '2'}</strong> jours à l'avance.</small></li>
-                <li><i class="bi bi-exclamation-triangle-fill"></i><small> Ce menu contient de <strong>${menuAllergenes}</strong>.</small></li>
+                <li><i class="bi bi-info-circle-fill"></i><small> Ce menu est conçu pour un minimum de <strong>${sanitizeHtml(menu.minPeople) || '1'}</strong> personnes.</small></li>
+                <li><i class="bi bi-exclamation-triangle-fill"></i><small>Ce menu nécessite une commande <strong>${sanitizeHtml(menu.orderBefore) || '2'}</strong> jours à l'avance.</small></li>
+                <li><i class="bi bi-exclamation-triangle-fill"></i><small> Ce menu contient de <strong>${sanitizeHtml(menuAllergenes)}</strong>.</small></li>
                 <li><i class="bi bi-info-circle-fill"></i><small>Contactez notre équipe pour toute demande spéciale ou question concernant le menu.</small></li>
                 </ul>
             </div>

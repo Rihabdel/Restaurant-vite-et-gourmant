@@ -1,4 +1,4 @@
-import {getToken, showAndHideElementsForRoles,getUserInfo,updateUserInfo,signout , isConnected } from '../script.js';
+import {getToken, showAndHideElementsForRoles,getUserInfo,updateUserInfo,signout , isConnected, sanitizeHtml} from '../script.js';
 import { API_BASE } from '../api.js';
 export default async function initProfil() {
     console.log("Initialisation page profil");
@@ -22,14 +22,15 @@ async function displayUserData(user) {
     const profileInfo = document.getElementById('profileInfo');
     if (!profileInfo) return;
     profileInfo.innerHTML = `  
+    
 
-    <h1 class="mb-4 text-center" >Bienvenue sur votre profil, ${user.firstName || ''} ${user.lastName || ''}</h1>
+    <h1 class="mb-4 text-center" >Bienvenue sur votre profil, ${sanitizeHtml(user.firstName || '')} ${sanitizeHtml(user.lastName || '')}</h1>
 
-    <p class="text-muted"><strong>Nom :</strong> ${user.lastName || ''}</p>
-    <p class="text-muted"><strong>Prénom :</strong> ${user.firstName || ''}</p>
-    <p class="text-muted"><strong>Numéro de téléphone :</strong> ${user.phone || ''}</p>
-    <p class="text-muted"><strong>Adresse postale :</strong> ${user.address || ''}</p>
-    <p class="text-muted"><strong>Email :</strong> ${user.email || ''}</p>
+    <p class="text-muted"><strong>Nom :</strong> ${sanitizeHtml(user.lastName || '')}</p>
+    <p class="text-muted"><strong>Prénom :</strong> ${sanitizeHtml(user.firstName || '')}</p>
+    <p class="text-muted"><strong>Numéro de téléphone :</strong> ${sanitizeHtml(user.phone || '')}</p>
+    <p class="text-muted"><strong>Adresse postale :</strong> ${sanitizeHtml(user.address || '')}</p>
+    <p class="text-muted"><strong>Email :</strong> ${sanitizeHtml(user.email || '')}</p>
     `;
     showAndHideElementsForRoles();
     initButtons();
@@ -85,10 +86,10 @@ function initform() {
 
             const formData = new FormData(profileForm);
             const updatedData = {
-                lastName: formData.get('Nom'),
-                firstName: formData.get('Prenom'),
+                lastName: sanitizeHtml(formData.get('Nom')),
+                firstName: sanitizeHtml(formData.get('Prenom')),
                 phone: parseInt(formData.get('NumeroTelephone').replace(/\D/g, '')) || null,
-                address: formData.get('AdressePostale')
+                address: sanitizeHtml(formData.get('AdressePostale'))
             };
 
             try {

@@ -1,6 +1,6 @@
 
 import { createOrder, getOrdersByUserId, getMenus, updateOrder, cancelOrder, getMenuById, getOrderById,previewOrder}from './api.js';
-import { getUserInfo, showAndHideElementsForRoles } from './script.js';
+import { getUserInfo, showAndHideElementsForRoles, sanitizeHtml } from './script.js';
 
 
 
@@ -40,26 +40,24 @@ function displayOrders(orders) {
         }
         ordersList.innerHTML = orders.map(order => `
             <tr>
-                <td class="d-none d-md-table-cell">${order.id}</td>
-                <td >${order.menu.title}</td>
+                <td class="d-none d-md-table-cell">${sanitizeHtml(order.id)}</td>
+                <td >${sanitizeHtml(order.menu.title)}</td>
                 <td>${new Date(order.deliveryDate).toISOString().split('T')[0]}</td>
                     <td>${new Date(order.deliveryTime).toISOString().substring(11,16)}</td>
-                    <td>${order.numberOfPeople}</td>
+                    <td>${sanitizeHtml(order.numberOfPeople)}</td>
                     <td >${order.deliveryCost ? order.deliveryCost.toFixed(2) + ' €' : 'N/A'}</td>
                     <td>${order.totalPrice  ? order.totalPrice.toFixed(2) + ' €' : 'N/A'}</td>
-                    <td>${order.deliveryAddress || ''}</td>
-                    <td>${order.deliveryCity || ''}</td>
+                    <td>${sanitizeHtml(order.deliveryAddress) || ''}</td>
+                    <td>${sanitizeHtml(order.deliveryCity) || ''}</td>
                 
                     <td>${
         order.status === 'en attente'
-        ? `<button class="btn btn-sm btn-secondary edit-order-btn" data-id="${order.id}">
-                <i class="bi bi-pencil"></i>
-           </button>`
+        ? `<button class="btn btn-sm btn-secondary edit-order-btn" data-id="${sanitizeHtml(order.id)}"><i class="bi bi-pencil"></i></button>`
         : 'Non modifiable'
     }</td>
-                    <td>${order.status === 'en attente' ? `<button class="btn btn-sm btn-danger cancel-order-btn" data-id="${order.id}"><i class="bi bi-x"></i></button>` : 'Non annulable'}</td>
+                    <td>${sanitizeHtml(order.status === 'en attente' ? `<button class="btn btn-sm btn-danger cancel-order-btn" data-id="${sanitizeHtml(order.id)}"><i class="bi bi-x"></i></button>` : 'Non annulable')}</td>
                     <td>
-                    ${order.status}
+                    ${sanitizeHtml(order.status)}
                     </td>
                     
             </tr>
@@ -302,34 +300,34 @@ export async function fillNewOrderDetailsModal(orderData, preview) {
         <h3 class="text-center mb-4">Récapitulatif de votre commande</h3>
             <div class="p-3 border rounded bg-light mb-3">
             <h4 class="mb-3">Vos informations</h4>
-                <p><strong>Nom :</strong> ${document.getElementById('customerName').value || 'N/A'}</p>
-                <p><strong>Prénom :</strong> ${document.getElementById('customerPrenom').value || 'N/A'}</p>
-                <p><strong>Email :</strong> ${document.getElementById('customerEmail').value || 'N/A'}</p>
-                <p><strong>Téléphone :</strong> ${document.getElementById('customerPhone').value || 'N/A'}</p>
-                <p><strong>Adresse de livraison :</strong> ${document.getElementById('factAddress').value || 'N/A'}</p>
+                <p><strong>Nom :</strong> ${sanitizeHtml(document.getElementById('customerName').value) || 'N/A'}</p>
+                <p><strong>Prénom :</strong> ${sanitizeHtml(document.getElementById('customerPrenom').value) || 'N/A'}</p>
+                <p><strong>Email :</strong> ${sanitizeHtml(document.getElementById('customerEmail').value) || 'N/A'}</p>
+                <p><strong>Téléphone :</strong> ${sanitizeHtml(document.getElementById('customerPhone').value) || 'N/A'}</p>
+                <p><strong>Adresse de livraison :</strong> ${sanitizeHtml(document.getElementById('factAddress').value) || 'N/A'}</p>
             </div>
             <div class="p-3 border rounded bg-light mb-3">
             <h4 class="mb-3">Détails de votre commande</h4>
-                <p><strong>Menu :</strong> ${menuSelect?.options[menuSelect.selectedIndex]?.text ?? 'N/A'}</p>
-                <p><strong>Nombre de convives :</strong> ${orderData.numberOfPeople ?? 'N/A'}</p>
-                <p><strong><i class="fas fa-users" style="color: red;"></i>Nombre minimum de convives :</strong> ${menu.minPeople}</p>
+                <p><strong>Menu :</strong> ${sanitizeHtml(menuSelect?.options[menuSelect.selectedIndex]?.text) ?? 'N/A'}</p>
+                <p><strong>Nombre de convives :</strong> ${sanitizeHtml(orderData.numberOfPeople) ?? 'N/A'}</p>
+                <p><strong><i class="fas fa-users" style="color: red;"></i>Nombre minimum de convives :</strong> ${sanitizeHtml(menu.minPeople)}</p>
             </div>
             <div class="p-3 border rounded bg-light mb-3">
             <h4 class="mb-3">Informations de livraison</h4>
-                <p><strong>Date de livraison :</strong> ${orderData.deliveryDate ? new Date(orderData.deliveryDate).toLocaleDateString('fr-FR') : 'N/A'}</p>
-                <p><strong>Heure de livraison :</strong> ${orderData.deliveryTime? new Date(orderData.deliveryTime).toTimeString().slice(0,5)
+                <p><strong>Date de livraison :</strong> ${sanitizeHtml(orderData.deliveryDate) ? new Date(orderData.deliveryDate).toLocaleDateString('fr-FR') : 'N/A'}</p>
+                <p><strong>Heure de livraison :</strong> ${sanitizeHtml(orderData.deliveryTime)? new Date(orderData.deliveryTime).toTimeString().slice(0,5)
         : 'N/A'}</p>
             </div>
 
             <div class="p-3 border rounded bg-light mt-3">  
             <h4 class="mb-3">Prix</h4>
             <p><strong>Statut de la commande :</strong> En attente de paiement</p>
-            <p><strong id="menuPrice">Prix du menu :</strong> ${preview.menuPrice} €</p>
+            <p><strong id="menuPrice">Prix du menu :</strong> ${sanitizeHtml(preview.menuPrice)} €</p>
             
-            <p><strong id="deliveryCost">Frais de livraison :</strong> ${preview.deliveryCost.toFixed(2) ?? 'N/A'} €</p>
-            <p><strong id="totalPrice">Prix total :</strong> ${preview.totalPrice ?? 'N/A'} €</p>
-            <p><strong id="discount" style="color: green;">Remise :${preview.discount.toFixed(2) ?? 'N/A'} €</strong> </p>
-            <small class="text-muted"><em>une remise de ${preview.discount.toFixed(2) ?? 'N/A'} € est appliquée sur votre commande </em></small>
+            <p><strong id="deliveryCost">Frais de livraison :</strong> ${sanitizeHtml(preview.deliveryCost.toFixed(2)) ?? 'N/A'} €</p>
+            <p><strong id="totalPrice">Prix total :</strong> ${sanitizeHtml(preview.totalPrice) ?? 'N/A'} €</p>
+            <p><strong id="discount" style="color: green;">Remise :${sanitizeHtml(preview.discount.toFixed(2)) ?? 'N/A'} €</strong> </p>
+            <small class="text-muted"><em>une remise de ${sanitizeHtml(preview.discount.toFixed(2)) ?? 'N/A'} € est appliquée sur votre commande </em></small>
                             
             </div>
         `;
@@ -382,7 +380,7 @@ export async function fillMenuSelect() {
             menuSelect.innerHTML = '<option value="" disabled selected>Choisissez un menu</option>';
             
             menus.forEach(menu => {
-                menuSelect.innerHTML += `<option value="${menu.id}">${menu.title}</option>`;
+                menuSelect.innerHTML += `<option value="${sanitizeHtml(menu.id)}">${sanitizeHtml(menu.title)}</option>`;
             });
         }
     } catch (error) {
@@ -401,7 +399,7 @@ export async function fillEditOrderModal(orderId) {
             return;
         }
         console.log("Détails de la commande récupérés pour modification :", order);
-        document.getElementById('customerName').value = order.user.firstName || '';
+        document.getElementById('customerName').value = sanitizeHtml(order.user.firstName) || '';
         document.getElementById('customerPrenom').value = order.user.lastName || '';
         document.getElementById('customerEmail').value = order.user.email || '';
         document.getElementById('customerPhone').value = order.user.phone || '';
@@ -422,11 +420,11 @@ if (editMenuSection && order.menu) {
     editMenuSection.innerHTML = `
         <label class="form-label fw-bold">Votre menu commandé :</label>
         <div class="p-3 border rounded bg-light">
-            <p class="mb-1"><strong>Menu :</strong> ${order.menu.title || 'N/A'}</p>
-            <p class="mb-1 text-muted small">${order.menu.descriptionMenu || 'Pas de description'}</p>
-            <p class="mb-1"><strong>Prix :</strong> ${totalPrice} €</p>
-            <p class="mb-1"><strong>Nombre de convives :</strong> ${order.numberOfPeople || 'N/A'}</p>
-            <p class="mb-0 text-info"><em>Minimum requis : ${order.menu.minPeople || 'N/A'}</em></p>
+            <p class="mb-1"><strong>Menu :</strong> ${sanitizeHtml(order.menu.title) || 'N/A'}</p>
+            <p class="mb-1 text-muted small">${sanitizeHtml(order.menu.descriptionMenu) || 'Pas de description'}</p>
+            <p class="mb-1"><strong>Prix :</strong> ${sanitizeHtml(totalPrice)} €</p>
+            <p class="mb-1"><strong>Nombre de convives :</strong> ${sanitizeHtml(order.numberOfPeople) || 'N/A'}</p>
+            <p class="mb-0 text-info"><em>Minimum requis : ${sanitizeHtml(order.menu.minPeople) || 'N/A'}</em></p>
         </div>
     `;
 }

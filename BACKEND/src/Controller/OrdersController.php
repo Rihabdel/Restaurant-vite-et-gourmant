@@ -72,9 +72,7 @@ final class OrdersController extends AbstractController
         try {
             $user = $this->getUser();
 
-
             $data = json_decode($request->getContent(), true);
-
             $requiredFields = [
                 "menu",
                 'numberOfPeople',
@@ -84,25 +82,24 @@ final class OrdersController extends AbstractController
                 'deliveryDate',
                 'deliveryTime'
             ];
-
             foreach ($requiredFields as $field) {
                 if (!isset($data[$field])) {
                     return $this->json(['error' => "Champ manquant : $field"], Response::HTTP_BAD_REQUEST);
                 }
             }
-
             $menu = $this->entityManager->getRepository(Menus::class)->find($data['menu']);
             if (!$menu) {
-                return $this->json(['error' => 'Menu non trouvé'], Response::HTTP_BAD_REQUEST);
+                return $this->json(['error' => 'Menu non trouvé'],
+                Response::HTTP_BAD_REQUEST);
             }
-
             // Vérification du nombre de personnes
             if ($data['numberOfPeople'] < $menu->getMinPeople()) {
-                return $this->json(['error' => "Minimum {$menu->getMinPeople()} personnes requises"], Response::HTTP_BAD_REQUEST);
+                return $this->json(['error' => "Minimum {$menu->getMinPeople()} personnes requises"],
+                Response::HTTP_BAD_REQUEST);
             }
-
             if ($data['numberOfPeople'] > $menu->getStock()) {
-                return $this->json(['error' => "Stock insuffisant. Disponible pour : {$menu->getStock()} personnes"], Response::HTTP_BAD_REQUEST);
+                return $this->json(['error' => "Stock insuffisant. Disponible pour : {$menu->getStock()} personnes"],
+                Response::HTTP_BAD_REQUEST);
             }
 
             $deliveryDateTime = new DateTimeImmutable($data['deliveryDate'] . ' ' . $data['deliveryTime']);
@@ -111,21 +108,18 @@ final class OrdersController extends AbstractController
             if ($deliveryDateTime < $currentDate) {
                 return $this->json(['error' => 'La date de livraison doit être supérieure à la date actuelle'], Response::HTTP_BAD_REQUEST);
             }
-
             if ($deliveryDateTime < $currentDate->modify('+' . $menu->getOrderBefore() . ' hours')) {
-                return $this->json(['error' => "La date de livraison doit respecter le délai de préparation ({$menu->getOrderBefore()} heures)"], Response::HTTP_BAD_REQUEST);
+                return $this->json(['error' => "La date de livraison doit respecter le délai de préparation ({$menu->getOrderBefore()} heures)"],
+                Response::HTTP_BAD_REQUEST);
             }
-
             $deliveryCost = $this->calculateDeliveryCost(
                 $data['deliveryCity'],
                 $data['deliveryPostalCode'],
                 10.0
             ); //en attendant d'avoir une vraie logique de calcul de distance.
-
             $totalPrice =
                 $menu->getPriceEstimate($data['numberOfPeople'])
                 + $deliveryCost;
-
             $order = new Orders();
             $order->setMenu($menu)
                 ->setUser($user)
@@ -139,7 +133,6 @@ final class OrdersController extends AbstractController
                 ->setDeliveryCost($deliveryCost)
                 ->setTotalPrice($totalPrice)
                 ->setStatus(Status::en_attente->value)
-
             ;
             $this->entityManager->persist($order);
             $this->entityManager->flush();

@@ -1,6 +1,6 @@
 import { API_BASE,getDishes, createDish, getDishById,updateDish,deleteDish,addDishAllergens,getAllergens
     ,getMenus,getMenuById, updateMenu,addDishToMenu, deleteMenu,getOrderById,deleteDishFromMenu, enregistrerMenu} from "./api.js";
-import { getToken} from "./script.js";
+import { getToken, sanitizeHtml} from "./script.js";
 import {fillEditMenuModal} from "./menu.js";
 import { validateEmail,validatePassword,validateConfirmPassword,validateRequired } from "./auth/inscription.js";
 
@@ -67,30 +67,30 @@ async function displayDishes(dishes) {
     dishes.forEach(dish => {
         const row = document.createElement("tr");
         row.innerHTML = `
-            <td>${dish.id}</td>
-            <td>${dish.category || 'Aucune'}</td>
-            <td>${dish.name}</td>
-            <td>${dish.description || ''}</td>
+            <td>${sanitizeHtml(dish.id)}</td>
+            <td>${sanitizeHtml(dish.category || 'Aucune')}</td>
+            <td>${sanitizeHtml(dish.name)}</td>
+            <td>${sanitizeHtml(dish.description || '')}</td>
             <td>${Number(dish.price).toFixed(2)} €</td>
             
             <td class="badge-allergenes">
-                ${dish.allergenName?.join(', ') || 'Aucun'}
+                ${sanitizeHtml(dish.allergenName?.join(', ') || 'Aucun')}
             </td>
             <td>
-            <select id="allergenSelect" class="form-select form-select-sm allergen-select" data-id="${dish.id}">
+            <select id="allergenSelect" class="form-select form-select-sm allergen-select" data-id="${sanitizeHtml(dish.id)}">
                 ${allergens.map(allergen => `
-                    <option value="${allergen.id}" ${dish.allergenIds?.includes(allergen.id) ? 'selected' : ''}>
-                        ${allergen.name}
+                    <option value="${sanitizeHtml(allergen.id)}" ${dish.allergenIds?.includes(allergen.id) ? 'selected' : ''}>
+                        ${sanitizeHtml(allergen.name)}
                     </option>
                 `).join('')}
             </select>
-            <button class="btn btn-sm btn-primary mt-2 add-allergen-dish-btn" data-id="${dish.id}">Ajouter</button>
+            <button class="btn btn-sm btn-primary mt-2 add-allergen-dish-btn" data-id="${sanitizeHtml(dish.id)}">Ajouter</button>
             </td>
             <td>
-                <button class="btn btn-dm edit-dish-btn" data-id="${dish.id}">
+                <button class="btn btn-dm edit-dish-btn" data-id="${sanitizeHtml(dish.id)}">
                     <i class="bi bi-pencil-square"></i>
                 </button>
-                <button class="btn btn-dm-danger delete-dish-btn" data-id="${dish.id}">
+                <button class="btn btn-dm-danger delete-dish-btn" data-id="${sanitizeHtml(dish.id)}">
                     <i class="bi bi-trash"></i>
                 </button>
             </td>
@@ -253,44 +253,44 @@ async function displayMenus(menus) {
     
     const rows = menus.map(menu => `
 <tr>
-    <td><strong>${menu.title}</strong></td>
-    <td>${menu.descriptionMenu || ''}</td>
-    <td>${menu.minPeople}</td>
-    <td>${menu.stock}</td>
-    <td>${menu.listOfDishesFromMenu?.map(d => d.category ? `${d.name}--(${d.category})` : d.name).join('- ') || 'Aucun'}</td>
+    <td><strong>${sanitizeHtml(menu.title)}</strong></td>
+    <td>${sanitizeHtml(menu.descriptionMenu || '')}</td>
+    <td>${sanitizeHtml(menu.minPeople)}</td>
+    <td>${sanitizeHtml(menu.stock)}</td>
+    <td>${sanitizeHtml(menu.listOfDishesFromMenu?.map(d => d.category ? `${d.name}--(${d.category})` : d.name).join('- ') || 'Aucun')}</td>
     <td>
-    <select id="dishSelect" class="form-select form-select-sm dish-select" data-id="${menu.id}">
+    <select id="dishSelect" class="form-select form-select-sm dish-select" data-id="${sanitizeHtml(menu.id)}">
         ${dishes.map(dish => `
-            <option value="${dish.id}" ${menu.listOfDishesFromMenu?.some(d => d.id === dish.id) ? 'selected' : ''}>
-                ${dish.name}--(${dish.category})
-        </option>
+            <option value="${sanitizeHtml(dish.id)}" ${sanitizeHtml(menu.listOfDishesFromMenu?.some(d => d.id === dish.id) ? 'selected' : '')}>
+                ${sanitizeHtml(dish.name)}--(${sanitizeHtml(dish.category)})
+            </option>
         `).join('')}
         
     </select>
-    <button class="btn btn-sm btn-primary mt-2 add-dish-menu-btn" data-id="${menu.id}">
+    <button class="btn btn-sm btn-primary mt-2 add-dish-menu-btn" data-id="${sanitizeHtml(menu.id)}">
         <i class="bi bi-plus"></i>
     </button>
-    <button class="btn btn-sm btn-secondary delete-dish-menu-btn" data-id="${menu.id}">
+    <button class="btn btn-sm btn-secondary delete-dish-menu-btn" data-id="${sanitizeHtml(menu.id)}">
         <i class="bi bi-trash"></i>
     </button>
     </td>
     <td>
-        <button class="available-btn ${menu.isAvailable ? 'available-yes' : 'availables-no'}"
-            data-id="${menu.id}">
-            ${menu.isAvailable ? "Disponible" : "Indisponible"}
+        <button class="available-btn ${sanitizeHtml(menu.isAvailable) ? 'available-yes' : 'availables-no'}"
+            data-id="${sanitizeHtml(menu.id)}" data-is-available="${sanitizeHtml(menu.isAvailable)}">
+            ${sanitizeHtml(menu.isAvailable) ? "Disponible" : "Indisponible"}
         </button>
     </td>
 
     <td>
-        ${menu.allAllergenes?.join(', ') || '-'}
+        ${sanitizeHtml(menu.allAllergenes?.join(', ') || '-')}
     </td>
 
     <td>
-        <button class="action-btn btn-edit edit-menu-btn" data-id="${menu.id}">
+        <button class="action-btn btn-edit edit-menu-btn" data-id="${sanitizeHtml(menu.id)}">
             <i class="bi bi-pencil"></i>
         </button>
 
-        <button class="action-btn btn-delete delete-menu-btn" data-id="${menu.id}">
+        <button class="action-btn btn-delete delete-menu-btn" data-id="${sanitizeHtml(menu.id)}">
             <i class="bi bi-trash"></i>
         </button>
     </td>
@@ -418,16 +418,16 @@ function initMenuEvents() {
                 e.preventDefault();
                 const formData = new FormData(editMenuForm);
                 const menuData = {
-                    title: formData.get('title'),
-                    descriptionMenu: formData.get('descriptionMenu'),
-                    price: formData.get('priceMenu'),
-                    minPeople:parseInt(formData.get('minPersons')),
-                    orderBefore: parseInt(formData.get('orderBefore')),
-                    stock: parseInt(formData.get('stock')),
-                    themeMenu: formData.get('themeMenu'),
-                    dietMenu: formData.get('dietMenu'),
-                    isAvailable: formData.get('isAvailable') === 'on',
-                    picture: formData.get('file') || null
+                    title: sanitizeHtml(formData.get('title')),
+                    descriptionMenu: sanitizeHtml(formData.get('descriptionMenu')),
+                    price: sanitizeHtml(formData.get('priceMenu')),
+                    minPeople: parseInt(sanitizeHtml(formData.get('minPersons'))),
+                    orderBefore: parseInt(sanitizeHtml(formData.get('orderBefore'))),
+                    stock: parseInt(sanitizeHtml(formData.get('stock'))),
+                    themeMenu: sanitizeHtml(formData.get('themeMenu')),
+                    dietMenu: sanitizeHtml(formData.get('dietMenu')),
+                    isAvailable: sanitizeHtml(formData.get('isAvailable')) === 'on',
+                    picture: sanitizeHtml(formData.get('file')) || null
                 }
                 await enregistrerMenu(menuData);
                 });
@@ -525,16 +525,16 @@ async function newEmployee(event) {
     const form = document.getElementById('newEmployeeForm');
     const formData = new FormData(form);
     const employeeData = {
-        email: formData.get('email'),
-        firstName: formData.get('firstName'),
-        lastName: formData.get('lastName'),
-        password: formData.get('password'),
-        phone: formData.get('phone'),
-        address: formData.get('address'),
-        roles: [formData.get("role")]
+        email: sanitizeHtml(formData.get('email')),
+        firstName: sanitizeHtml(formData.get('firstName')),
+        lastName: sanitizeHtml(formData.get('lastName')),
+        password: sanitizeHtml(formData.get('password')),
+        phone: sanitizeHtml(formData.get('phone')),
+        address: sanitizeHtml(formData.get('address')),
+        roles: [sanitizeHtml(formData.get("role"))]
     };
     try {  
-        const response = await fetch(`${API_BASE}/registration`, {
+        const response = await fetch(`${API_BASE}/register`, {
             method: "POST",
             headers: myHeaders,
             body: JSON.stringify(employeeData)
@@ -621,26 +621,26 @@ function displayAdminOrders(orders) {
         }
         ordersList.innerHTML = orders.map(order => `
             <tr>
-                <td class="d-none d-md-table-cell">${order.id}</td>
-                <td >${order.menu.title}</td>
+                <td class="d-none d-md-table-cell">${sanitizeHtml(order.id)}</td>
+                <td >${sanitizeHtml(order.menu.title)}</td>
                 <td>${new Date(order.deliveryDate).toISOString().split('T')[0]}</td>
                     <td>${new Date(order.deliveryTime).toISOString().substring(11,16)}</td>
-                    <td>${order.numberOfPeople}</td>
-                    <td>${order.deliveryAddress || ''}</td>
-                    <td>${order.deliveryCity || ''}</td>
+                    <td>${sanitizeHtml(order.numberOfPeople)}</td>
+                    <td>${sanitizeHtml(order.deliveryAddress) || ''}</td>
+                    <td>${sanitizeHtml(order.deliveryCity) || ''}</td>
                     
-                    <td class="d-none d-md-table-cell">${order.canceledBy || 'N/A'}</td>
-                    <td><button class="btn btn-sm btn-secondary edit-order-btn" data-id="${order.id}"><i class="bi bi-pencil"></i></button></td>
-                    <td><button class="btn btn-sm btn-danger delete-order-btn" data-id="${order.id}"><i class="bi bi-trash"></i></button></td>
+                    <td class="d-none d-md-table-cell">${sanitizeHtml(order.canceledBy) || 'N/A'}</td>
+                    <td><button class="btn btn-sm btn-secondary edit-order-btn" data-id="${sanitizeHtml(order.id)}"><i class="bi bi-pencil"></i></button></td>
+                    <td><button class="btn btn-sm btn-danger delete-order-btn" data-id="${sanitizeHtml(order.id)}"><i class="bi bi-trash"></i></button></td>
                     <td>
-                        <select class="form-select form-select-sm status-order-btn" data-id="${order.id}">
-                            <option value="en_attente" ${order.status === "en_attente" ? "selected" : ""}>En attente</option>
-                            <option value="accepté" ${order.status === "accepté" ? "selected" : ""}>Accepté</option>
-                            <option value="en_préparation" ${order.status === "en_préparation" ? "selected" : ""}>En préparation</option>
-                            <option value="livrée" ${order.status === "livrée" ? "selected" : ""}>Livrée</option>
-                            <option value="en_attente_de_retour" ${order.status === "en_attente_de_retour" ? "selected" : ""}>En attente de retour</option>
-                            <option value="terminée " ${order.status === "terminée" ? "selected" : ""}>Terminée</option>
-                            <option value="annulé" ${order.status === "annulé" ? "selected" : ""}>Annulée</option>
+                        <select class="form-select form-select-sm status-order-btn" data-id="${sanitizeHtml(order.id)}">
+                            <option value="en_attente" ${sanitizeHtml(order.status) === "en_attente" ? "selected" : ""}>En attente</option>
+                            <option value="accepté" ${sanitizeHtml(order.status) === "accepté" ? "selected" : ""}>Accepté</option>
+                            <option value="en_préparation" ${sanitizeHtml(order.status) === "en_préparation" ? "selected" : ""}>En préparation</option>
+                            <option value="livrée" ${sanitizeHtml(order.status) === "livrée" ? "selected" : ""}>Livrée</option>
+                            <option value="en_attente_de_retour" ${sanitizeHtml(order.status) === "en_attente_de_retour" ? "selected" : ""}>En attente de retour</option>
+                            <option value="terminée " ${sanitizeHtml(order.status) === "terminée" ? "selected" : ""}>Terminée</option>
+                            <option value="annulé" ${sanitizeHtml(order.status) === "annulé" ? "selected" : ""}>Annulée</option>
                         </select>
                     </td>
             </tr>
@@ -661,7 +661,7 @@ async function loadOrders() {
         console.error("Erreur lors du chargement des commandes :", error);
         const container = document.getElementById('historyOrdersTable');
         if (container) {
-            container.innerHTML = `<tr><td colspan="5">Erreur : ${error.message}</td></tr>`;
+            container.innerHTML = `<tr><td colspan="5">Erreur : ${sanitizeHtml(error.message)}</td></tr>`;
         }
     }
 }
@@ -680,8 +680,8 @@ export function initOrdersListeners() {
                     if (menuSelect) {
                         menuSelect.innerHTML = `<option value="">Sélectionnez un menu</option>` +
                             menus.map(menu => 
-                                `<option value="${menu.id}" ${order.menu?.id === menu.id ? 'selected' : ''}>
-                                    ${menu.title}
+                                `<option value="${sanitizeHtml(menu.id)}" ${sanitizeHtml(order.menu?.id) === sanitizeHtml(menu.id) ? 'selected' : ''}>
+                                    ${sanitizeHtml(menu.title)}
                                 </option>`
                             ).join('');
                     }
@@ -840,7 +840,7 @@ export function fillEditOrderModal(order) {
         const menuSelect = document.getElementById('menuSelectEdit');
         if (menuSelect) {   
             menuSelect.innerHTML = `<option value="">Sélectionnez un menu</option>` +
-                menus.map(menu => `<option value="${menu.id}" ${order.menu?.id === menu.id ? 'selected' : ''}>${menu.title}</option>`).join('');
+                menus.map(menu => `<option value="${sanitizeHtml(menu.id)}" ${sanitizeHtml(order.menu?.id) === sanitizeHtml(menu.id) ? 'selected' : ''}>${sanitizeHtml(menu.title)}</option>`).join('');
         }
     }).catch(error => {
         console.error("Erreur lors du chargement des menus pour la modale :", error);
@@ -871,15 +871,15 @@ if (editOrderForm) {
             const formData = new FormData(editOrderForm);
             const orderData = {
            
-            numberOfPeople: formData.get('numberOfPeople') || existingOrder.numberOfPeople,
-            deliveryDate: formData.get('deliveryDate') 
-    ? `${formData.get('deliveryDate')} 00:00:00`
-    : existingOrder.deliveryDate,
-           deliveryTime: formData.get('deliveryTime') 
-    ? `${formData.get('deliveryTime')}:00`
+            numberOfPeople: sanitizeHtml(formData.get('numberOfPeople')) || sanitizeHtml(existingOrder.numberOfPeople),
+            deliveryDate: sanitizeHtml(formData.get('deliveryDate')) 
+    ? `${sanitizeHtml(formData.get('deliveryDate'))} 00:00:00`
+    : sanitizeHtml(existingOrder.deliveryDate),
+           deliveryTime: sanitizeHtml(formData.get('deliveryTime')) 
+    ? `${sanitizeHtml(formData.get('deliveryTime'))}:00`
     : existingOrder.deliveryTime,
 
-            canceledBy: getToken() ? "admin" : existingOrder.canceledBy
+            canceledBy: getToken() ? "admin" : sanitizeHtml(existingOrder.canceledBy)
         };
             
             console.log("Données à mettre à jour :", orderData);
@@ -950,7 +950,7 @@ function applyFilters() {
     if (menu) {
         getMenus().then(menus => {
             menu.innerHTML = `<option value="all">Tous les menus</option>` +
-                menus.map(menu => `<option value="${menu.title}">${menu.title}</option>`).join('');
+                menus.map(menu => `<option value="${sanitizeHtml(menu.id)}">${sanitizeHtml(menu.title)}</option>`).join('');
         }).catch(error => {
             console.error("Erreur lors du chargement des menus pour le filtre :", error);
             alert("Une erreur est survenue lors du chargement des menus pour le filtre.");
@@ -1005,7 +1005,7 @@ const menuChart = document.getElementById('menuChart').getContext('2d');
 const menuChartConfig = {
     type: 'bar',
     data: {
-        labels: await getMenus().then(menus => menus.map(menu => menu.title)).catch(error => {
+        labels: await getMenus().then(menus => menus.map(menu => sanitizeHtml(menu.title))).catch(error => {
             console.error("Erreur lors du chargement des menus pour le graphique :", error);
             return [];
         }
@@ -1200,16 +1200,16 @@ function displayContactMsg(messages) {
     }
     contactMessagesTable.innerHTML = messages.map(msg => `
         <tr>
-            <td>${msg.email}</td>
-            <td>${msg.title}</td>
-            <td>${msg.message}</td>
-            <td><button class="btn btn-sm btn-danger delete-contact-msg-btn" data-id="${msg.id}">
+            <td>${sanitizeHtml(msg.email)}</td>
+            <td>${sanitizeHtml(msg.title)}</td>
+            <td>${sanitizeHtml(msg.message)}</td>
+            <td><button class="btn btn-sm btn-danger delete-contact-msg-btn" data-id="${sanitizeHtml(msg.id)}">
                     <i class="bi bi-trash">Supprimer</i>
                 </button>
                 <button class="check-btn btn btn-sm ${msg.traite ? 'btn-secondary' : 'btn-success'}"
-                data-id="${msg.id}" py-1>
+                data-id="${sanitizeHtml(msg.id)}" py-1>
                 <i class="bi bi-check"></i>
-                <span>${msg.traite ? 'Traité' : 'Nouveau'}</span>
+                <span>${sanitizeHtml(msg.traite ? 'Traité' : 'Nouveau')}</span>
                 </button>
             </td>
             <td>${new Date(msg.createdAt).toLocaleString()}</td>

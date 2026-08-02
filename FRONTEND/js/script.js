@@ -1,4 +1,4 @@
-export const API_BASE = 'http://127.0.0.1:8000/api'; 
+import { API_BASE } from "./api.js";
 const tokenCookieName = "accesstoken";
 export const roleCookieName = 'role';
 const signoutBtn = document.getElementById("SignoutBtn");
@@ -177,9 +177,15 @@ async function addConctactMsg(contactData) {
     });
     return response;
 }
-
-
-
-
+export function sanitizeHtml(text){
+    // Créez un élément HTML temporaire de type "div"
+    const tempHtml = document.createElement('div');
+    
+    // Affectez le texte reçu en tant que contenu texte de l'élément "tempHtml"
+    tempHtml.textContent = text;
+    
+    // Cela va "neutraliser" ou "échapper" tout code HTML potentiellement malveillant
+    return tempHtml.innerHTML;
+}
 
 showAndHideElementsForRoles();
