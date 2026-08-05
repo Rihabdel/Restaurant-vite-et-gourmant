@@ -214,7 +214,8 @@ export async function addAllergen(allergenName) {
     return await response.json();
 }
 export async function getDishAllergens(dishId) {
-   
+   console.log(API_BASE);
+console.log(url);
     const response = await fetch(`${API_BASE}/dish_allergen/${dishId}`, {
         method: 'GET',
         headers: {
@@ -228,16 +229,28 @@ export async function getDishAllergens(dishId) {
     return await response.json();
 }
 export async function getAllergens() {
-    const response = await fetch(`${API_BASE}/allergens`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
+    try {
+        const response = await fetch(`${API_BASE}/allergens/`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Erreur HTTP : ${response.status}`);
         }
-    
-    });
-    
-    if (!response.ok) throw new Error('Erreur chargement allergènes');
-    return await response.json();
+
+        const allergens = await response.json();
+
+        console.log("Allergènes reçus :", allergens);
+
+        return allergens;
+
+    } catch (error) {
+        console.error("Erreur récupération allergènes :", error);
+        return [];
+    }
 }
 // --- Fonction API pour dishAllegen ---
 export async function getDishAllergenes(id) {

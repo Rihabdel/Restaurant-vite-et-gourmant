@@ -28,7 +28,6 @@ export async function displayMenus(menus){
         console.error("menus n'est pas un tableau :", menus);
         return;
     }
-
     const visibleMenus = menus.filter(menu => menu.isAvailable=== true);
     container.innerHTML = visibleMenus.map(menu=> {
 const pictureUrl = sanitizeHtml(menu.pictureUrl) ? `${API_BASE}${sanitizeHtml(menu.pictureUrl)}` : '/scss/images/viteGourmand.png';

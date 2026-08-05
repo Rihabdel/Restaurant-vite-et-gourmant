@@ -66,39 +66,31 @@ class SecurityController extends AbstractController
     ): JsonResponse {
         try {
             $data = json_decode($request->getContent(), true);
-
             if (!$data) {
                 return new JsonResponse(['error' => 'JSON invalide'], Response::HTTP_BAD_REQUEST);
             }
-
             if (empty($data['email']) || empty($data['password'])) {
                 return new JsonResponse(['error' => 'Champs obligatoires manquants'], Response::HTTP_BAD_REQUEST);
             }
-
             $user = new User();
             $user->setEmail($data['email']);
             $user->setPhone($data['phone'] ?? null);
             $user->setAddress($data['address'] ?? null);
             $user->setLastName($data['lastName'] ?? null);
             $user->setFirstName($data['firstName'] ?? null);
-
             $user->setPassword(
                 $passwordHasher->hashPassword($user, $data['password'])
             );
-
             // Gérer les rôles
             if (isset($data['roles']) && is_array($data['roles'])) {
                 $user->setRoles($data['roles']);
             } else {
                 $user->setRoles(['ROLE_USER']);
             }
-
             $user->setCreatedAt(new \DateTimeImmutable());
-
             // On utilise la variable $entityManager fraîchement injectée
             $entityManager->persist($user);
             $entityManager->flush();
-
             return new JsonResponse([
                 'user' => $user->getUserIdentifier(),
                 'firstName' => $user->getFirstName(),
@@ -149,7 +141,6 @@ class SecurityController extends AbstractController
         if (!$user) {
             return new JsonResponse(['message' => 'Identifiants invalides'], 401);
         }
-
         return new JsonResponse([
             'user' => $user->getUserIdentifier(),
             'apiToken' => $user->getApiToken(),

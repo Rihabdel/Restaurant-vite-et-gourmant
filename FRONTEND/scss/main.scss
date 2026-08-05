@@ -13,19 +13,19 @@ footer {
     position: absolute;
     background-color: $secondary;
     width: 100%;
-    font-family: 'Hind Madurai', serif;
+    font-family: 'manrope', sans-serif;
     font-size: 15px;
 }
 }
 body{
     background-color: white !important;
-    font-family: 'Playfair Display', serif;
+    font-family: 'manrope', sans-serif;
     font-size: 20px;
     line-height: 1.6;
 }
 
 p{
-    font-family: 'Playfair Display', serif; 
+    font-family: 'manrope', sans-serif;
     margin-bottom: 15px;
     font-size: 1.1rem;
 }
@@ -64,13 +64,13 @@ li{
 
 //*-- navbar **//
 .navbar-brand{  
-    font-family: 'Playfair Display', serif;
+    font-family: 'manrope', sans-serif;
     font-size: 28px;
     color: $primary !important; 
 
 }
 .nav a{
-    font-family: 'Playfair Display', serif;
+    font-family: 'manrope', sans-serif;
     font-size: 25px;
     color: $accent !important;
 }
@@ -588,8 +588,8 @@ thead {
         
         .badge {
             display: inline-block;
-            background-color: rgba(255, 255, 255, 0.4);
-            color:$primary;
+            background-color: rgba(44, 18, 18, 0.445);
+            color: rgb(122, 93, 11);
             padding: 0.5rem 1rem;
             border-radius: 4px;
             font-size: 1.2rem;

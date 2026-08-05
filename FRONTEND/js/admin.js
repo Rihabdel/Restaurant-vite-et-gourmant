@@ -1,4 +1,4 @@
-import { API_BASE,getDishes, createDish, getDishById,updateDish,deleteDish,addDishAllergens,getAllergens
+import { API_BASE, getDishes, createDish, getDishById,updateDish,deleteDish,addDishAllergens,getAllergens
     ,getMenus,getMenuById, updateMenu,addDishToMenu, deleteMenu,getOrderById,deleteDishFromMenu, enregistrerMenu} from "./api.js";
 import { getToken, sanitizeHtml} from "./script.js";
 import {fillEditMenuModal} from "./menu.js";
@@ -20,6 +20,7 @@ export default async function initAdmin() {
     
     if (dishList) {
         await loadDishes();
+        
         initDishListeners();
     }
     if (employeeList) {
@@ -54,7 +55,7 @@ async function loadDishes() {
 }
 // afficher les plats dans le tableau
 async function displayDishes(dishes) {
-    
+    const dishList = document.getElementById("dishList");
     dishList.innerHTML = "";
     if (!dishes || dishes.length === 0) {
         dishList.innerHTML = `
@@ -63,7 +64,15 @@ async function displayDishes(dishes) {
             </tr>`;
         return;
     }
-    const allergens = await getAllergens();
+    let allergens = [];
+    try {
+        allergens = await getAllergens();
+    } catch (e) {
+        console.error("Erreur chargement allergènes :", e);
+    }
+
+    console.log("Nombre de plats :", dishes.length);
+
     dishes.forEach(dish => {
         const row = document.createElement("tr");
         row.innerHTML = `
@@ -143,6 +152,9 @@ function initDishListeners() {
             const allergenId = selectedOptions.map(option =>option.value);
             try {
                 await addDishAllergens(dishId, allergenId[0]);
+                console.log(API_BASE);
+console.log(url);
+
                 alert("Allergènes mis à jour !");
                 loadDishes();
             } catch (error) {

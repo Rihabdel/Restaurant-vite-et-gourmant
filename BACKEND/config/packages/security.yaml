@@ -33,10 +33,14 @@ security:
         - { path: ^/api/doc, roles: PUBLIC_ACCESS }
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/registration, roles: PUBLIC_ACCESS }
-
+        # routes de l'API : les routes commençant par /api sont accessibles à tous en lecture (GET), mais nécessitent un rôle ROLE_ADMIN ou ROLE_EMPLOYEE pour les méthodes POST, PUT et DELETE
         - { path: ^/api, roles: PUBLIC_ACCESS, methods: [GET] }
-        # sécurisation de l'API : les routes commençant par /api sont accessibles à tous, mais les autres routes nécessitent des rôles spécifiques
-        - { path: ^/api/menus, roles: ROLE_ADMIN, methods: [POST, PUT, DELETE] }
+        # routes de l'API : les routes commençant par /api nécessitent un rôle ROLE_ADMIN ou ROLE_EMPLOYEE pour les méthodes POST, PUT et DELETE
+        - {
+              path: ^/api,
+              roles: [ROLE_ADMIN, ROLE_EMPLOYEE],
+              methods: [POST, PUT, DELETE],
+          }
         #espace administration : les routes commençant par /admin sont réservées aux utilisateurs ayant le rôle ROLE_ADMIN
         - { path: ^/admin, roles: ROLE_ADMIN }
 

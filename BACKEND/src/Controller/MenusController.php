@@ -36,8 +36,7 @@ final class MenusController extends AbstractController
 
     ) {}
 
-    #[IsGranted('ROLE_ADMIN')]
-    #[Route('/new', name: 'new', methods: ['POST'])]
+   
     #[OA\Post(
         tags: ['Menu'],
         summary: 'Créer un nouveau menu',
@@ -63,6 +62,8 @@ final class MenusController extends AbstractController
             new OA\Response(response: 422, description: 'Erreur de validation')
         ]
     )]
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/new', name: 'new', methods: ['POST'])]
     public function new(Request $request): JsonResponse
     {
         //decoder le json
