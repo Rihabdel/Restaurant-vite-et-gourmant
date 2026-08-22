@@ -296,14 +296,26 @@ final class OrdersController extends AbstractController
             return $this->json(['error' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
         }
         $orders = $ordersRepository->findByClientId($user->getId());
-        if ($orders === []) {
-            return $this->json(['message' => 'Aucune commande trouvée pour cet utilisateur'], Response::HTTP_NOT_FOUND);
-        }
-        if (!$orders) {
-            return $this->json(['message' => 'Aucune commande trouvée pour cet utilisateur'], Response::HTTP_NOT_FOUND);
-        }
-        return $this->json($orders, Response::HTTP_OK, [], ['groups' => ['orders:read', 'menu:read', 'user:read']]);
+            if (empty($orders)) {
+        return $this->json(
+            ['message' => 'Aucune commande trouvée pour cet utilisateur'],
+            Response::HTTP_NOT_FOUND
+        );
     }
+
+    return $this->json(
+        $orders,
+        Response::HTTP_OK,
+        [],
+        [
+            'groups' => [
+                'orders:read',
+                'menu:read',
+                'user:read'
+            ]
+        ]
+    );
+}
 
     // Méthodes auxiliaires
     #[Route('/orders/{id}/cancel', methods: ['PUT'], name: 'cancel')]

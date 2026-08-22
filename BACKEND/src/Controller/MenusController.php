@@ -20,11 +20,11 @@ use symfony\component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use OpenApi\Attributes as OA;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-
+use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/menu', name: 'app_api_menus_')]
 final class MenusController extends AbstractController
@@ -62,7 +62,7 @@ final class MenusController extends AbstractController
             new OA\Response(response: 422, description: 'Erreur de validation')
         ]
     )]
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted(new Expression("is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')"))]
     #[Route('/new', name: 'new', methods: ['POST'])]
     public function new(Request $request): JsonResponse
     {
@@ -279,9 +279,9 @@ final class MenusController extends AbstractController
         );
     }
 
-    #[IsGranted('ROLE_ADMIN')]
-    #[Route('/{id}', methods: ['PUT'], name: 'edit')]
-    #[OA\Put(
+    #[IsGranted(new Expression("is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')"))]
+    #[Route('/{id}', methods: ['PATCH'], name: 'edit')]
+    #[OA\Patch(
         tags: ['Menu'],
         summary: 'Modifier un menu existant',
         parameters: [
@@ -356,6 +356,18 @@ final class MenusController extends AbstractController
             }
             $menus->setDietMenu($dietMenu);
         }
+        //valider l'entité
+        $errors = $this->validator->validate($menus);
+        if (count($errors) > 0) {
+            $messagesErreur = [];
+            foreach ($errors as $error) {
+                $messagesErreur[] = $error->getMessage();
+            }
+            return new JsonResponse(
+                ['erreurs' => $messagesErreur],
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            );
+        }
         $menus->setUpdatedAt(new DateTimeImmutable());
         $entityManager->persist($menus);
         $entityManager->flush();
@@ -382,7 +394,7 @@ final class MenusController extends AbstractController
             new OA\Response(response: 404, description: 'Menu non trouvé')
         ]
     )]
-    #[IsGranted("ROLE_ADMIN")]
+    #[IsGranted(new Expression("is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')"))]
     public function delete(EntityManagerInterface $entityManager, int $id): Response
     {
 
@@ -448,7 +460,7 @@ final class MenusController extends AbstractController
             ]
         )
     ]
-    #[IsGranted("ROLE_ADMIN")]
+    #[IsGranted(new Expression("is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')"))]
     public function uploadPicture(int $id, Request $request, EntityManagerInterface $em): JsonResponse
     {
         $menu = $em->getRepository(Menus::class)->find($id);

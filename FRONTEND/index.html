@@ -21,24 +21,24 @@
         <li class="nav-item">
           <a class="nav-link" href="/menu" onclick="route(event)">Nos menus</a>
         </li>
-            <li class="nav-item" data-show="ROLE_USER,ROLE_ADMIN">
+            <li class="nav-item" data-show="ROLE_USER">
             <a class="nav-link" href="/order" onclick="route(event)">Mes commandes</a>
         </li>
         <li class="nav-item" data-show="disconnected">
             <a class="nav-link" href="/connexion" onclick="route(event)">Connexion</a>
         </li>
-        <li class="nav-item" data-show="ROLE_USER,ROLE_ADMIN">
+        <li class="nav-item" data-show="ROLE_USER,ROLE_ADMIN,ROLE_EMPLOYEE">
             <a class="nav-link" href="/monCompte" onclick="route(event)">Mon Compte</a>
         </li>
-        <li class="nav-item" data-show="ROLE_ADMIN">
+        <li class="nav-item" data-show="ROLE_ADMIN,ROLE_EMPLOYEE">
             <a class="nav-link" href="/admin" onclick="route(event)">Administration</a>
         </li>
-        <li class="nav-item" data-show="ROLE_USER,ROLE_ADMIN">
+        <li class="nav-item" data-show="ROLE_USER,ROLE_ADMIN,ROLE_EMPLOYEE">
             <button id="SignoutBtn" class="nav-link" href="">Deconnexion</button>
         </li>
                 <li class="nav-item">
             <a class="nav-link" href="/contact" onclick="route(event)">Contact</a>
-        </li>
+        </li>s
       </ul>
   </div>
 </nav>
