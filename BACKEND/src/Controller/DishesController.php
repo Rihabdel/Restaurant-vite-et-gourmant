@@ -19,6 +19,8 @@ use Symfony\Component\HttpFoundation\Request;
 use symfony\component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
+use Symfony\Component\Security\Core\Authorization\Expression\Expression;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use OpenApi\Attributes as OA;
 
@@ -75,7 +77,7 @@ final class DishesController extends AbstractController
             ]
         )
     ]
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted(new Expression("is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')"))]
     public function new(Request $request): JsonResponse
     {
         try {
@@ -337,6 +339,7 @@ final class DishesController extends AbstractController
             )
         ]
     )]
+    #[IsGranted(new Expression("is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')"))]
     public function update(
         int $id,
         Request $request,
@@ -411,6 +414,7 @@ final class DishesController extends AbstractController
             ]
         )
     ]
+    #[IsGranted(new Expression("is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')"))]
     public function delete(EntityManagerInterface $entityManager, int $id, Request $request): Response
     {
 

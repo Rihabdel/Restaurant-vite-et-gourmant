@@ -16,7 +16,8 @@ use Symfony\Component\HttpFoundation\Request;
 use symfony\component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-
+use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
+use Symfony\Component\Security\Core\Authorization\Expression\Expression;
 use OpenApi\Attributes as OA;
 
 #[Route('/api/allergens', name: 'app_api_allergens_')]
@@ -69,6 +70,7 @@ final class AllergensController extends AbstractController
             ),
         ]
     )]
+    #[IsGranted(new Expression("is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')"))]
     public function new(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -152,7 +154,7 @@ final class AllergensController extends AbstractController
     }
 
     #[Route('/{id}', methods: ['PUT'], name: 'edit')]
-    //#[IsGranted('ROLE_ADMIN')]
+    #[IsGranted(new Expression("is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')"))]
     #[OA\Put(
         tags: ['Allergens'],
         summary: 'Mettre à jour un allergène',
@@ -249,7 +251,7 @@ final class AllergensController extends AbstractController
         }
     }
     #[Route('/{id}', methods: ['DELETE'], name: 'delete')]
-    //#[IsGranted('ROLE_ADMIN')]
+    #[IsGranted(new Expression("is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')"))]
     #[OA\Delete(
         tags: ['Allergens'],
         summary: 'Supprimer un allergène',

@@ -89,6 +89,7 @@ final class DishAllergenController extends AbstractController
             )
         ]
     )]
+    #[IsGranted(new Expression("is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')"))]
     public function addAllergenToDish(Request $request, int $id): JsonResponse
     {
         try {

@@ -116,7 +116,7 @@ export async function getMenuById(id) {
 }
 export async function updateMenu(id, menuData) {
   const response = await fetch(`${API_BASE}/menu/${id}`, {
-    method: "PATCH",
+    method: "PUT",
     headers: {
       "Content-Type": "application/json",
       "X-AUTH-TOKEN": getToken(),

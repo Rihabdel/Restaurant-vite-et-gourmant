@@ -119,7 +119,7 @@ final class ReviewsController extends AbstractController
     }
 
     #[Route('', name: 'show', methods: ['GET'])]
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted(new Expression("is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')"))]
     #[OA\Get(
         summary: 'Afficher les avis validés',
         description: 'Permet à un administrateur de voir tous les avis validés.',
@@ -195,6 +195,7 @@ final class ReviewsController extends AbstractController
             )
         ]
     )]
+    #[IsGranted(new Expression("is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')"))]
     public function delete(int $id, EntityManagerInterface $entityManager): JsonResponse
     {
         $review = $entityManager->getRepository(Reviews::class)->find($id);
@@ -210,7 +211,7 @@ final class ReviewsController extends AbstractController
     }
 
     #[Route('/{id}/validate', name: 'validate', methods: ['PATCH'])]
-    #[IsGranted('ROLE_EMPLOYEE')]
+    #[IsGranted(new Expression("is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')"))]
     #[OA\Patch(
         summary: 'Valider un avis',
         description: 'Permet à un employé de valider un avis en changeant son statut.',
