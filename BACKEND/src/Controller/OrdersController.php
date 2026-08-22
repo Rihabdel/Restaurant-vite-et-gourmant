@@ -21,8 +21,9 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use App\Service\MailService;
+use Symfony\Component\ExpressionLanguage\Expression;
 
-#[Route('api', name: 'app_api_orders_')]
+#[Route('/api', name: 'app_api_orders_')]
 final class OrdersController extends AbstractController
 {
     public function __construct(
@@ -455,11 +456,7 @@ final class OrdersController extends AbstractController
             return $this->json(['message' => 'Commande modifiée avec succès'], Response::HTTP_OK);
         }
     }
-
-
     // Logique de modification de la commande (ex: changer le nombre de personnes, l'adresse de livraison
-
-
     private function canAccessOrder(Orders $order): bool
     {
         // Seul le propriétaire de la commande, les admins et les employés peuvent accéder aux détails d'une commande
@@ -490,7 +487,7 @@ final class OrdersController extends AbstractController
     }
     //delete menu admin ou employee
     #[Route('/admin/orders/{id}', methods: ['DELETE'], name: 'delete')]
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted(new Expression("is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')"))]
     #[OA\Delete(
         tags: ["Orders"],
         summary: "Supprimer une commande",
@@ -531,7 +528,7 @@ final class OrdersController extends AbstractController
 
     // afficher toutes les commandes pour les employés et les admins et les filtrer par statut, date de livraison ou menu
     #[Route('/admin/orders', methods: ['GET'], name: 'admin_index')]
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted(new Expression("is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')"))]
 
     #[OA\Get(
         tags: ["Orders"],
@@ -599,7 +596,7 @@ final class OrdersController extends AbstractController
 
     // Modifier une commande par un admin ou un employé
     #[Route('/admin/orders/{id}/edit', methods: ['PUT'], name: 'admin_edit')]
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted(new Expression("is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')"))]
 
     public function editOrderByAdmin(Orders $order, Request $request): JsonResponse
     {
@@ -641,7 +638,7 @@ final class OrdersController extends AbstractController
 
     // Mettre à jour le statut d'une commande par un admin
     #[Route('/admin/orders/{id}/status', methods: ['PUT'], name: 'admin_update_status')]
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted(new Expression("is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')"))]
     #[OA\Put(
         tags: ["Orders"],
         summary: "Mettre à jour le statut d'une commande (admin)",

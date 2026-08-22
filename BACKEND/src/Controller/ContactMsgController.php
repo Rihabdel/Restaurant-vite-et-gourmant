@@ -14,6 +14,8 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\ExpressionLanguage\Expression;
+
 
 use OpenApi\Attributes as OA;
 
@@ -27,7 +29,7 @@ class ContactMsgController extends AbstractController
     ) {}
 
     #[Route('/all', name: 'contact_list', methods: ['GET'])]
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted(new Expression("is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')"))]
     public function index(): Response
     {
         try {
@@ -138,7 +140,7 @@ class ContactMsgController extends AbstractController
             )
         ]
     )]
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted(new Expression("is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')"))]
     public function deleteContactMsg(int $id): JsonResponse
     {
         try {
@@ -202,7 +204,7 @@ class ContactMsgController extends AbstractController
             )
         ]
     )]
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted(new Expression("is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')"))]
     public function markAsTreated(int $id): Response
     {
         try {

@@ -62,8 +62,9 @@ final class MenusController extends AbstractController
             new OA\Response(response: 422, description: 'Erreur de validation')
         ]
     )]
-    #[IsGranted(new Expression("is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')"))]
+    
     #[Route('/new', name: 'new', methods: ['POST'])]
+    #[IsGranted(new Expression("is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')"))]
     public function new(Request $request): JsonResponse
     {
         //decoder le json
@@ -280,8 +281,8 @@ final class MenusController extends AbstractController
     }
 
     #[IsGranted(new Expression("is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')"))]
-    #[Route('/{id}', methods: ['PATCH'], name: 'edit')]
-    #[OA\Patch(
+    #[Route('/{id}', methods: ['PUT'], name: 'edit')]
+    #[OA\Put(
         tags: ['Menu'],
         summary: 'Modifier un menu existant',
         parameters: [
