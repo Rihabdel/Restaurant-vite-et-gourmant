@@ -533,12 +533,34 @@ function initMenuEvents() {
         isAvailable: sanitizeHtml(formData.get("isAvailable")) === "on",
         picture: sanitizeHtml(formData.get("file")) || null,
       };
-      await enregistrerMenu(menuData);
+      const fileInput = document.getElementById("editMenuPicture");
+
+      //  image seulement si choisie
+      if (fileInput && fileInput.files.length > 0) {
+        formData.append("picture", fileInput.files[0]);
+      }
+
+      const menuId = sanitizeHtml(editMenuForm.getAttribute("data-id"));
+
+      try {
+        if (menuId) {
+          await updateMenu(menuId, menuData);
+          alert("Menu mis à jour !");
+        } else {
+          await enregistrerMenu(menuData, formData);
+          alert("Menu créé !");
+        }
+
+        const modalEl = document.getElementById("editMenuModal");
+        bootstrap.Modal.getInstance(modalEl).hide();
+
+        window.location.reload();
+      } catch (error) {
+        console.error("Erreur API :", error);
+      }
     });
   }
 }
-
-// Initialiser le formulaire d'édition de menu pour la création et la modification
 
 //--initilaiser les listeners d'un ajout d'un employee
 function initEmployeeListeners() {
