@@ -196,20 +196,23 @@ export async function getListDesDishesByMenuId(id) {
 
 // --- Fonction API pour les allergènes ---
 
-export async function addAllergen(allergenName) {
+export async function addAllergen(allergenData) {
   const response = await fetch(`${API_BASE}/allergens/new`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "X-AUTH-TOKEN": getToken(),
     },
-    body: JSON.stringify({ name: allergenName }),
+    body: JSON.stringify(allergenData),
   });
   if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || "Erreur d'ajout de l'allergène");
+    const errorText = await response.text();
+
+    console.error("Erreur serveur :", response.status);
+    console.error("Réponse serveur :", errorText);
+
+    throw new Error(`Erreur ${response.status}`);
   }
-  return await response.json();
 }
 export async function getDishAllergens(dishId) {
   console.log(API_BASE);

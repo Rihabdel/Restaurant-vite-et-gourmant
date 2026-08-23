@@ -63,8 +63,13 @@
                     </div>
                     <div class="tab-pane fade  ow active" id="v-pills-dishes" role="tabpanel" aria-labelledby="v-pills-dishes-tab" tabindex="0">
                         <!-- LISTE PLATS -->
+                         
                         <div class="admin-gestion mb-3" id="gestion-dishes">
                             <h2 class="mb-4">Gestion des plats</h2>
+                            <div class="text-center">
+                            <button class="btn btn-primary" id="addDishButton">Ajouter un plat</button>
+                            <button class="btn btn-primary" id="addAllergenButton">Ajouter un allergène</button>
+                        </div>
                             <table class="table table-striped admin-table table-hover align-middle">
                                 <thead>
                                     <tr>
@@ -80,10 +85,29 @@
                                 </thead>
                                 <tbody id="dishList"></tbody>
                             </table>
+                            <!-- Modal pour ajouter un allergène -->
+                            <div class="modal fade" id="addAllergenModal" tabindex="-1" aria-labelledby="addAllergenModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-body">
+                                            <form id="addAllergenForm">
+                                                <div class="mb-3">
+                                                    <label for="allergenName" class="form-label">Nom de l'allergène</label>
+                                                    <input type="text" class="form-control" id="allergenName" name="allergenName" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="allergenDescription" class="form-label">Description</label>
+                                                    <textarea class="form-control" id="allergenDescription" name="allergenDescription" rows="3"></textarea>
+                                                </div>
+                                                <div class="text-center">
+                                                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
                         </div>
-                        <div class="text-center">
-                            <button class="btn btn-primary" id="addDishButton">Ajouter un plat</button>
-                        </div>
+                        
                         <!-- Modals pour ajouter et modifier un plat -->
                         <div class="modal fade" id="addDishModal" tabindex="-1" aria-labelledby="addDishModalLabel" aria-hidden="true">
                             <div class="modal-dialog">
