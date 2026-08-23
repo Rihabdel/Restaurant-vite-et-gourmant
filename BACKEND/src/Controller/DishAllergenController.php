@@ -138,7 +138,6 @@ final class DishAllergenController extends AbstractController
                 $dishAllergen = new DishAllergen();
                 $dishAllergen->setDish($dish);
                 $dishAllergen->setAllergen($allergen);
-                $dish->addAllergenToDish($dishAllergen);
             } else {
                 return new JsonResponse(
                     ['message' => 'Le plat est déjà associé à cet allergène'],
