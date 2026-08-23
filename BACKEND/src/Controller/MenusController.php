@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
+
 
 #[Route('/api/menu', name: 'app_api_menus_')]
 final class MenusController extends AbstractController
