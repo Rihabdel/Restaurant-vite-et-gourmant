@@ -33,15 +33,9 @@ security:
         - { path: ^/api/doc, roles: PUBLIC_ACCESS }
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/register, roles: PUBLIC_ACCESS }
-        # routes de l'API : les routes commençant par /api sont accessibles à tous en lecture (GET), mais nécessitent un rôle ROLE_ADMIN ou ROLE_EMPLOYEE pour les méthodes POST, PUT et DELETE
-        - { path: ^/api, roles: PUBLIC_ACCESS, methods: [GET] }
-        # routes de l'API : les routes commençant par /api nécessitent un rôle ROLE_ADMIN ou ROLE_EMPLOYEE pour les méthodes POST, PUT et DELETE
-        - {
-              path: ^/api,
-              roles: "is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')",
-              methods: [POST, PUT, DELETE, PATCH],
-          }
-        #espace administration : les routes commençant par /admin sont réservées aux utilisateurs ayant le rôle ROLE_ADMIN
+        # espace utilisateur : les routes commençant par /api/orders sont réservées aux utilisateurs ayant le rôle ROLE_USER
+        - { path: ^/api/orders, roles: [ROLE_USER] }
+        #espace administration : les routes commençant par /admin sont réservées aux utilisateurs ayant le rôle ROLE_ADMIN ou ROLE_EMPLOYEE
         - { path: ^/admin, roles: [ROLE_ADMIN, ROLE_EMPLOYEE] }
 
 when@test:

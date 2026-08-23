@@ -260,7 +260,9 @@ export async function getDishAllergenes(id) {
     },
   });
   if (!response.ok) {
-    throw new Error("Erreur d'affichage des allergènes du plat");
+    throw new Error(
+      `Erreur d'affichage des allergènes du plat : ${response.status}`,
+    );
   }
   return await response.json();
 }
@@ -379,7 +381,7 @@ export async function previewOrder(data) {
   if (!response.ok) {
     const errorData = await response.json();
     console.error("Détails serveur :", errorData);
-    throw new Error("Erreur de prévisualisation de la commande");
+    throw new Error(`Erreur ${response.status}`);
   }
   return await response.json();
 }

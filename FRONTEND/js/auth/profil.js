@@ -8,7 +8,7 @@ import {
   sanitizeHtml,
 } from "../script.js";
 import { API_BASE } from "../api.js";
-import { sanitizeHtml } from "../script.js";
+
 export default async function initProfil() {
   console.log("Initialisation page profil");
   try {
