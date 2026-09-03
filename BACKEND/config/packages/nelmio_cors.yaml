@@ -2,7 +2,7 @@ nelmio_cors:
     defaults:
         origin_regex: true
         allow_origin:
-            - "^http?://localhost(:[0-9]+)?$"
+            - "^http://localhost(:[0-9]+)?$"
             - '^https?://127\.0\.0\.1(:[0-9]+)?$'
             - '^https://.*\.onrender\.com$'
         allow_methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
@@ -14,7 +14,7 @@ nelmio_cors:
         "^/api/":
             origin_regex: true
             allow_origin:
-                - "^http?://localhost(:[0-9]+)?$"
+                - "^http://localhost(:[0-9]+)?$"
                 - '^https?://127\.0\.0\.1(:[0-9]+)?$'
                 - '^https://.*\.onrender\.com$'
             allow_headers: ["Content-Type", "Authorization", "X-AUTH-TOKEN"]

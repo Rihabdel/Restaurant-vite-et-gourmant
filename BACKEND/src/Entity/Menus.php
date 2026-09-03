@@ -37,7 +37,7 @@ class Menus
     #[ORM\Column(type: Types::TEXT, nullable: false)]
     private ?string $descriptionMenu = null;
 
-
+    #[Groups(['menu:read', 'menu:list', 'menu:write', 'menu:detail'])]
     #[ORM\Column(type: 'text', length: 255, nullable: true)]
     private ?string $picture = null;
 

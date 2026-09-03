@@ -1,5 +1,6 @@
 import { getToken } from "./script.js";
-export const API_BASE = "https://vite-gourmand-api-novo.onrender.com/api";
+export const API_BASE = "http://localhost:8000/api";
+//export const API_BASE = "https://vite-gourmand-api-novo.onrender.com/api";
 // --- Fonctions API pour les plats ---
 export async function getDishes() {
   const response = await fetch(`${API_BASE}/dishes/list`, {

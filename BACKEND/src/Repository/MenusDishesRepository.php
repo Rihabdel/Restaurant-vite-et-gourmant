@@ -69,4 +69,20 @@ class MenusDishesRepository extends ServiceEntityRepository
             ->getQuery()
             ->getArrayResult();
     }
+    public function calculateTotalPrice(Menus $menu): float
+    {
+        $result = $this->createQueryBuilder('md')
+            ->select('SUM(d.price * md.quantity)')
+            ->join('md.dish', 'd')
+            ->where('md.menu = :menu')
+            ->setParameter('menu', $menu)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        if ($result === null) {
+            return 0.0;
+        }
+
+        return (float) $result;
+    }
 }

@@ -51,8 +51,8 @@ export async function displayMenus(menus) {
   const visibleMenus = menus.filter((menu) => menu.isAvailable === true);
   container.innerHTML = visibleMenus
     .map((menu) => {
-      const pictureUrl = sanitizeHtml(menu.pictureUrl)
-        ? `${API_BASE}${sanitizeHtml(menu.pictureUrl)}`
+      const pictureUrl = sanitizeHtml(menu.picture)
+        ? `http://localhost:8000/uploads/menus/${sanitizeHtml(menu.picture)}`
         : "/scss/images/viteGourmand.png";
       return `
             <div class="col-lg-3 col-md-4 mb-4 p-2">
@@ -364,16 +364,12 @@ function initForm() {
       isAvailable: sanitizeHtml(formData.get("isAvailable")) === "on",
       picture: sanitizeHtml(formData.get("file")) || null,
     };
-
     const fileInput = document.getElementById("editMenuPicture");
-
     //  image seulement si choisie
     if (fileInput && fileInput.files.length > 0) {
       formData.append("picture", fileInput.files[0]);
     }
-
     const menuId = sanitizeHtml(form.getAttribute("data-id"));
-
     try {
       if (menuId) {
         await updateMenu(menuId, $data);

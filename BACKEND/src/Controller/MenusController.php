@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use symfony\component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use OpenApi\Attributes as OA;
@@ -36,8 +36,7 @@ final class MenusController extends AbstractController
         private ValidatorInterface $validator,
 
     ) {}
-
-   
+    
     #[OA\Post(
         tags: ['Menu'],
         summary: 'Créer un nouveau menu',
@@ -63,9 +62,8 @@ final class MenusController extends AbstractController
             new OA\Response(response: 422, description: 'Erreur de validation')
         ]
     )]
-    
     #[Route('/new', name: 'new', methods: ['POST'])]
-    #[IsGranted(new Expression("is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')"))]
+    #[IsGranted('ROLE_EMPLOYEE')]
     public function new(Request $request): JsonResponse
     {
         //decoder le json
@@ -108,6 +106,9 @@ final class MenusController extends AbstractController
         }
         $menu->setThemeMenu($themeMenu);
         $menu->setDietMenu($dietMenu);
+        $menu->setPicture($data['picture'] ?? null);
+        //prix somme des prix des plats du menu
+        $menu->setPrice($this->entityManager->getRepository(MenusDishesRepository::class)->calculateTotalPrice($menu));
         //valider l'entité
         $errors = $this->validator->validate($menu);
         if (count($errors) > 0) {
@@ -121,6 +122,7 @@ final class MenusController extends AbstractController
             );
         }
         //persist et flush
+    
         $menu->setCreatedAt(new DateTimeImmutable());
 
         $this->entityManager->persist($menu);
@@ -281,7 +283,7 @@ final class MenusController extends AbstractController
         );
     }
 
-    #[IsGranted(new Expression("is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')"))]
+    #[IsGranted(isGranted: 'ROLE_EMPLOYEE')]
     #[Route('/{id}', methods: ['PUT'], name: 'edit')]
     #[OA\Put(
         tags: ['Menu'],
@@ -396,7 +398,7 @@ final class MenusController extends AbstractController
             new OA\Response(response: 404, description: 'Menu non trouvé')
         ]
     )]
-    #[IsGranted(new Expression("is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')"))]
+    #[IsGranted('ROLE_EMPLOYEE')]
     public function delete(EntityManagerInterface $entityManager, int $id): Response
     {
 
@@ -462,7 +464,7 @@ final class MenusController extends AbstractController
             ]
         )
     ]
-    #[IsGranted(new Expression("is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')"))]
+    #[IsGranted('ROLE_EMPLOYEE')]
     public function uploadPicture(int $id, Request $request, EntityManagerInterface $em): JsonResponse
     {
         $menu = $em->getRepository(Menus::class)->find($id);

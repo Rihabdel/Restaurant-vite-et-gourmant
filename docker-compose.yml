@@ -33,7 +33,7 @@ services:
       POSTGRES_PASSWORD: 1234
       POSTGRES_DB: viteEtGourmand_clean
     ports:
-      - "5433:5432"
+      - "5434:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
 
