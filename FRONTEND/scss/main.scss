@@ -732,7 +732,7 @@ thead {
             margin: 40px 0;
              background-color: white;
             border-radius: 40px;
-          
+        
             border: 2px solid rgba(212, 167, 106, 0.2);
             box-shadow: 0 10px 40px rgba(0,0,0,0.05);
             margin-bottom: 50px;
@@ -833,13 +833,10 @@ thead {
                 padding: 30px 20px;
             }
         }
+        
 
-        
-        
-       
         // *-- ----------------------------------/**MODAL DEVIS**/----------------------------------*//
         .modal-dialog {
-            
             max-width: 800px;
             width: 80%;
             margin: 30px auto;
@@ -878,8 +875,9 @@ thead {
         }
     //*-- ----------------------------------/**service complementaire */----------------------------------*//
    
-    .service-highlight {
-            background-color: $body-bg;
+        .service-highlight {
+            background-color: rgb(247, 245, 237); 
+            color: #666;
             border-radius: 15px;
             padding: 30px;
             margin-top: 40px;
@@ -887,24 +885,36 @@ thead {
             font-weight: bold;
         }
         
-        .service-highlight h4 {
+        .service-highlight h3 {
             font-size: 1.5rem;
             font-weight: 600;
             margin-bottom: 15px;
             color: $primary;
         }
-        
-        .service-highlight p, .service-highlight li {
-            color: white;
+        .service-highlight p {
             font-size: 1.1rem;
             line-height: 1.6;
+        }
+        .service-features {
+            list-style-type: none;
+            padding-left: 0;
+            margin-bottom: 25px;
         }
         /* section nos services */
         .service-card {
             display: flex   ;
             flex-direction: column ;
             border-radius: 20px;
-           
+        }
+        .services-section {
+            border-radius: 40px;
+            border: 2px solid rgba(212, 167, 106, 0.2);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+            padding: 25px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
         /*-- ----------------------------------/**CALL TO ACTION BUTTON**/----------------------------------*//
 button {

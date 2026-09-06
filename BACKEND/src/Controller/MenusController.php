@@ -36,7 +36,7 @@ final class MenusController extends AbstractController
         private ValidatorInterface $validator,
 
     ) {}
-    
+
     #[OA\Post(
         tags: ['Menu'],
         summary: 'Créer un nouveau menu',
@@ -108,7 +108,9 @@ final class MenusController extends AbstractController
         $menu->setDietMenu($dietMenu);
         $menu->setPicture($data['picture'] ?? null);
         //prix somme des prix des plats du menu
-        $menu->setPrice($this->entityManager->getRepository(MenusDishesRepository::class)->calculateTotalPrice($menu));
+        $menu->setPrice(
+            $data['price'] ?? 0.0
+        );
         //valider l'entité
         $errors = $this->validator->validate($menu);
         if (count($errors) > 0) {
@@ -283,7 +285,7 @@ final class MenusController extends AbstractController
         );
     }
 
-    #[IsGranted(isGranted: 'ROLE_EMPLOYEE')]
+    #[IsGranted('ROLE_EMPLOYEE')]
     #[Route('/{id}', methods: ['PUT'], name: 'edit')]
     #[OA\Put(
         tags: ['Menu'],

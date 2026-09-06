@@ -222,7 +222,6 @@ function initDishListeners() {
         loadDishes();
       } catch (error) {
         console.error("Erreur lors de l'ajout de l'allergène :", error);
-        alert("Une erreur est survenue lors de l'ajout de l'allergène.");
       }
     });
   }
@@ -238,7 +237,6 @@ function initDishListeners() {
       loadDishes();
     } catch (error) {
       console.error("Erreur lors de la suppression du plat :", error);
-      alert("Une erreur est survenue lors de la suppression du plat.");
     }
   });
 
@@ -399,9 +397,6 @@ function initMenuEvents() {
           "Erreur lors de la mise à jour de la disponibilité :",
           error,
         );
-        alert(
-          "Une erreur est survenue lors de la mise à jour de la disponibilité.",
-        );
       }
     }
   });
@@ -442,7 +437,6 @@ function initMenuEvents() {
       const menuId = deleteDishMenuBtn.dataset.id;
       if (!menuId) {
         console.error("ID de menu manquant pour suppression de plat");
-        alert("Erreur technique");
         return;
       }
       const select = document.querySelector(
@@ -453,7 +447,6 @@ function initMenuEvents() {
           "Sélecteur de plats introuvable pour le menu ID :",
           menuId,
         );
-        alert("Erreur technique");
         return;
       }
       const selectedOptions = Array.from(select.selectedOptions);
@@ -464,9 +457,6 @@ function initMenuEvents() {
         loadMenus(); // Recharger la liste pour refléter les changements
       } catch (error) {
         console.error("Erreur lors de la suppression du plat du menu :", error);
-        alert(
-          "Une erreur est survenue lors de la suppression du plat du menu.",
-        );
       }
     }
 
@@ -476,7 +466,7 @@ function initMenuEvents() {
       const menuId = addDishMenu.dataset.id;
       if (!menuId) {
         console.error("ID de menu manquant");
-        alert("Erreur technique");
+
         return;
       }
       const select = document.querySelector(
@@ -487,7 +477,7 @@ function initMenuEvents() {
           "Sélecteur de plats introuvable pour le menu ID :",
           menuId,
         );
-        alert("Erreur technique");
+
         return;
       }
       const selectedOptions = Array.from(select.selectedOptions);
@@ -500,9 +490,6 @@ function initMenuEvents() {
         console.error(
           "Erreur lors de la mise à jour des plats du menu :",
           error,
-        );
-        alert(
-          "Une erreur est survenue lors de la mise à jour des plats du menu.",
         );
       }
     }

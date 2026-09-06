@@ -23,10 +23,10 @@ WORKDIR /var/www/html
 # Copier le projet Symfony
 COPY . .
 # Set environment variables for production
-ENV APP_ENV=prod
-ENV APP_DEBUG=0
+ENV APP_ENV=dev
+ENV APP_DEBUG=1
 # Installation des dépendances PHP 
-RUN composer install --no-dev --optimize-autoloader  
+RUN composer install
 #créer un utilaisateur pour exécuter le conteneur
 RUN useradd -m appSymfony && chown -R appSymfony:appSymfony /var/www/html
 

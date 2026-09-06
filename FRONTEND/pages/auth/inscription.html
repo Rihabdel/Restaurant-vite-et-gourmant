@@ -17,14 +17,28 @@
           <label for="AddressePostaleInput" class="form-label">Adresse postale</label>
           <input type="text" class="form-control" id="AddressePostaleInput" placeholder="Votre adresse postale" name="address"> 
         </div>
-        <div class="mb-3">
-          <label for="EmailInput" class="form-label">Email</label>
-          <input type="email" class="form-control" id="EmailInput" placeholder="test@mail.fr" name="email"> 
-        </div>
+      
+      <div class="mb-3">
+          <label for="EmailInput" class="form-label">Adresse e-mail</label>
+          <input
+              type="email"
+              class="form-control"
+              id="EmailInput"
+              name="email"
+              placeholder="test@mail.fr"
+              aria-describedby="emailHelp"
+              required>
+          <div class="invalid-feedback">
+              Veuillez saisir une adresse e-mail valide.
+          </div>
+      </div>
         <div class="mb-3">
           <label for="PasswordInput" class="form-label">Mot de passe</label>
-          <input type="password" class="form-control" id="PasswordInput" name="password">
-          <small class="form-text text-muted">Le mot de passe doit contenir au moins 10 caractères constitué au minima d'un caractère spécial, une majuscule, une minuscule, un chiffre</small>
+          <input type="password" class="form-control" id="PasswordInput" name="password" aria-describedby="passwordHelp passwordError" required>
+          <div id="passwordHelp" class="form-text"> Le mot de passe doit contenir au moins 10 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial. </div>
+          <div id="passwordError" class="invalid-feedback"> Le mot de passe ne respecte pas les critères demandés. 
+            Veuillez choisir un mot de passe plus fort.
+          </div> 
         </div>
         <div class="mb-3">
             <label for="ValidatePasswordInput" class="form-label">Validez votre mot de passe</label>

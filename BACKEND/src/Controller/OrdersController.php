@@ -487,7 +487,7 @@ final class OrdersController extends AbstractController
     }
     //delete menu admin ou employee
     #[Route('/admin/orders/{id}', methods: ['DELETE'], name: 'delete')]
-    #[IsGranted(new Expression("is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')"))]
+    #[IsGranted('ROLE_EMPLOYEE')]
     #[OA\Delete(
         tags: ["Orders"],
         summary: "Supprimer une commande",
@@ -528,7 +528,7 @@ final class OrdersController extends AbstractController
 
     // afficher toutes les commandes pour les employés et les admins et les filtrer par statut, date de livraison ou menu
     #[Route('/admin/orders', methods: ['GET'], name: 'admin_index')]
-    #[IsGranted(new Expression("is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')"))]
+    #[IsGranted('ROLE_EMPLOYEE')]
 
     #[OA\Get(
         tags: ["Orders"],
@@ -596,7 +596,53 @@ final class OrdersController extends AbstractController
 
     // Modifier une commande par un admin ou un employé
     #[Route('/admin/orders/{id}/edit', methods: ['PUT'], name: 'admin_edit')]
-    #[IsGranted(new Expression("is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')"))]
+    #[IsGranted('ROLE_EMPLOYEE')]
+    #[OA\Put(
+        tags: ["Orders"],
+        summary: "Modifier une commande (admin/employee)",
+        parameters: [
+            new OA\Parameter(
+                name: "id",
+                in: "path",
+                description: "ID de la commande à modifier",
+                required: true,
+                schema: new OA\Schema(type: "integer")
+            )
+        ],
+        requestBody: new OA\RequestBody(
+            description: "Détails à modifier (ex: numberOfPeople, deliveryAddress, etc.)",
+            required: true,
+            content: new OA\JsonContent(
+                example: [
+                    "numberOfPeople" => 20,
+                    "deliveryAddress" => "456 Rue Modifiée",
+                    "deliveryCity" => "Bordeaux",
+                    "deliveryPostalCode" => "33000",
+                    "deliveryDate" => "2026-04-01",
+                    "deliveryTime" => "20:00",
+                    "status" => "en_preparation"
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Commande modifiée avec succès"
+            ),
+            new OA\Response(
+                response: 400,
+                description: "La commande ne peut être modifiée à ce stade ou données invalides"
+            ),
+            new OA\Response(
+                response: 403,
+                description: "Accès non autorisé"
+            ),
+            new OA\Response(
+                response: 404,
+                description: "Commande non trouvée"
+            )
+        ]
+    )]
 
     public function editOrderByAdmin(Orders $order, Request $request): JsonResponse
     {
@@ -638,7 +684,7 @@ final class OrdersController extends AbstractController
 
     // Mettre à jour le statut d'une commande par un admin
     #[Route('/admin/orders/{id}/status', methods: ['PUT'], name: 'admin_update_status')]
-    #[IsGranted(new Expression("is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE')"))]
+    #[IsGranted('ROLE_EMPLOYEE')]
     #[OA\Put(
         tags: ["Orders"],
         summary: "Mettre à jour le statut d'une commande (admin)",

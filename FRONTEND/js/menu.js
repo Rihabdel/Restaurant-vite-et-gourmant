@@ -51,14 +51,14 @@ export async function displayMenus(menus) {
   const visibleMenus = menus.filter((menu) => menu.isAvailable === true);
   container.innerHTML = visibleMenus
     .map((menu) => {
-      const pictureUrl = sanitizeHtml(menu.picture)
+      const pictureUrl = menu.picture
         ? `http://localhost:8000/uploads/menus/${sanitizeHtml(menu.picture)}`
         : "/scss/images/viteGourmand.png";
       return `
             <div class="col-lg-3 col-md-4 mb-4 p-2">
                 <div class="card menu-card">
                     <div class="card-image">
-                        <img src="${pictureUrl}" class="card-img-top" alt="Image du menu ${pictureUrl}">
+                        <img src="${pictureUrl}" class="card-img-top" alt="${sanitizeHtml(menu.title)}"/>
                         <div class="action-image-buttons" data-show="ROLE_ADMIN,ROLE_EMPLOYEE" style="display:none">
                             <button class="btn btn-outline-light edit-img-menu-btn" data-id="${sanitizeHtml(menu.id)}">
                                 <i class="bi bi-pencil"></i> Modifier
